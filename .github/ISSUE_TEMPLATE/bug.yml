@@ -11,11 +11,14 @@ body:
       options:
         - Je ne sais pas
         - Développement
+        - Game design
         - Réseau
         - Animation
         - Sound design
         - Graphisme
         - Modélisation 3D
+        - Direction artistique et tech art
+        - Publication
         - Gestion de projet
     validations:
       required: true
