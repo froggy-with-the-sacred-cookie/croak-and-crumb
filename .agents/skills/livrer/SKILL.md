@@ -1,6 +1,6 @@
 ---
 name: livrer
-description: Prendre une tâche du tableau GitHub Projects de Froggy, puis la livrer jusqu'à la fusion : branche, commits, push, pull request vers develop, relecture et suivi de la carte. À charger quand on prend une tâche, avant un commit, un push ou une pull request, pour relire la pull request d'un autre, et quand on dit « livre », « commite », « pousse » ou « ouvre la PR ».
+description: Prendre une tâche du tableau GitHub Projects de Froggy, puis la livrer jusqu'à la fusion : branche, commits, push, pull request vers develop, relecture et suivi de la carte. À charger quand on crée ou prend une tâche, avant un commit, un push ou une pull request, pour relire la pull request d'un autre, et quand on dit « livre », « commite », « pousse » ou « ouvre la PR ».
 ---
 
 # Livrer une tâche
@@ -12,14 +12,18 @@ skill dit l'ordre des gestes. Il ne donne aucun droit en plus : chaque commit et
 
 1. Sur le [tableau](https://github.com/orgs/froggy-with-the-sacred-cookie/projects/1), prendre une carte « Prêt » de
    son domaine, priorité Haute d'abord. Une carte « En cours » ou « En revue » appartient à quelqu'un.
-2. Lire l'issue en entier. Si le résultat attendu ou la façon de le vérifier manque, poser la question en commentaire
-   et laisser la carte où elle est.
+2. Lire l'issue en entier. Si « Résultat attendu » ou « C'est fini quand… » manque ou reste flou, poser la question en
+   commentaire et laisser la carte où elle est.
 3. S'assigner l'issue (`gh issue edit <n> --add-assignee @me`), passer la carte « En cours », et écrire sa branche
    dans un commentaire de l'issue.
 
 Une IA change le statut d'une carte avec `gh project item-edit` : les identifiants se lisent avec
 `gh project field-list 1 --owner froggy-with-the-sacred-cookie --format json` et
 `gh project item-list 1 --owner froggy-with-the-sacred-cookie --format json`. Un humain fait glisser la carte.
+
+Créer une issue : par le formulaire **Tâche** ou **Bug** sur GitHub, qui la pose seul sur le tableau. Une IA passe par
+`gh issue create --body-file <fichier>`, avec les titres du formulaire (`AGENTS.md`, « Les tâches »), puis l'ajoute au
+tableau : `gh project item-add 1 --owner froggy-with-the-sacred-cookie --url <adresse de l'issue>`.
 
 ## 2. Travailler sur sa branche
 
@@ -48,7 +52,7 @@ git switch -c feature/<sujet>      # ou fix/<sujet>, art/<sujet>
 2. Pousser, sur demande : `git push -u origin <branche>`.
 3. Ouvrir la pull request vers `develop`, sur demande : `gh pr create --base develop --draft`. Elle suit le
    [modèle](../../../.github/pull_request_template.md) : `Closes #n` en première ligne si elle termine l'issue (l'issue
-   se ferme à la fusion), `Partie de #n` sinon.
+   se ferme à la fusion), `Partie de #n` sinon. Remplir Ce qui change, Comment le voir, Choix à valider et Vérifié.
 4. Elle reste en brouillon tant que les vérifications ne sont pas faites ou qu'une question attend l'équipe. Prête
    (`gh pr ready <n>`) : passer la carte « En revue ». Repassée en brouillon (`gh pr ready <n> --undo`) : « En cours ».
 
@@ -56,7 +60,8 @@ git switch -c feature/<sujet>      # ou fix/<sujet>, art/<sujet>
 
 - Une approbation d'un autre membre est obligatoire. Une nouvelle modification annule l'approbation, et les discussions
   doivent être résolues.
-- Qui relit commence par « Décisions prises par l'IA », puis teste en jeu ce qui se juge à l'œil ou à l'oreille.
+- Qui relit commence par « Choix à valider », puis suit « Comment le voir » et teste en jeu ce qui se juge à l'œil ou
+  à l'oreille.
 - Une IA ne fusionne pas. L'auteur fusionne une fois l'approbation reçue ; la branche s'efface toute seule sur GitHub.
 - En local, ensuite : `git switch develop && git pull && git branch -d <branche>`.
 - Laisser le relais dans l'issue : ce qui est fait, la pull request, les vérifications, la suite.

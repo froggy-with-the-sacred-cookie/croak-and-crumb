@@ -65,5 +65,6 @@ Les tâches sont suivies dans le [tableau GitHub Projects](https://github.com/or
 Domaines : développement (arènes, météo, caméra, personnages, multijoueur, capacités, objets, score, équilibrage,
 menus), animation, sound design, graphisme (HUD), modélisation 3D, réseau, gestion de projet.
 
-Prendre une tâche et la livrer jusqu'à la pull request : skill [`livrer`](.claude/skills/livrer/SKILL.md). Une pull
-request suit le [modèle](.github/pull_request_template.md).
+Prendre une tâche et la livrer jusqu'à la pull request : skill [`livrer`](.claude/skills/livrer/SKILL.md). Une issue
+se crée par le formulaire **Tâche** ou **Bug** (*New issue*), une pull request suit le
+[modèle](.github/pull_request_template.md). Une idée de design va dans Notion.

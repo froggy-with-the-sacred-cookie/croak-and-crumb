@@ -2,22 +2,24 @@ Closes #
 
 <!-- Closes #n ferme l'issue à la fusion. Pour une partie seulement : Partie de #n. Garde une seule de ces lignes. -->
 
-## Changement
+## Ce qui change
 
-<!-- Ce qui change pour le joueur ou pour l'équipe. Une capture, une vidéo ou un son si ça se voit ou s'entend. -->
+<!-- En une ou deux phrases, pour quelqu'un d'un autre domaine.
+Glisse une capture, une vidéo ou un son : GitHub les accepte ici. -->
 
-## Décisions prises par l'IA
+## Comment le voir
 
-<!-- Si une IA a travaillé dessus : les choix faits sans consigne, les hypothèses à vérifier, ce qui a été laissé de
-côté et pourquoi. Sinon, « Aucune ». Qui relit commence ici. -->
+<!-- La scène à ouvrir et quoi faire (touches, nombre de joueurs).
+Pour un asset ou un son : où il est utilisé dans le jeu. -->
 
-## Vérifications
+## Choix à valider
 
-<!-- Ce qui a été lancé et le résultat réel : compilation, tests, partie jouée (avec combien de clients). Ce qui n'a
-pas pu être vérifié. -->
+<!-- Ce que toi ou ton IA avez décidé sans consigne, ce qui reste à trancher. Sinon : « Aucun ».
+Qui relit commence ici. -->
 
-- [ ] Compile sans erreur nouvelle (console Unity lue).
-- [ ] Testé en mode Play, avec plusieurs clients si le réseau change.
-- [ ] Nouveaux assets et scripts avec leur `.meta`, fichiers lourds en LFS.
-- [ ] Assets externes : source et licence notées, publication permise.
-- [ ] Carte du tableau passée « En revue ».
+## Vérifié
+
+- [ ] Le projet s'ouvre dans Unity sans erreur nouvelle
+- [ ] Testé en jeu, à plusieurs joueurs si le réseau change
+- [ ] Seulement mes fichiers : aucune scène d'un autre modifiée par erreur
+- [ ] Assets externes : source et licence notées

@@ -40,8 +40,11 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
 - Colonnes : Backlog (à préciser), Prêt (claire, peut être prise), En cours, En revue (pull request prête à relire),
   Terminé.
 - Une carte « En cours » ou « En revue » appartient à quelqu'un : ne pas la reprendre sans son accord.
-- Une tâche dit le résultat attendu (jouable, visible ou audible), comment le vérifier et ce qui est hors périmètre. Une
-  tâche floue reste en Backlog, sa question en commentaire.
+- Une issue se crée par le formulaire **Tâche** ou **Bug** de GitHub. Une IA qui la crée en ligne de commande reprend
+  les titres du formulaire en `###`, dans le même ordre : Domaine, Résultat attendu, C'est fini quand…, Références,
+  Hors sujet (pour un bug : Domaine, Ce qui se passe, Ce qui devrait se passer, Pour le reproduire, Capture ou vidéo).
+- Une tâche floue reste en Backlog, sa question en commentaire. En passant une carte en « Prêt », on recopie son
+  Domaine sur la carte du tableau.
 - Prendre une tâche, commiter, pousser, ouvrir et relire une pull request : skill `livrer`.
 
 ## Garde-fous (pour toute IA, toute session)
