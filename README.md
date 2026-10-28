@@ -53,14 +53,18 @@ de modifier une scène ou un préfabriqué partagé (les conflits de scène se f
 Le projet est prêt pour Claude Code et Codex :
 
 - [`AGENTS.md`](AGENTS.md) : les règles communes à toutes les IA (lues par Codex, chargées par [`CLAUDE.md`](CLAUDE.md)).
-- `.claude/skills/` : 17 skills (savoir-faire repris de prototypes précédents : mouvement, caméra, multijoueur, assets
+- `.claude/skills/` : 18 skills (savoir-faire repris de prototypes précédents : mouvement, caméra, multijoueur, assets
   avec Gemini / Meshy / Blender, son, tech art…). Copie pour Codex dans `.agents/skills/` : après une modification,
   `python3 Tools/sync_skills.py`.
 - [`Docs/IA/HERITAGE.md`](Docs/IA/HERITAGE.md) : d'où vient chaque skill.
-- `Tools/` : scripts d'appoint (Meshy, Blender, client du MCP de Unity, outils d'art).
+- `Tools/` : scripts d'appoint (Meshy, Blender, client du MCP de Unity, outils d'art, veille du tableau).
 
 ## Organisation
 
-Les tâches sont suivies dans GitHub Projects. Domaines : développement (arènes, météo, caméra, personnages,
-multijoueur, capacités, objets, score, équilibrage, menus), animation, sound design, graphisme (HUD), modélisation 3D,
-réseau.
+Les tâches sont suivies dans le [tableau GitHub Projects](https://github.com/orgs/froggy-with-the-sacred-cookie/projects/1).
+Domaines : développement (arènes, météo, caméra, personnages, multijoueur, capacités, objets, score, équilibrage,
+menus), animation, sound design, graphisme (HUD), modélisation 3D, réseau, gestion de projet.
+
+Prendre une tâche et la livrer jusqu'à la pull request : skill [`livrer`](.claude/skills/livrer/SKILL.md). Une issue
+se crée par le formulaire **Tâche** ou **Bug** (*New issue*), une pull request suit le
+[modèle](.github/pull_request_template.md). Une idée de design va dans Notion.

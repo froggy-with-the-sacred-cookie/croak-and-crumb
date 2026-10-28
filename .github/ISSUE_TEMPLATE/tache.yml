@@ -1,0 +1,47 @@
+name: Tâche
+description: Quelque chose à faire (code, asset, son, animation, HUD…). Une idée de design va dans Notion.
+projects: ["froggy-with-the-sacred-cookie/1"]
+body:
+  - type: markdown
+    attributes:
+      value: Une tâche, c'est un résultat qu'on peut jouer, voir ou entendre. Elle arrive en Backlog sur le tableau.
+  - type: dropdown
+    id: domaine
+    attributes:
+      label: Domaine
+      options:
+        - Développement
+        - Réseau
+        - Animation
+        - Sound design
+        - Graphisme
+        - Modélisation 3D
+        - Gestion de projet
+    validations:
+      required: true
+  - type: textarea
+    id: resultat
+    attributes:
+      label: Résultat attendu
+      description: Ce que le joueur ou l'équipe pourra faire, voir ou entendre.
+      placeholder: "Exemple : Froggy peut sauter d'un nénuphar à l'autre."
+    validations:
+      required: true
+  - type: textarea
+    id: fin
+    attributes:
+      label: C'est fini quand…
+      description: Comment on vérifie que c'est fait.
+      placeholder: "Exemple : en partie à 2 comme à 4, Froggy saute d'un nénuphar à l'autre sans tomber à l'eau."
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: Références
+      description: Images, lien Notion, exemple d'un autre jeu. Tu peux glisser des images ici.
+  - type: textarea
+    id: hors-sujet
+    attributes:
+      label: Hors sujet
+      description: Ce que cette tâche ne fait pas.

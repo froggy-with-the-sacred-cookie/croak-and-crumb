@@ -1,0 +1,51 @@
+name: Bug
+description: Quelque chose ne marche pas comme prévu.
+labels: ["bug"]
+projects: ["froggy-with-the-sacred-cookie/1"]
+body:
+  - type: dropdown
+    id: domaine
+    attributes:
+      label: Domaine
+      description: Si tu ne sais pas, choisis « Je ne sais pas ».
+      options:
+        - Je ne sais pas
+        - Développement
+        - Réseau
+        - Animation
+        - Sound design
+        - Graphisme
+        - Modélisation 3D
+        - Gestion de projet
+    validations:
+      required: true
+  - type: textarea
+    id: constat
+    attributes:
+      label: Ce qui se passe
+      placeholder: "Exemple : à 4 joueurs, Froggy traverse le nénuphar au lieu de s'y poser."
+    validations:
+      required: true
+  - type: textarea
+    id: attendu
+    attributes:
+      label: Ce qui devrait se passer
+      placeholder: "Exemple : Froggy se pose sur le nénuphar."
+    validations:
+      required: true
+  - type: textarea
+    id: reproduire
+    attributes:
+      label: Pour le reproduire
+      description: La scène, les étapes, le nombre de joueurs, et si tu étais l'hôte ou un client.
+      placeholder: |
+        1. Ouvrir la scène …
+        2. Lancer une partie à … joueurs
+        3. …
+    validations:
+      required: true
+  - type: textarea
+    id: capture
+    attributes:
+      label: Capture ou vidéo
+      description: Tu peux glisser une image ou une vidéo ici.

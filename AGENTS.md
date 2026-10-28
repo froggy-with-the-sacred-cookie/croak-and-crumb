@@ -19,7 +19,8 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
 - Unity **6000.5.9f1**, URP 17.5, Input System 1.20 (`Assets/InputSystem_Actions.inputactions`).
 - Réseau : **FishNet** (choisi dans Notion, pas encore installé). Vérifier la documentation de la version installée
   avant d'écrire du code réseau : ne jamais écrire une API FishNet de mémoire.
-- Gestion de projet : GitHub Projects.
+- Gestion de projet : le [tableau GitHub Projects](https://github.com/orgs/froggy-with-the-sacred-cookie/projects/1),
+  voir « Les tâches ».
 - Dépôt : https://github.com/froggy-with-the-sacred-cookie/croak-and-crumb
 
 ## Les branches
@@ -31,6 +32,22 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
 - On travaille sur une branche partie de `develop` : `feature/<sujet>`, `fix/<sujet>`, `art/<sujet>`, puis une pull
   request vers `develop`. La branche s'efface à la fusion.
 - Une IA ne commite jamais sur `main` ni sur `develop`, et n'ouvre une pull request que sur demande.
+
+## Les tâches
+
+- Chaque tâche est une issue de ce dépôt, sur le tableau, avec un **Domaine** et une **Priorité** (Haute, Moyenne,
+  Basse).
+- Colonnes : Backlog (à préciser), Prêt (claire, peut être prise), En cours, En revue (pull request prête à relire),
+  Terminé.
+- Une carte « En cours » ou « En revue » appartient à quelqu'un : ne pas la reprendre sans son accord.
+- Une issue se crée par le formulaire **Tâche** ou **Bug** de GitHub. Une IA qui la crée en ligne de commande reprend
+  les titres du formulaire en `###`, dans le même ordre : Domaine, Résultat attendu, C'est fini quand…, Références,
+  Hors sujet (pour un bug : Domaine, Ce qui se passe, Ce qui devrait se passer, Pour le reproduire, Capture ou vidéo).
+- La case Domaine d'une carte se remplit toute seule depuis le formulaire, quand elle est vide : une veille de la
+  gestion de projet lance `Tools/tableau_domaine.py`. Une case remplie n'est jamais réécrite ; un bug en « Je ne sais
+  pas » se règle à la main, au tri.
+- Une tâche floue reste en Backlog, sa question en commentaire.
+- Prendre une tâche, commiter, pousser, ouvrir et relire une pull request : skill `livrer`.
 
 ## Garde-fous (pour toute IA, toute session)
 
@@ -62,6 +79,7 @@ d'écrire ; plusieurs si besoin.
 | Tu touches à… | Skill |
 |---|---|
 | Début de session, « continue », état des lieux, avant de dire « fini » | `session-froggy` |
+| Prendre une tâche du tableau, commit, push, pull request, relecture | `livrer` |
 | Piloter ou tester Unity par une IA (MCP), captures, tests, build | `unity-mcp` |
 | Réseau, autorité, synchronisation, bots, simulation d'équilibrage, anti-boule-de-neige | `multijoueur-equilibrage` |
 | Contrôleur de Froggy, saut, nage, vitesse, tolérances | `ressenti-mouvement` |
