@@ -16,7 +16,8 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
 
 ## La technique
 
-- Unity **6000.5.9f1**, URP 17.5, Input System 1.20 (`Assets/InputSystem_Actions.inputactions`).
+- Unity **6000.6.7f1** (tout le monde exactement la même ; en changer se décide en équipe, par une PR), URP, Input
+  System (`Assets/InputSystem_Actions.inputactions`).
 - Réseau : **FishNet** (choisi dans Notion, pas encore installé). Vérifier la documentation de la version installée
   avant d'écrire du code réseau : ne jamais écrire une API FishNet de mémoire.
 - Gestion de projet : GitHub Projects.

@@ -9,7 +9,8 @@ météo qui change la partie (la pluie accélère les grenouilles), caméra à l
 
 ## Prérequis
 
-- **Unity 6000.5.9f1** (via Unity Hub), avec le module de build de ta plateforme.
+- **Unity 6000.6.7f1**, exactement (via Unity Hub), avec le module de build de ta plateforme. Une autre version
+  réécrit les réglages du projet à l'ouverture et crée des conflits : changer de version se décide en équipe, par une PR.
 - **Git LFS** : les images, modèles et sons sont stockés en LFS (`.gitattributes`).
 - Réseau : **FishNet** (pas encore installé).
 
