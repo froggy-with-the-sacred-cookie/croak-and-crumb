@@ -112,3 +112,10 @@ InitTestScene*.unity*
 
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
+
+# Captures, planches et tirages des IA (lourds, hors dépôt)
+/Captures/
+# Originaux des GLB Meshy remplacés par Tools/meshy/unpack_glb.py
+/Tools/meshy/glb_original/
+# Python
+__pycache__/
