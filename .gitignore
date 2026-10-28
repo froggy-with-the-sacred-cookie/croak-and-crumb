@@ -119,3 +119,9 @@ InitTestScene*.unity*
 /Tools/meshy/glb_original/
 # Python
 __pycache__/
+
+# Secrets et réglages locaux des IA
+.env*
+!.env.example
+CLAUDE.local.md
+.claude/settings.local.json
