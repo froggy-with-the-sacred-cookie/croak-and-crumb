@@ -81,6 +81,11 @@ Pièges :
 - Une capture prise après l'arrêt du mode Play montre l'aperçu de l'éditeur : vérifier `isPlaying`.
 - Les captures vont dans un dossier ignoré par git (`Captures/`) ; sortir en JPG, le disque se remplit vite.
 - Comparer : composer les captures côte à côte et regarder ; un écart de pixels chiffré ne suffit pas.
+- **Simuler des appuis par le MCP ne marche pas** (Froggy, 28 octobre 2026, MCP officiel de Unity, `Unity_RunCommand`) :
+  `InputSystem.QueueStateEvent` sur un clavier ou une manette virtuelle, puis `Step()` ou `InputSystem.Update()`, ne
+  change pas l'état de l'appareil (éditeur sans focus), même en passant `backgroundBehavior` à `IgnoreFocus`. Et ce
+  MCP refuse `System.Reflection`. Pour mesurer un contrôleur sans humain : un test avec `InputTestFixture`, ou un
+  point d'entrée de test public dans le contrôleur.
 
 ## 4. Tests
 
