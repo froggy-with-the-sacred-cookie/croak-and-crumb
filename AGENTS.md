@@ -43,8 +43,10 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
 - Une issue se crée par le formulaire **Tâche** ou **Bug** de GitHub. Une IA qui la crée en ligne de commande reprend
   les titres du formulaire en `###`, dans le même ordre : Domaine, Résultat attendu, C'est fini quand…, Références,
   Hors sujet (pour un bug : Domaine, Ce qui se passe, Ce qui devrait se passer, Pour le reproduire, Capture ou vidéo).
-- Une tâche floue reste en Backlog, sa question en commentaire. En passant une carte en « Prêt », on recopie son
-  Domaine sur la carte du tableau.
+- La case Domaine d'une carte se remplit toute seule depuis le formulaire, quand elle est vide : une veille de la
+  gestion de projet lance `Tools/tableau_domaine.py`. Une case remplie n'est jamais réécrite ; un bug en « Je ne sais
+  pas » se règle à la main, au tri.
+- Une tâche floue reste en Backlog, sa question en commentaire.
 - Prendre une tâche, commiter, pousser, ouvrir et relire une pull request : skill `livrer`.
 
 ## Garde-fous (pour toute IA, toute session)

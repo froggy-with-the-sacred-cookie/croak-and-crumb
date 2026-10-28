@@ -57,7 +57,7 @@ Le projet est prêt pour Claude Code et Codex :
   avec Gemini / Meshy / Blender, son, tech art…). Copie pour Codex dans `.agents/skills/` : après une modification,
   `python3 Tools/sync_skills.py`.
 - [`Docs/IA/HERITAGE.md`](Docs/IA/HERITAGE.md) : d'où vient chaque skill.
-- `Tools/` : scripts d'appoint (Meshy, Blender, client du MCP de Unity, outils d'art).
+- `Tools/` : scripts d'appoint (Meshy, Blender, client du MCP de Unity, outils d'art, veille du tableau).
 
 ## Organisation
 
