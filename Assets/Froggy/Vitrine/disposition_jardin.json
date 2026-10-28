@@ -1,0 +1,1023 @@
+{
+ "elements": [
+  {
+   "nom": "Pont_Taiko_Rouge",
+   "pos": [
+    1.852,
+    0,
+    -1.25
+   ],
+   "lacet": -90,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Lanterne_Yukimi",
+   "pos": [
+    -8.476,
+    -0.1,
+    4.336
+   ],
+   "lacet": -4.42,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Tsukubai",
+   "pos": [
+    -4.0,
+    0.0,
+    8.6
+   ],
+   "lacet": 0,
+   "echelle": 1.0
+  },
+  {
+   "nom": "ShishiOdoshi",
+   "pos": [
+    10.45,
+    0.0,
+    -1.8
+   ],
+   "lacet": -90,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Rocher_Mousse",
+   "pos": [
+    -1.92,
+    0.0,
+    5.469
+   ],
+   "lacet": -40.46,
+   "echelle": 0.9
+  },
+  {
+   "nom": "Rocher_Mousse",
+   "pos": [
+    -7.546,
+    0.0,
+    -3.35
+   ],
+   "lacet": -141.42,
+   "echelle": 1.1
+  },
+  {
+   "nom": "Rocher_Mousse",
+   "pos": [
+    4.507,
+    0.0,
+    1.752
+   ],
+   "lacet": -246.19,
+   "echelle": 0.7
+  },
+  {
+   "nom": "Rocher_Mousse",
+   "pos": [
+    -6.3,
+    -0.55,
+    2.0
+   ],
+   "lacet": -49.93,
+   "echelle": 1.25
+  },
+  {
+   "nom": "Galets",
+   "pos": [
+    -3.273,
+    0.0,
+    -3.578
+   ],
+   "lacet": -40.48,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Galets",
+   "pos": [
+    -1.609,
+    0.0,
+    -3.129
+   ],
+   "lacet": -83.45,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Galets",
+   "pos": [
+    4.589,
+    0.0,
+    -5.127
+   ],
+   "lacet": -272.73,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Iris",
+   "pos": [
+    3.632,
+    0.0,
+    -4.896
+   ],
+   "lacet": -266.64,
+   "echelle": 0.994
+  },
+  {
+   "nom": "Iris",
+   "pos": [
+    5.489,
+    0.0,
+    -5.356
+   ],
+   "lacet": -49.17,
+   "echelle": 1.149
+  },
+  {
+   "nom": "Iris",
+   "pos": [
+    7.66,
+    0.0,
+    -5.022
+   ],
+   "lacet": -161.19,
+   "echelle": 1.111
+  },
+  {
+   "nom": "Iris",
+   "pos": [
+    -10.527,
+    0.0,
+    -0.615
+   ],
+   "lacet": -358.68,
+   "echelle": 1.074
+  },
+  {
+   "nom": "Iris",
+   "pos": [
+    -9.169,
+    0.0,
+    -2.269
+   ],
+   "lacet": -7.33,
+   "echelle": 0.978
+  },
+  {
+   "nom": "Iris",
+   "pos": [
+    -6.172,
+    0.0,
+    -3.595
+   ],
+   "lacet": -145.06,
+   "echelle": 1.232
+  },
+  {
+   "nom": "Pin_Niwaki",
+   "pos": [
+    -11.94,
+    0.0,
+    1.0
+   ],
+   "lacet": 0,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Pin_Niwaki",
+   "pos": [
+    14.6,
+    0.0,
+    2.0
+   ],
+   "lacet": -200,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Erable_Momiji",
+   "pos": [
+    12.8,
+    0.0,
+    -6.5
+   ],
+   "lacet": -71.46,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Erable_Momiji",
+   "pos": [
+    -1.2,
+    0.0,
+    11.0
+   ],
+   "lacet": -118.91,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Cerisier_1",
+   "pos": [
+    -11.0,
+    1.1,
+    -8.5
+   ],
+   "lacet": -131.36,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Petales_Sol",
+   "pos": [
+    -10.7,
+    1.069,
+    -8.9
+   ],
+   "lacet": -343.84,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Cerisier_2",
+   "pos": [
+    4.8,
+    0.0,
+    -8.8
+   ],
+   "lacet": -75.72,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Petales_Sol",
+   "pos": [
+    5.1,
+    0.0,
+    -9.2
+   ],
+   "lacet": -78.09,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Cerisier_1",
+   "pos": [
+    -15.2,
+    0.0,
+    -2.0
+   ],
+   "lacet": -210.56,
+   "echelle": 0.85
+  },
+  {
+   "nom": "Petales_Sol",
+   "pos": [
+    -14.9,
+    0.0,
+    -2.4
+   ],
+   "lacet": -197.06,
+   "echelle": 0.85
+  },
+  {
+   "nom": "Bambous",
+   "pos": [
+    -15.6,
+    0.0,
+    12.4
+   ],
+   "lacet": -343.35,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Bambous",
+   "pos": [
+    -11.2,
+    0.0,
+    12.7
+   ],
+   "lacet": -301.93,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Bambous",
+   "pos": [
+    -6.6,
+    0.0,
+    12.9
+   ],
+   "lacet": -127.98,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Bambous",
+   "pos": [
+    15.8,
+    0.0,
+    12.3
+   ],
+   "lacet": -73.39,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Bambous",
+   "pos": [
+    16.3,
+    0.0,
+    7.2
+   ],
+   "lacet": -301.11,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Cloture_Bambou",
+   "pos": [
+    -15.0,
+    0.0,
+    11.3
+   ],
+   "lacet": 0,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Cloture_Bambou",
+   "pos": [
+    -12.6,
+    0.0,
+    11.3
+   ],
+   "lacet": 0,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Cloture_Bambou",
+   "pos": [
+    -10.2,
+    0.0,
+    11.3
+   ],
+   "lacet": 0,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Cloture_Bambou",
+   "pos": [
+    -7.8,
+    0.0,
+    11.3
+   ],
+   "lacet": 0,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Cloture_Bambou",
+   "pos": [
+    -5.4,
+    0.0,
+    11.3
+   ],
+   "lacet": 0,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Cloture_Bambou",
+   "pos": [
+    -3.0,
+    0.0,
+    11.3
+   ],
+   "lacet": 0,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Cloture_Bambou",
+   "pos": [
+    -0.6,
+    0.0,
+    11.3
+   ],
+   "lacet": 0,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Gravier_Ratisse",
+   "pos": [
+    10.0,
+    0.0,
+    8.6
+   ],
+   "lacet": 0,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Rocher_Dresse",
+   "pos": [
+    8.2,
+    0,
+    9.1
+   ],
+   "lacet": -356.03,
+   "echelle": 1.092
+  },
+  {
+   "nom": "Rocher_Dresse",
+   "pos": [
+    11.1,
+    0,
+    7.8
+   ],
+   "lacet": -10.93,
+   "echelle": 0.902
+  },
+  {
+   "nom": "Rocher_Dresse",
+   "pos": [
+    12.4,
+    0,
+    9.8
+   ],
+   "lacet": -264.62,
+   "echelle": 0.712
+  },
+  {
+   "nom": "Nenuphar_Petit",
+   "pos": [
+    4.407,
+    -0.135,
+    -3.107
+   ],
+   "lacet": -230.72,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Nenuphar_Moyen",
+   "pos": [
+    -2.499,
+    -0.135,
+    1.785
+   ],
+   "lacet": -301.02,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Nenuphar_Petit",
+   "pos": [
+    -6.624,
+    -0.135,
+    -0.288
+   ],
+   "lacet": -288.2,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Nenuphar_Petit",
+   "pos": [
+    6.98,
+    -0.135,
+    -0.063
+   ],
+   "lacet": -179.33,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Nenuphar_Petit",
+   "pos": [
+    -4.945,
+    -0.135,
+    -1.178
+   ],
+   "lacet": -220.58,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Nenuphar_Grand",
+   "pos": [
+    -2.934,
+    -0.135,
+    -2.149
+   ],
+   "lacet": -63.4,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Nenuphar_Moyen",
+   "pos": [
+    4.144,
+    -0.135,
+    -0.215
+   ],
+   "lacet": -258.12,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Nenuphar_Petit",
+   "pos": [
+    -8.241,
+    -0.135,
+    -0.611
+   ],
+   "lacet": -50.63,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Nenuphar_Petit",
+   "pos": [
+    -0.774,
+    -0.135,
+    0.198
+   ],
+   "lacet": -336.75,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Nenuphar_Petit",
+   "pos": [
+    -4.481,
+    -0.135,
+    4.656
+   ],
+   "lacet": -208.58,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Nenuphar_Moyen",
+   "pos": [
+    6.346,
+    -0.135,
+    -2.583
+   ],
+   "lacet": -254.1,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Nenuphar_Petit",
+   "pos": [
+    -9.522,
+    -0.135,
+    0.948
+   ],
+   "lacet": -327.51,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Nenuphar_Petit",
+   "pos": [
+    -8.461,
+    -0.135,
+    3.288
+   ],
+   "lacet": -95.75,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Nenuphar_Petit",
+   "pos": [
+    8.414,
+    -0.135,
+    -1.323
+   ],
+   "lacet": -148.7,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Nenuphar_Petit",
+   "pos": [
+    -5.542,
+    -0.135,
+    -2.803
+   ],
+   "lacet": -20.36,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Nenuphar_Moyen",
+   "pos": [
+    -0.131,
+    -0.135,
+    2.593
+   ],
+   "lacet": -231.32,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Nenuphar_Petit",
+   "pos": [
+    5.658,
+    -0.135,
+    -4.308
+   ],
+   "lacet": -41.98,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Nenuphar_Petit",
+   "pos": [
+    -6.361,
+    -0.135,
+    4.356
+   ],
+   "lacet": -341.31,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Nenuphar_Petit",
+   "pos": [
+    7.924,
+    -0.135,
+    -3.47
+   ],
+   "lacet": -215.53,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Nenuphar_Petit",
+   "pos": [
+    5.691,
+    -0.135,
+    0.736
+   ],
+   "lacet": -41.27,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Nenuphar_Petit",
+   "pos": [
+    -0.794,
+    -0.135,
+    -1.617
+   ],
+   "lacet": -158.9,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Nenuphar_Petit",
+   "pos": [
+    -7.22,
+    -0.135,
+    -1.771
+   ],
+   "lacet": -288.34,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Nenuphar_Petit",
+   "pos": [
+    -3.461,
+    -0.135,
+    0.101
+   ],
+   "lacet": -208.08,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Nenuphar_Petit",
+   "pos": [
+    -2.646,
+    -0.135,
+    3.802
+   ],
+   "lacet": -276.33,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Fleur_Nenuphar",
+   "pos": [
+    -0.781,
+    -0.12,
+    3.602
+   ],
+   "lacet": -216.83,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Fleur_Nenuphar",
+   "pos": [
+    -7.616,
+    -0.12,
+    3.599
+   ],
+   "lacet": -194.42,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Fleur_Nenuphar",
+   "pos": [
+    -3.698,
+    -0.12,
+    1.843
+   ],
+   "lacet": -219.75,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Fleur_Nenuphar",
+   "pos": [
+    -8.745,
+    -0.12,
+    -1.357
+   ],
+   "lacet": -131.36,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Fleur_Nenuphar",
+   "pos": [
+    -4.184,
+    -0.12,
+    -3.147
+   ],
+   "lacet": -74.05,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Fleur_Nenuphar",
+   "pos": [
+    -5.1,
+    -0.12,
+    -2.019
+   ],
+   "lacet": -253.49,
+   "echelle": 1.0
+  },
+  {
+   "nom": "Fleur_Nenuphar",
+   "pos": [
+    6.543,
+    -0.12,
+    -4.472
+   ],
+   "lacet": -171.01,
+   "echelle": 1.0
+  },
+  {
+   "nom": "PierreGue_1",
+   "pos": [
+    1.466,
+    0.0,
+    -11.092
+   ],
+   "lacet": -263.44,
+   "echelle": 1.0
+  },
+  {
+   "nom": "PierreGue_1",
+   "pos": [
+    0.728,
+    0.0,
+    -10.445
+   ],
+   "lacet": -328.04,
+   "echelle": 1.0
+  },
+  {
+   "nom": "PierreGue_1",
+   "pos": [
+    0.763,
+    0.0,
+    -9.501
+   ],
+   "lacet": -230.64,
+   "echelle": 1.0
+  },
+  {
+   "nom": "PierreGue_1",
+   "pos": [
+    0.234,
+    0.0,
+    -8.769
+   ],
+   "lacet": -282.81,
+   "echelle": 1.0
+  },
+  {
+   "nom": "PierreGue_3",
+   "pos": [
+    0.532,
+    0.0,
+    -7.922
+   ],
+   "lacet": -107.69,
+   "echelle": 1.0
+  },
+  {
+   "nom": "PierreGue_3",
+   "pos": [
+    0.233,
+    0.0,
+    -7.087
+   ],
+   "lacet": -32.49,
+   "echelle": 1.0
+  },
+  {
+   "nom": "PierreGue_1",
+   "pos": [
+    0.765,
+    0.0,
+    -6.343
+   ],
+   "lacet": -137.89,
+   "echelle": 1.0
+  },
+  {
+   "nom": "PierreGue_2",
+   "pos": [
+    0.726,
+    0.0,
+    -5.41
+   ],
+   "lacet": -53.0,
+   "echelle": 1.0
+  },
+  {
+   "nom": "PierreGue_3",
+   "pos": [
+    1.468,
+    0.0,
+    -4.754
+   ],
+   "lacet": -88.31,
+   "echelle": 1.0
+  },
+  {
+   "nom": "PierreGue_2",
+   "pos": [
+    1.705,
+    0.0,
+    -3.745
+   ],
+   "lacet": -91.59,
+   "echelle": 1.0
+  },
+  {
+   "nom": "PierreGue_2",
+   "pos": [
+    1.254,
+    0.0,
+    4.12
+   ],
+   "lacet": -298.99,
+   "echelle": 1.0
+  },
+  {
+   "nom": "PierreGue_3",
+   "pos": [
+    0.529,
+    0.0,
+    4.745
+   ],
+   "lacet": -183.66,
+   "echelle": 1.0
+  },
+  {
+   "nom": "PierreGue_2",
+   "pos": [
+    0.359,
+    0.0,
+    5.625
+   ],
+   "lacet": -51.25,
+   "echelle": 1.0
+  },
+  {
+   "nom": "PierreGue_3",
+   "pos": [
+    -0.584,
+    0.0,
+    6.084
+   ],
+   "lacet": -107.01,
+   "echelle": 1.0
+  },
+  {
+   "nom": "PierreGue_1",
+   "pos": [
+    -1.159,
+    0.0,
+    6.915
+   ],
+   "lacet": -177.06,
+   "echelle": 1.0
+  },
+  {
+   "nom": "PierreGue_3",
+   "pos": [
+    -2.195,
+    0.0,
+    6.964
+   ],
+   "lacet": -248.29,
+   "echelle": 1.0
+  },
+  {
+   "nom": "PierreGue_1",
+   "pos": [
+    -2.892,
+    0.0,
+    7.495
+   ],
+   "lacet": -262.38,
+   "echelle": 1.0
+  },
+  {
+   "nom": "PierreGue_1",
+   "pos": [
+    -3.784,
+    0.0,
+    7.217
+   ],
+   "lacet": -30.22,
+   "echelle": 1.0
+  }
+ ],
+ "depart": [
+  1.852,
+  0.0,
+  -12.0
+ ],
+ "bornes": [
+  -18.0,
+  18.0,
+  -14.0,
+  14.0
+ ],
+ "controle": [
+  -4.5,
+  -0.6,
+  1.0,
+  -11.0,
+  1.1,
+  -8.5
+ ],
+ "vues": [
+  {
+   "nom": "troisieme_personne",
+   "pos": [
+    1.852,
+    2.4,
+    -16.5
+   ],
+   "cible": [
+    1.852,
+    0.5,
+    -6.0
+   ]
+  },
+  {
+   "nom": "ensemble",
+   "pos": [
+    -2,
+    21,
+    -27
+   ],
+   "cible": [
+    0,
+    -1,
+    0
+   ]
+  },
+  {
+   "nom": "pont",
+   "pos": [
+    8.352,
+    2.2,
+    -7.25
+   ],
+   "cible": [
+    1.852,
+    0.6,
+    -1.25
+   ]
+  },
+  {
+   "nom": "nenuphars",
+   "pos": [
+    -6.0,
+    2.2,
+    -6.5
+   ],
+   "cible": [
+    -4.5,
+    -0.3,
+    2.0
+   ]
+  },
+  {
+   "nom": "gravier",
+   "pos": [
+    5.0,
+    3.2,
+    2.1
+   ],
+   "cible": [
+    10.0,
+    0,
+    8.6
+   ]
+  },
+  {
+   "nom": "cerisiers",
+   "pos": [
+    -4.0,
+    2.4,
+    -5.0
+   ],
+   "cible": [
+    -11.0,
+    1.8,
+    -8.5
+   ]
+  }
+ ]
+}
