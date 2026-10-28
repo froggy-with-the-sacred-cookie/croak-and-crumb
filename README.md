@@ -1,8 +1,12 @@
 # Croak & Crumb — Froggy et la recherche du cookie sacré
 
-Un jeu **multijoueur** de type *Capture The Flag*, de 2 à 4 joueurs. Chacun incarne Froggy, une grenouille humanoïde,
-dans des arènes variées (jungle, marécage, désert, oasis) : lacs et nénuphars pour des sauts précis, terrain étroit,
-météo qui change la partie (la pluie accélère les grenouilles), caméra à la première ou à la troisième personne.
+Un jeu **multijoueur** de type *Capture The Flag*, de 2 à 4 joueurs. Chacun incarne Froggy, une grenouille humanoïde :
+lacs et nénuphars pour des sauts précis, terrain étroit, météo qui change la partie (la pluie accélère les grenouilles),
+caméra à la première ou à la troisième personne.
+
+La première version se joue dans un seul environnement, le **jardin japonais**, en troisième personne ; les autres
+environnements viennent ensuite. Son périmètre est dans la page Notion
+[« V1 »](https://app.notion.com/p/4077e94430ba80d4b2fbed4ba5d9f6ee).
 
 > Le concept est en cours d'écriture. La référence du design est la page Notion
 > [« Froggy – Présentation du projet »](https://app.notion.com/p/4077e94430ba80caac00da616ba0e73c).
