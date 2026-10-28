@@ -125,3 +125,6 @@ __pycache__/
 !.env.example
 CLAUDE.local.md
 .claude/settings.local.json
+
+# Fichiers de macOS
+.DS_Store
