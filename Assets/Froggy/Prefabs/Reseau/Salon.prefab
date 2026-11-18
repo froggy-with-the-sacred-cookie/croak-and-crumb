@@ -118,7 +118,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Froggy.Reseau.Salon
   scenePartie: Vitrine_JardinJaponais
-  prefabJoueur: {fileID: 291364705442974439, guid: 3b18444832543a441b0a5971cb50b554, type: 3}
+  prefabJoueur: {fileID: 291364705442974439, guid: 8ba55335c39399f49837cff234bd6780, type: 3}
   apparitions:
   - {fileID: 4355821949841339020}
   - {fileID: 7292702660835036246}
