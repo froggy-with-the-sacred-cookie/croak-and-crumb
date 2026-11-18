@@ -41,6 +41,9 @@ namespace Froggy.Regles
 
         public ReglesCookies Regles { get; private set; }
 
+        /// <summary>Le score provisoire à l'écran : le HUD (P6-02) l'éteint quand il prend sa place.</summary>
+        public bool ScoreProvisoire { get => scoreProvisoire; set => scoreProvisoire = value; }
+
         /// <summary>En pause, rien ne se ramasse ni ne réapparaît (avant le départ, après la fin : DeroulementPartie).</summary>
         public bool EnPause { get; set; }
         public IReadOnlyList<PorteurCookies> Porteurs => porteurs;
