@@ -15647,8 +15647,9 @@ MonoBehaviour:
   - {fileID: 465349405}
   - {fileID: 465349404}
   hauteur: 1
-  modeleDeDepart: -1
+  modeleDeDepart: 2
   raccourcis: 0
+  volPourAtterrir: 0.25
 --- !u!1001 &1031166656
 PrefabInstance:
   m_ObjectHideFlags: 0
