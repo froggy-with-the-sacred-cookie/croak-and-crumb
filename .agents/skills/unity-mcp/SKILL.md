@@ -17,6 +17,11 @@ du MCP ; celui-ci dit comment ne pas casser.
 - **Quand la session perd les outils** (après un redémarrage de Unity) alors que le serveur répond encore (HTTP 406 sur
   `/mcp`) : l'appeler en JSON-RPC (`initialize`, puis `tools/call` avec l'en-tête `Mcp-Session-Id` et
   `Accept: application/json, text/event-stream`). Lovecraft avait un petit client Python pour ça (`Outils/unity.py`).
+- **Sans aucun MCP, la ligne de commande `unity` suffit** (Froggy, 28 octobre 2026 : rien sur le port 8080, le paquet
+  `com.unity.pipeline` est dans le projet) : `~/.unity/bin/unity status`, `unity command eval --project-path <projet>
+  '<C#>'` (C# récent, `return` donne le résultat), `unity recompile --project-path <projet>`. Après l'entrée en mode
+  Play, la connexion tombe le temps du rechargement (« No Pipeline instance found ») : `unity status --until-ready`
+  avant l'appel suivant. Les règles des sections 1 et 3 valent pareil (un appel pour vérifier, un pour agir).
 
 ## 1. Ne jamais recompiler pendant une partie
 
@@ -93,6 +98,10 @@ Pièges :
   scène vide).
 - **`run_tests` enregistre la scène ouverte si elle est modifiée** : si une modification attend l'accord de l'équipe,
   ne pas lancer les tests avant, ou prévenir.
+- **Sans MCP, pas de `unity test` sur un projet ouvert** : il lance un second éditeur (option `--timeout` : « Kill the
+  Unity process »), comme `-batchmode`. Froggy, 28 octobre 2026 : on a exécuté les méthodes `[Test]` / `[TestCase]` par
+  réflexion dans `unity command eval` (une `AssertionException` = un échec). Les tests dans `Assets/Froggy/Editor/`
+  voient NUnit sans asmdef.
 
 ## 5. Build en ligne de commande
 
@@ -114,3 +123,34 @@ Pièges :
   pas seulement l'éditeur.
 - Les modèles de kits sans couleurs de sommets peuvent faire perdre les leurs aux maillages générés dessinés après (le
   shader lit `COLOR`) : un postprocesseur d'import qui leur donne du blanc l'a réglé.
+- **Dans l'éditeur, `GetComponent<T>()` rend un « faux null »** quand le composant manque : `x.GetComponent<T>() ??
+  x.AddComponent<T>()` n'ajoute rien. Tester avec `!= null` (`VitrineJardin.Composant<T>`, 28 octobre 2026).
+- **Travailler dans un éditeur qu'un autre utilise** (Froggy, 28 octobre 2026 : la session des personnages avait
+  `Test_Personnages` ouverte) : un outil qui ouvre sa scène retient la scène d'avant, refuse si elle a des modifications
+  non enregistrées, et la rouvre à la fin (`VitrineJardin.OuvrirVitrine` / `Revenir`). Une sonde instancie dans une scène
+  d'aperçu (`EditorSceneManager.NewPreviewScene`), pas dans la scène ouverte.
+- **`unity recompile` sans le focus peut durer plus de 6 minutes** (macOS ralentit l'éditeur en arrière-plan) : le lancer
+  en arrière-plan avec `--timeout 600`, puis vérifier les shaders et les types par `unity command eval`
+  (`ShaderUtil.ShaderHasError`, `Type.GetType`). La sortie de `recompile` peut être vide même quand tout va bien.
+- **Une touche se nomme par sa place sur un clavier QWERTY américain, et un Mac ISO la déplace** (Froggy, 29 octobre
+  2026) : sur le Mac AZERTY de Florent, `Key.Backquote` est la touche « < » à côté de Maj, pas « @ » au-dessus de Tab,
+  et le menu de debug ne s'ouvrait pas. Avant de choisir une touche, lire `Keyboard.current[k].displayName` dans
+  Unity ; pour une touche « au-dessus de Tab », écouter aussi le caractère (`onTextInput` : « ² », « @ »).
+- **Particules** : `Particle.velocity` ignore les modules de vitesse et de bruit ; une sonde lit `totalVelocity`.
+- **Traînée des particules** (`limitVelocityOverLifetime.drag`, Froggy, 29 octobre 2026, voltige de sakura) : par
+  défaut Unity la multiplie par la taille de la particule (`multiplyDragByParticleSize`) ; à 0,1 m elle ne freinait
+  presque rien (2,3 m/s de dérive au vent). Et elle freine aussi le module de vitesse : une chute réglée là tombait à
+  −0,02 m/s. Pour une vitesse limite, une force (gravité faible, vent) divisée par la traînée, mesurée par une sonde.
+- **Le Mono de Unity calcule les `float` en double**, puis les arrondit en les rangeant (Froggy, 29 octobre 2026,
+  analyse des trajets du Bâtisseur) : un plus court chemin en `float` voyait des cases « améliorées » sans l'être et
+  les remettait dans la file ; plus de 15 minutes sur 6 000 cases, 2 ms en .NET. Un algorithme qui compare des sommes
+  (Dijkstra, accumulations) travaille en `double` et exige un écart minimal pour améliorer.
+- **`unity command eval` coupe la réponse à 30 s, mais pas le calcul** : l'éditeur reste occupé jusqu'au bout, sans
+  moyen de l'arrêter, et ne répond plus. Chronométrer d'abord sur une petite entrée, un appel par étape ; pour déboguer
+  un calcul pur, le recopier dans un petit projet `dotnet` du scratchpad (hors de Unity), et `sample <pid>` montre si
+  l'éditeur tourne dans du code géré.
+- **Photographier une fenêtre de l'éditeur** (Froggy, 29 octobre 2026, Bâtisseur d'arène) : `w.ShowTab()` (rangée en
+  onglet, c'est sinon l'onglet voisin qu'on photographie), `RepaintImmediately` deux fois, puis la méthode interne
+  `GrabPixels(RenderTexture, Rect)` du `HostView` (champ `m_Parent` de l'`EditorWindow`, par réflexion), le rectangle en
+  **pixels** (taille × `EditorGUIUtility.pixelsPerPoint`). L'image sort **à l'envers** : retourner les lignes avant
+  d'enregistrer. Marche aussi pour la vue Scène, avec les poignées et les panneaux dessinés par les outils.
