@@ -33,6 +33,24 @@ namespace Froggy.Outils.Tests
             aDetruire.Clear();
         }
 
+        [Test]
+        public void UnBotNEstJamaisLeJoueurLocal()
+        {
+            // #132 : un bot garde un PlayerInput éteint ; le HUD le prenait pour « toi » et affichait son score
+            var humain = new GameObject("Humain", typeof(PlayerInput));
+            var bot = new GameObject("Bot", typeof(PlayerInput));
+            bot.GetComponent<PlayerInput>().enabled = false;
+            var mannequin = new GameObject("Mannequin");
+            aDetruire.Add(humain);
+            aDetruire.Add(bot);
+            aDetruire.Add(mannequin);
+
+            Assert.That(HudPartie.EstJoueurLocal(humain.transform), Is.True);
+            Assert.That(HudPartie.EstJoueurLocal(bot.transform), Is.False, "PlayerInput éteint : un bot");
+            Assert.That(HudPartie.EstJoueurLocal(mannequin.transform), Is.False);
+            Assert.That(HudPartie.EstJoueurLocal(null), Is.False);
+        }
+
         private static EtatHud Etat(Phase phase, float reste, params (int joueur, int cookies)[] joueurs)
         {
             var e = new EtatHud { PartieConnue = true, Phase = phase, Reste = reste, Local = 1 };

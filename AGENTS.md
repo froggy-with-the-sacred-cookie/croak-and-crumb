@@ -93,6 +93,13 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
   cache jusqu'au retour. Les écrans ne passent que par `Salon.Local` ; leurs textes sont dans `ContenuSalle` (C# pur).
   Les réglages du joueur (volumes, secousses, flashs, vibrations, de 0 à 1) : `ReglagesJoueur.Actuels`, à lire au
   moment où l'effet part ; les tests écrivent dans un fichier de test, jamais dans le vrai.
+- Partie complète : `Assets/Froggy/Scenes/Partie_JardinJaponais.unity`, lancée par « Solo » (avec 3 bots). Comme une
+  scène de test, elle charge le jardin par-dessus (`DecorDeTest`) et assemble tous les systèmes avec leurs vrais
+  réglages (3 min, météo du jardin). **Un nouveau système de jeu s'y ajoute aussi**, pas seulement dans la scène de test
+  de son poste, sans ses outils `Essai…`. Ses repères sont provisoires : à placer au Bâtisseur. Le salon charge encore la
+  vitrine tant que les objets, la torgnole, la météo et le cookie sacré ne sont pas en réseau. `PartieJardinTests`
+  vérifie que chaque système y est une fois, et **échoue si un système d'une scène de test de poste y manque**. En
+  partie, Échap ou Start ouvre la pause (`MenuPause` : reprendre, rejouer, retour au menu ; le solo se fige).
 - Froggy en ligne (`Assets/Froggy/Scripts/Reseau/FroggyReseau.cs`, P2-02, première version sans prédiction) : le salon
   fait apparaître `Prefabs/Reseau/FroggyReseau` pour chaque joueur, un objet réseau invisible (NetworkTransform, client
   autoritaire) plus une copie de la Froggy du jardin (`PlayerTemplate`), faite sur chaque machine comme les bots.

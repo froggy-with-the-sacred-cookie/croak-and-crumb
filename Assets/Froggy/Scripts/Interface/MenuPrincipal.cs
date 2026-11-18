@@ -18,7 +18,11 @@ namespace Froggy.Interface
     {
         /// <summary>La scène du menu et du salon, première du build.</summary>
         public const string SceneMenu = "Assets/Froggy/Scenes/Menu.unity";
-        private const string SceneSolo = "Vitrine_JardinJaponais";
+        /// <summary>
+        /// La partie complète (règles, objets, météo, cookie sacré, bots, HUD) sur le jardin : « Solo » la lance, avec
+        /// des bots. Le salon charge encore la vitrine tant que ces règles ne sont pas en réseau.
+        /// </summary>
+        public const string SceneSolo = "Assets/Froggy/Scenes/Partie_JardinJaponais.unity";
         private const string PrefabEtang = "MenuEtang/Menu_Principal_Etang";
         /// <summary>Volume de l'ambiance du menu quand le réglage « Ambiance » est à 100 % (choix de Julien).</summary>
         private const float VolumeAmbiance = 0.12f;
@@ -41,12 +45,28 @@ namespace Froggy.Interface
         public Ecran EcranActuel => ecran;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        private static void Reinitialiser() => instanceCreee = false;
+        private static void Reinitialiser()
+        {
+            instanceCreee = false;
+            SceneManager.sceneLoaded -= QuandUneSceneArrive;
+        }
 
+        /// <summary>
+        /// Au lancement si le jeu part du menu, et chaque fois que la scène Menu revient (retour d'une partie solo, y
+        /// compris d'une partie lancée directement dans l'éditeur).
+        /// </summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void CreerAuDemarrage()
         {
-            Scene scene = SceneManager.GetActiveScene();
+            SceneManager.sceneLoaded -= QuandUneSceneArrive;
+            SceneManager.sceneLoaded += QuandUneSceneArrive;
+            Creer(SceneManager.GetActiveScene());
+        }
+
+        private static void QuandUneSceneArrive(Scene scene, LoadSceneMode mode) => Creer(scene);
+
+        private static void Creer(Scene scene)
+        {
             if (scene.path != SceneMenu || instanceCreee) return;
             instanceCreee = true;
             GameObject objet = new GameObject("Menu principal Froggy");
@@ -84,6 +104,7 @@ namespace Froggy.Interface
                 if (visible)
                 {
                     AssurerEventSystem();
+                    CacherPanneauProvisoire();   // au retour d'une partie solo, le salon de la scène Menu est neuf
                     Afficher(ecran);
                     if (ambiance.clip != null && !ambiance.isPlaying) ambiance.Play();
                 }
@@ -157,6 +178,18 @@ namespace Froggy.Interface
             if (panneau != null) panneau.enabled = false;
         }
 
+        /// <summary>
+        /// « Solo » : la partie complète, sans réseau. Le salon de la scène Menu survit aux changements de scène, et il
+        /// coupe le joueur local du décor (CoupeJoueurLocal, utile seulement en réseau) : hors de tout salon, on le
+        /// ferme d'abord, pour que la partie soit la même que lancée seule (sinon, ni joueur ni bots).
+        /// </summary>
+        private static void LancerSolo()
+        {
+            Reseau.Salon salon = Reseau.Salon.Local;
+            if (salon != null && !salon.Connecte && !salon.Occupe) Destroy(salon.gameObject);
+            SceneManager.LoadScene(SceneSolo);
+        }
+
         /// <summary>Les écrans posés sur l'étang (ou sur l'eau du croquis), cachés jusqu'à leur tour.</summary>
         private void ConstruireEcrans(Transform parent)
         {
@@ -206,7 +239,7 @@ namespace Froggy.Interface
             menuPrincipal = etang.Centre;
             etang.Rejoindre.onClick.AddListener(() => Afficher(Ecran.Salons));
             etang.Parametres.onClick.AddListener(() => Afficher(Ecran.Parametres));
-            etang.Solo.onClick.AddListener(() => SceneManager.LoadScene(SceneSolo));
+            etang.Solo.onClick.AddListener(LancerSolo);
             ConstruireEcrans(etang.transform);
         }
 
@@ -248,7 +281,7 @@ namespace Froggy.Interface
                 new Vector2(0.5f, 0.415f), new Vector2(740f, 170f), () => Afficher(Ecran.Parametres));
             BoutonPeint("Solo", menuPrincipal, "Bouton_Solo",
                 new Vector2(0.5f, 0.205f), new Vector2(710f, 179f),
-                () => SceneManager.LoadScene(SceneSolo));
+                LancerSolo);
 
             ConstruireEcrans(fond);
         }
