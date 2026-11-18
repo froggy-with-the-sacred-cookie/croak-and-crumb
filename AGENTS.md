@@ -6,9 +6,14 @@ directement). Tout se passe en français : les échanges, les documents, les mes
 ## Le jeu
 
 Froggy et la recherche du cookie sacré : un jeu **exclusivement multijoueur** de type *Capture The Flag*, de 2 à 4
-joueurs, où chacun incarne Froggy, une grenouille humanoïde. Arènes variées (jungle, marécage, désert, oasis), lacs et
-nénuphars qui demandent des sauts précis, terrain étroit, météo qui change la partie (la pluie accélère les grenouilles),
-caméra qui passe de la première à la troisième personne en cours de partie.
+joueurs, où chacun incarne Froggy, une grenouille humanoïde. Lacs et nénuphars qui demandent des sauts précis, terrain
+étroit, météo qui change la partie (la pluie accélère les grenouilles), caméra qui passe de la première à la troisième
+personne en cours de partie.
+
+**La V1 se joue dans un seul environnement : le jardin japonais**, sur une arène faite pour 4 joueurs et jouable aussi
+à 3 et à 2, en troisième personne. Les autres environnements et la bascule en première personne viennent dans les
+versions suivantes. Le périmètre exact est la page Notion « V1 »
+(https://app.notion.com/p/4077e94430ba80d4b2fbed4ba5d9f6ee).
 
 **La référence du design est la page Notion « Froggy – Présentation du projet »**
 (https://app.notion.com/p/4077e94430ba80caac00da616ba0e73c). Le concept est en cours d'écriture : tout ce qui n'y est
