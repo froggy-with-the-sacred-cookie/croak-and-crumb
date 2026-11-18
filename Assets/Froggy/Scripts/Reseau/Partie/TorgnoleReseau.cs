@@ -11,8 +11,8 @@ namespace Froggy.Reseau
     /// toutes les Froggy. Chez un autre joueur, la touche demande le coup à l'hôte ; l'hôte vérifie que la demande vient
     /// bien du joueur de cette Froggy. Le recul d'une Froggy pilotée par une autre machine part chez elle (elle seule fait
     /// bouger son corps). Le cookie lâché et le cookie sacré tombé arrivent déjà par PartieReseau et CookieSacreReseau ;
-    /// chez les autres, le geste « Torgnole » se joue quand le coup leur parvient. Sur le préfabriqué de la partie en ligne.
-    /// Pas encore : la recharge affichée chez les autres joueurs (leur HUD voit la torgnole toujours prête).
+    /// chez les autres, le geste « Torgnole » se joue et la recharge du frappeur commence quand le coup leur parvient
+    /// (leur HUD la montre). Sur le préfabriqué de la partie en ligne.
     /// </summary>
     [RequireComponent(typeof(PartieTorgnoles))]
     public class TorgnoleReseau : NetworkBehaviour
@@ -84,11 +84,13 @@ namespace Froggy.Reseau
             corps.linearVelocity = new Vector3(vitesse.x, Mathf.Max(v.y, 0f), vitesse.z);
         }
 
-        // le coup relayé par PartieReseau : le frappeur joue son geste ici aussi
+        // le coup relayé par PartieReseau : le frappeur joue son geste ici aussi, et sa recharge commence
         private void JouerLeGeste(EvenementPartie e)
         {
-            if (e.Type == TypeEvenement.CoupDonne && e.Auteur != null)
-                e.Auteur.SendMessage("Jouer", "Torgnole", SendMessageOptions.DontRequireReceiver);
+            if (e.Type != TypeEvenement.CoupDonne || e.Auteur == null) return;
+            e.Auteur.SendMessage("Jouer", "Torgnole", SendMessageOptions.DontRequireReceiver);
+            var frappeur = e.Auteur.GetComponent<PorteurCookies>();
+            if (frappeur != null && torgnoles.Regles != null) torgnoles.Regles.Recharger(frappeur.Joueur);
         }
     }
 }

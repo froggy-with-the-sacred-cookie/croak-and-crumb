@@ -62,6 +62,20 @@ namespace Froggy.Outils.Tests
         }
 
         [Test]
+        public void UnCoupRecuDeLHoteRechargeLeFrappeur()
+        {
+            var regles = Regles();
+            regles.Recharger(2);
+            Assert.That(regles.Reste(2), Is.EqualTo(5f), "#128 : la recharge du frappeur commence chez les autres joueurs");
+            Assert.That(regles.Prete(1), Is.True, "les autres restent prêts");
+            for (int i = 0; i < 249; i++) regles.Pas(Dt);   // 4,98 s
+            Assert.That(regles.Prete(2), Is.False, "pas avant 5 s");
+            regles.Pas(Dt);
+            regles.Pas(Dt);
+            Assert.That(regles.Prete(2), Is.True, "5 s après : prête");
+        }
+
+        [Test]
         public void LaRechargeDesReglagesEstCelleDeLaCarte()
         {
             var reglages = ScriptableObject.CreateInstance<ReglagesTorgnole>();
