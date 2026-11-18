@@ -44,8 +44,8 @@ namespace Froggy.Cameras
         private Froggy.Jardin.ChoixMuraille contour;
         private Froggy.Personnages.FroggyApparence apparence;
         private string[] nomsFroggy;
+        [System.NonSerialized] private Vector2 defilement;
         private Froggy.Jardin.VoltigeSakura voltige;
-        private Vector2 defilement;
         private bool rouvert;
         private Keyboard ecoute;
         private bool tape;
@@ -144,12 +144,13 @@ namespace Froggy.Cameras
             // boutons entre la mise en page et le dessin (IMGUI l'exige)
             var gestes = apparence != null ? apparence.Gestes : null;
             int rangees = gestes != null && gestes.Count > 0 ? Mathf.CeilToInt(gestes.Count / 3f) + 2 : 0;
-            float contenu = 560f + (contour != null ? 160f : 0f) + (voltige != null ? 120f : 0f)
+            float hauteur = 585f +(contour != null ? 160f : 0f) + (voltige != null ? 120f : 0f)
                             + (apparence != null ? 70f + 22f * nomsFroggy.Length + 26f * rangees : 0f);
-            // une vue Game basse (388 px dans l'éditeur, 18/11/2026) coupait la section Froggy : le menu défile
-            float hauteur = Mathf.Min(contenu, Screen.height / e - 32f);
-            GUILayout.BeginArea(new Rect(16f, 16f, 400f, hauteur), GUI.skin.box);
-            defilement = GUILayout.BeginScrollView(defilement);
+            // fenêtre plus basse que le menu (#99) : le cadre s'arrête au bas de l'écran et son contenu défile, à la
+            // molette ou à la barre. Menu ouvert, la caméra ne lit plus la molette : pas de zoom en même temps.
+            float visible = HauteurVisible(hauteur, Screen.height / e, 16f);
+            GUILayout.BeginArea(new Rect(16f, 16f, 400f, visible), GUI.skin.box);
+            defilement = GUILayout.BeginScrollView(defilement, false, visible < hauteur);
             GUILayout.Label("Caméra (debug) · la même touche pour fermer");
             var actuel = Actuel;
             int choix = GUILayout.SelectionGrid((int)actuel, Noms, 1);
@@ -165,6 +166,7 @@ namespace Froggy.Cameras
                 wow.ChampTroisiemePersonne = Curseur("Champ de vision (°)", wow.ChampTroisiemePersonne, 40f, 90f, "0");
                 wow.DistanceMax = Curseur("Distance max (m)", wow.DistanceMax, 4f, 30f, "0.0");
                 wow.InverserY = GUILayout.Toggle(wow.InverserY, " Inverser l'axe vertical");
+                wow.VoirAtterrissage = GUILayout.Toggle(wow.VoirAtterrissage, " Voir où l'on atterrit (cadre posé en l'air, regard vers la chute)");
                 GUILayout.Label($"Distance actuelle : {wow.Distance:0.0} m{(wow.PremierePersonne ? " (première personne)" : "")}");
             }
             if (contour != null)
@@ -195,7 +197,7 @@ namespace Froggy.Cameras
                 if (choixFroggy != f) apparence.Afficher(choixFroggy - 1);
                 if (gestes != null && gestes.Count > 0) Gestes(gestes);
             }
-            GUILayout.Space(12f);
+            GUILayout.FlexibleSpace();
             GUILayout.Label("Les réglages changés ici s'oublient à la fin de la partie.");
             GUILayout.EndScrollView();
             GUILayout.EndArea();
@@ -214,6 +216,10 @@ namespace Froggy.Cameras
             }
             if (GUILayout.Button("Revenir au déplacement (après une boucle)")) apparence.Jouer("Deplacement");
         }
+
+        /// <summary>La hauteur du cadre du menu : la sienne, ou ce que l'écran laisse sous et sur la marge s'il est plus bas.</summary>
+        public static float HauteurVisible(float hauteurMenu, float hauteurEcran, float marge) =>
+            Mathf.Min(hauteurMenu, Mathf.Max(120f, hauteurEcran - 2f * marge));
 
         private static float Curseur(string nom, float valeur, float min, float max, string format)
         {

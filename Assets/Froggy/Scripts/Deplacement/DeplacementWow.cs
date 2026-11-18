@@ -1,3 +1,4 @@
+using Froggy.Socle;
 using Froggy.Template;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -15,6 +16,7 @@ namespace Froggy.Deplacement
     /// Course, sprint, saut et tolérances (coyote time, tampon, saut variable) : les mêmes que TemplatePlayerController,
     /// avec les mêmes réglages ; seul le repère change. Le remplace tant qu'il est actif (CameraOrbitale l'active et le
     /// coupe avec elle). La logique tient dans Pas(), appelée au pas physique, pour que les tests la fassent tourner hors jeu.
+    /// Le composant Modificateurs de Froggy (socle commun, T-01 ; ajouté ici s'il manque) multiplie la vitesse et la hauteur du saut.
     /// </summary>
     [RequireComponent(typeof(Rigidbody), typeof(BoxCollider))]
     public class DeplacementWow : MonoBehaviour
@@ -31,6 +33,7 @@ namespace Froggy.Deplacement
         private Rigidbody corps;
         private BoxCollider boite;
         private TemplatePlayerController ancien;
+        private Modificateurs modificateurs;
         private InputAction moveAction, jumpAction, sprintAction, pasDeCote, courseAuto;
         private bool pret;
 
@@ -38,10 +41,17 @@ namespace Froggy.Deplacement
         [System.NonSerialized] private Entrees entrees;
         [System.NonSerialized] private bool imposees, sautAppuye, auto;
         [System.NonSerialized] private float coyote, tampon;
-        [System.NonSerialized] private bool montee;
+        [System.NonSerialized] private bool montee, etaitAuSol;
 
         public bool AuSol { get; private set; }
         public bool CourseAuto => auto;
+        /// <summary>Le collider sur lequel Froggy se tient (ou presque : à groundCheckDistance près), sinon null.</summary>
+        public Collider SolTouche { get; private set; }
+        /// <summary>
+        /// Froggy vient de se poser, avec le sol touché : au pas physique où il redevient « au sol », même s'il repart
+        /// aussitôt par le tampon de saut (il n'a alors jamais touché le sol physiquement). Parcours de test, sons, poussière…
+        /// </summary>
+        public event System.Action<Collider> Atterrissage;
 
         private void Initialiser()
         {
@@ -50,6 +60,9 @@ namespace Froggy.Deplacement
             corps = GetComponent<Rigidbody>();
             boite = GetComponent<BoxCollider>();
             ancien = GetComponent<TemplatePlayerController>();
+            // chaque Froggy en a un, pour que les autres postes le trouvent sans toucher au préfabriqué
+            modificateurs = GetComponent<Modificateurs>();
+            if (modificateurs == null) modificateurs = gameObject.AddComponent<Modificateurs>();
             if (visuel == null) visuel = transform.Find("Visual");
             var entree = GetComponent<PlayerInput>();
             if (entree != null)
@@ -124,18 +137,24 @@ namespace Froggy.Deplacement
 
             Vector3 v = corps.linearVelocity;
             AuSol = v.y <= 0.01f && Sol();   // en montée, on ne se recolle pas au sol
+            // annoncé avant le saut éventuel du même pas : un saut enchaîné par le tampon part sans contact physique
+            if (AuSol && !etaitAuSol) Atterrissage?.Invoke(SolTouche);
+            etaitAuSol = AuSol;
             coyote = AuSol ? reglages.coyoteTime : coyote - dt;
             tampon -= dt;
             if (AuSol) montee = false;
 
-            Vector3 voulue = Vitesse(entrees.deplacement, corps.rotation.eulerAngles.y, entrees.sprint, reglages, reglagesWow);
+            // météo, objets, cookies portés : lus au pas physique, sans savoir qui les a posés
+            float facteurVitesse = modificateurs.Vitesse, facteurSaut = modificateurs.Saut;
+
+            Vector3 voulue = Vitesse(entrees.deplacement, corps.rotation.eulerAngles.y, entrees.sprint, reglages, reglagesWow) * facteurVitesse;
             float acceleration = AuSol ? reglages.groundAcceleration : reglagesWow.elanFigeEnLair ? 0f : reglages.airAcceleration;
             Vector3 horizontal = Vector3.MoveTowards(new Vector3(v.x, 0f, v.z), voulue, acceleration * dt);
 
             // la hauteur se donne, la vitesse se dérive
             if (tampon > 0f && coyote > 0f)
             {
-                v.y = Mathf.Sqrt(2f * -Physics.gravity.y * reglages.jumpHeight);
+                v.y = Mathf.Sqrt(2f * -Physics.gravity.y * reglages.jumpHeight * facteurSaut);
                 tampon = coyote = 0f;
                 montee = true;
                 AuSol = false;
@@ -180,8 +199,10 @@ namespace Froggy.Deplacement
             Vector3 taille = Vector3.Scale(boite.size, transform.lossyScale);
             Vector3 demi = new Vector3(taille.x * 0.45f, 0.05f, taille.z * 0.45f);
             float distance = taille.y * 0.5f - demi.y + reglages.groundCheckDistance;
-            return gameObject.scene.GetPhysicsScene().BoxCast(transform.TransformPoint(boite.center), demi, Vector3.down,
-                out _, transform.rotation, distance, reglages.groundLayers, QueryTriggerInteraction.Ignore);
+            bool sol = gameObject.scene.GetPhysicsScene().BoxCast(transform.TransformPoint(boite.center), demi, Vector3.down,
+                out var touche, transform.rotation, distance, reglages.groundLayers, QueryTriggerInteraction.Ignore);
+            SolTouche = sol ? touche.collider : null;
+            return sol;
         }
     }
 }

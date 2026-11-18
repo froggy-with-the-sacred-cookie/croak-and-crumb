@@ -25,6 +25,10 @@ namespace Froggy.Cameras
     ///   transparent, skill camera). Comme WoW, seuls le sol et les murs l'arrêtent (colliders sous un BloqueCamera) :
     ///   elle traverse le petit décor. Florent, 28 octobre 2026 : butée contre chaque pierre, rocher ou bambou, elle
     ///   changeait de distance, donc de hauteur, sans arrêt (« vraiment très désagréable »).
+    /// - on voit où l'on atterrit (#15) : en l'air, le cadre garde la hauteur du dernier sol tant que Froggy ne la dépasse
+    ///   pas nettement, le suit sans retard sous ce sol, et le regard se baisse (jusqu'à inclinaisonChuteMax) pour garder
+    ///   dans l'image le point de chute prédit, ou le découvrir s'il est caché par un mur. Case « voirAtterrissage » pour
+    ///   comparer avec avant (aussi dans le menu de debug).
     /// Se pose sur le CameraRig du PlayerTemplate, à côté de TemplateCameraRig qu'elle remplace tant qu'elle est active :
     /// décocher le composant rend l'ancienne caméra (bascule pour comparer). Le cap passe par la rotation du joueur, que
     /// TemplatePlayerController prend comme repère quand il n'a pas de rig. Seule propriétaire de la caméra ; elle suit la
@@ -81,6 +85,26 @@ namespace Froggy.Cameras
         [Tooltip("Coché : tout collider arrête la caméra (le premier essai). Décoché : seulement ceux sous un BloqueCamera.")]
         [SerializeField] private bool toutBloque;
 
+        [Header("Voir où l'on atterrit (#15)")]
+        [Tooltip("Décoché : la caméra suit la hauteur de Froggy sans rien prévoir (comportement d'avant, pour comparer).")]
+        [SerializeField] private bool voirAtterrissage = true;
+        [Tooltip("En l'air, le cadre ne monte que si Froggy dépasse son dernier sol de plus que ça, en m (un saut normal ne le bouge presque pas).")]
+        [SerializeField] private float margeMontee = 1.2f;
+        [Tooltip("Écart vertical max entre le cadre et Froggy, en m : il ne sort jamais du cadre.")]
+        [SerializeField] private float ecartCadreMax = 2f;
+        [Tooltip("Temps du ressort de hauteur du cadre, en s (recalage après un atterrissage plus haut).")]
+        [SerializeField] private float tempsHauteur = 0.2f;
+        [Tooltip("Marge gardée sous le point d'atterrissage, en fraction de la hauteur de l'image.")]
+        [Range(0f, 0.4f)] [SerializeField] private float margeBas = 0.15f;
+        [Tooltip("Inclinaison ajoutée au plus pour voir où l'on tombe, en degrés.")]
+        [SerializeField] private float inclinaisonChuteMax = 60f;
+        [Tooltip("Vitesse max de cette inclinaison, en degrés par seconde.")]
+        [SerializeField] private float vitesseInclinaisonChuteMax = 240f;
+        [Tooltip("Temps du ressort de cette inclinaison, en s (le retour au sol prend le double).")]
+        [SerializeField] private float tempsInclinaisonChute = 0.1f;
+        [Tooltip("Durée de vol prédite au plus, en s.")]
+        [SerializeField] private float dureePrediction = 2.5f;
+
         private Transform joueur;
         private Rigidbody corps;
         private Camera cam;
@@ -99,6 +123,10 @@ namespace Froggy.Cameras
         [System.NonSerialized] private float distanceVoulue, distanceZoom, vitesseZoom, distance, vitesseRallonge;
         [System.NonSerialized] private bool cache, initialise, pasDeCote = true, capture;
         [System.NonSerialized] private Vector2 positionCurseur;
+        [System.NonSerialized] private float hauteurCadre, vitesseHauteur, dernierSol, inclinaisonChute, vitesseInclinaisonChute;
+        [System.NonSerialized] private bool atterrissageConnu;
+        [System.NonSerialized] private Vector3 atterrissage;
+        private Collider colliderJoueur;
 
         private static readonly FieldInfo ChampRig =
             typeof(TemplatePlayerController).GetField("cameraRig", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -120,6 +148,11 @@ namespace Froggy.Cameras
             get => distanceMax;
             set { distanceMax = value; distanceVoulue = Mathf.Min(distanceVoulue, value); }
         }
+        public bool VoirAtterrissage { get => voirAtterrissage; set => voirAtterrissage = value; }
+        /// <summary>Inclinaison ajoutée en ce moment pour voir où l'on tombe, en degrés.</summary>
+        public float InclinaisonChute => inclinaisonChute;
+        /// <summary>Le point d'atterrissage prédit, s'il y en a un (Froggy en l'air).</summary>
+        public bool Atterrissage(out Vector3 point) { point = atterrissage; return atterrissageConnu; }
 
         private void Awake()
         {
@@ -133,6 +166,7 @@ namespace Froggy.Cameras
             moveAction = joueur.GetComponent<PlayerInput>().actions["Move"];
             virage = ActionVirage(moveAction, compositesClavier);
             foreach (var r in joueur.GetComponentsInChildren<Renderer>(true)) rendusJoueur.Add((r, r.shadowCastingMode));
+            colliderJoueur = joueur.GetComponent<Collider>();
         }
 
         private void OnEnable()
@@ -153,6 +187,7 @@ namespace Froggy.Cameras
                 cap = lacet = joueur.eulerAngles.y;
                 inclinaison = inclinaisonDepart;
                 distanceVoulue = distanceZoom = distance = distanceDepart;
+                Recaler();
                 initialise = true;
             }
             virage.Enable();
@@ -181,6 +216,18 @@ namespace Froggy.Cameras
             distanceVoulue = distanceZoom = distance = Zoomer(nouvelleDistance, 0f, 1f, distanceMax, seuilPremierePersonne);
             vitesseZoom = vitesseRallonge = 0f;
             corps.rotation = Quaternion.Euler(0f, cap, 0f);
+            Recaler();
+        }
+
+        /// <summary>
+        /// Après un saut net de Froggy (réapparition, téléportation) : le cadre repart de sa position, sans glisser depuis
+        /// l'ancienne (skill camera, section 1).
+        /// </summary>
+        public void Recaler()
+        {
+            hauteurCadre = dernierSol = joueur.position.y;
+            vitesseHauteur = inclinaisonChute = vitesseInclinaisonChute = 0f;
+            atterrissageConnu = false;
         }
 
         private void Update()
@@ -221,15 +268,165 @@ namespace Froggy.Cameras
             float dt = Time.deltaTime;
             distanceZoom = Mathf.SmoothDamp(distanceZoom, distanceVoulue, ref vitesseZoom, tempsZoom, Mathf.Infinity, dt);
             float t = Mathf.Clamp01(distanceZoom / Mathf.Max(seuilPremierePersonne, 0.01f));
-            Vector3 pivot = joueur.position + Vector3.up * Mathf.Lerp(hauteurYeux, hauteurPivot, t);
-            Quaternion rotation = Quaternion.Euler(inclinaison, lacet, 0f);
+            var physique = joueur.gameObject.scene.GetPhysicsScene();
+            Vector3 position = joueur.position;
+            Vector3 vitesse = corps.linearVelocity;
+            bool auSol = AuSol();
+
+            // hauteur du cadre : en l'air, il garde le dernier sol tant que Froggy ne le dépasse pas nettement
+            if (auSol) dernierSol = position.y;
+            hauteurCadre = HauteurCadre(hauteurCadre, ref vitesseHauteur, position.y, dernierSol, auSol, margeMontee,
+                ecartCadreMax, tempsHauteur, dt);
+            float y = voirAtterrissage ? Mathf.Lerp(position.y, hauteurCadre, t) : position.y;   // en 1re personne : les yeux
+            Vector3 pivot = new Vector3(position.x, y, position.z) + Vector3.up * Mathf.Lerp(hauteurYeux, hauteurPivot, t);
+
+            float chute = voirAtterrissage ? inclinaisonChute * t : 0f;
+            Quaternion rotation = Quaternion.Euler(Mathf.Min(inclinaison + chute, inclinaisonMax), lacet, 0f);
             Vector3 arriere = rotation * Vector3.back;
 
-            float libre = Libre(joueur.gameObject.scene.GetPhysicsScene(), pivot, arriere, distanceZoom, rayonCollision, obstacles, joueur, touches, toutBloque);
+            // le plan proche de la caméra doit tenir dans la sphère qui teste les murs, sinon ses coins y entrent
+            float rayon = Mathf.Max(rayonCollision, RayonPlanProche(cam.nearClipPlane, cam.fieldOfView, cam.aspect));
+            float libre = Libre(physique, pivot, arriere, distanceZoom, rayon, obstacles, joueur, touches, toutBloque);
             distance = Suivre(distance, libre, distanceZoom, ref vitesseRallonge, tempsRallonge, dt);
-            cam.transform.SetPositionAndRotation(pivot + arriere * distance, rotation);
+            Vector3 posCam = pivot + arriere * distance;
+            cam.transform.SetPositionAndRotation(posCam, rotation);
             cam.fieldOfView = Mathf.Lerp(champPremierePersonne, champTroisiemePersonne, t);
             Cacher(distance < seuilPremierePersonne * 0.5f);
+
+            SuivreAtterrissage(physique, auSol, position, vitesse, posCam, dt);
+        }
+
+        /// <summary>
+        /// En l'air : prédit où Froggy va tomber et règle l'inclinaison ajoutée (pour l'image suivante) pour que ce point
+        /// reste dans le cadre, au-dessus de la marge du bas, et ne soit pas caché par un mur. Au sol, elle revient à zéro.
+        /// </summary>
+        private void SuivreAtterrissage(PhysicsScene physique, bool auSol, Vector3 position, Vector3 vitesse, Vector3 posCam, float dt)
+        {
+            atterrissageConnu = false;
+            float cible = 0f;
+            if (voirAtterrissage && !auSol)
+            {
+                float pieds = colliderJoueur != null ? position.y - colliderJoueur.bounds.min.y : 0f;
+                Vector3 depart = position + Vector3.down * pieds;
+                atterrissageConnu = PointDeChute(physique, depart, vitesse, Physics.gravity, dureePrediction, obstacles,
+                    joueur, touches, out atterrissage);
+                if (atterrissageConnu)
+                {
+                    // cam.fieldOfView est le champ vertical
+                    cible = Mathf.Min(inclinaisonChuteMax, inclinaisonChute
+                        + InclinaisonManquante(posCam, inclinaison + inclinaisonChute, lacet, atterrissage, cam.fieldOfView, margeBas));
+                    // dans le cadre mais caché derrière un mur : on monte encore, doucement (le cadre reste continu)
+                    if (Cache(physique, posCam, atterrissage + Vector3.up * 0.3f))
+                        cible = Mathf.Min(inclinaisonChuteMax, Mathf.Max(cible, inclinaisonChute + vitesseInclinaisonChuteMax * 0.5f * dt));
+                    cible = Mathf.Min(cible, inclinaisonMax - inclinaison);
+                    cible = Mathf.Max(cible, 0f);
+                }
+                else cible = inclinaisonChute;   // pas de sol prévu (vide, eau sans collider) : on ne bouge pas
+            }
+            float temps = cible >= inclinaisonChute ? tempsInclinaisonChute : tempsInclinaisonChute * 2f;
+            inclinaisonChute = Mathf.SmoothDamp(inclinaisonChute, cible, ref vitesseInclinaisonChute, temps,
+                vitesseInclinaisonChuteMax, dt);
+        }
+
+        private bool Cache(PhysicsScene physique, Vector3 depuis, Vector3 point)
+        {
+            Vector3 d = point - depuis;
+            float l = d.magnitude;
+            if (l < 0.01f) return false;
+            int n = physique.Raycast(depuis, d / l, touches, l, obstacles, QueryTriggerInteraction.Ignore);
+            for (int i = 0; i < n; i++)
+            {
+                var c = touches[i].collider;
+                if (c.transform.IsChildOf(joueur)) continue;
+                if (!toutBloque && c.GetComponentInParent<BloqueCamera>() == null) continue;   // le petit décor ne compte pas
+                return true;
+            }
+            return false;
+        }
+
+        private bool AuSol()
+        {
+            if (deplacement != null && deplacement.enabled) return deplacement.AuSol;
+            if (controleur != null && controleur.enabled) return controleur.IsGrounded;
+            return Mathf.Abs(corps.linearVelocity.y) < 0.05f;
+        }
+
+        /// <summary>
+        /// La hauteur du cadre au pas suivant (skill camera, section 2, leçon d'Eku). Au sol : la hauteur de Froggy. En l'air :
+        /// le dernier sol, tant que Froggy ne le dépasse pas de plus que marge (un saut ne fait pas monter le cadre) ;
+        /// au-delà, Froggy moins la marge. Le tout par un ressort critique, mais le cadre ne reste jamais au-dessus de
+        /// Froggy (en chute, il le suit sans retard) ni à plus de ecartMax en dessous : il reste dans l'image. La cible est
+        /// une fonction continue de la hauteur de Froggy.
+        /// </summary>
+        public static float HauteurCadre(float actuelle, ref float vitesse, float yJoueur, float dernierSol, bool auSol,
+            float marge, float ecartMax, float temps, float dt)
+        {
+            float cible = auSol ? yJoueur
+                : yJoueur > dernierSol + marge ? yJoueur - marge
+                : Mathf.Min(dernierSol, yJoueur);
+            float h = Mathf.SmoothDamp(actuelle, cible, ref vitesse, temps, Mathf.Infinity, dt);
+            if (h > yJoueur) { h = yJoueur; vitesse = 0f; }
+            else if (h < yJoueur - ecartMax) { h = yJoueur - ecartMax; vitesse = 0f; }
+            return h;
+        }
+
+        /// <summary>
+        /// Où Froggy touchera quelque chose, en suivant sa trajectoire balistique depuis depart (ses pieds) : vrai et le
+        /// point, ou faux s'il ne touche rien avant dureeMax. Tout collider compte (on atterrit aussi sur le petit décor),
+        /// sauf le joueur et les déclencheurs. Hypothèse : on ne compte pas le contrôle en l'air (il change peu la chute).
+        /// </summary>
+        public static bool PointDeChute(PhysicsScene physique, Vector3 depart, Vector3 vitesse, Vector3 gravite,
+            float dureeMax, int masque, Transform joueur, RaycastHit[] touches, out Vector3 point)
+        {
+            const float pas = 0.04f;
+            Vector3 p = depart, v = vitesse;
+            for (float t = 0f; t < dureeMax; t += pas)
+            {
+                Vector3 suivant = p + v * pas + 0.5f * pas * pas * gravite;
+                v += gravite * pas;
+                Vector3 d = suivant - p;
+                float l = d.magnitude;
+                if (l > 1e-5f)
+                {
+                    int n = physique.Raycast(p, d / l, touches, l, masque, QueryTriggerInteraction.Ignore);
+                    float plusProche = float.PositiveInfinity;
+                    for (int i = 0; i < n; i++)
+                    {
+                        if (joueur != null && touches[i].collider.transform.IsChildOf(joueur)) continue;
+                        plusProche = Mathf.Min(plusProche, touches[i].distance);
+                    }
+                    if (plusProche < float.PositiveInfinity) { point = p + d / l * plusProche; return true; }
+                }
+                p = suivant;
+            }
+            point = p;
+            return false;
+        }
+
+        /// <summary>
+        /// De combien de degrés il faut encore baisser le regard pour que point soit au-dessus de la marge du bas (en
+        /// fraction de la hauteur de l'image), vu de la caméra (position, inclinaison et cap en degrés, champ vertical).
+        /// Zéro s'il y est déjà, ou s'il est derrière la caméra (baisser le regard n'y changerait rien).
+        /// </summary>
+        public static float InclinaisonManquante(Vector3 camera, float inclinaison, float cap, Vector3 point,
+            float champVertical, float marge)
+        {
+            Vector3 d = Quaternion.Euler(0f, -cap, 0f) * (point - camera);   // dans le repère du cap : z devant, y en haut
+            if (d.z < 0.1f) return 0f;
+            float sousHorizon = Mathf.Atan2(-d.y, d.z) * Mathf.Rad2Deg;
+            float bordBas = inclinaison + champVertical * (0.5f - marge);
+            return Mathf.Max(0f, sousHorizon - bordBas);
+        }
+
+        /// <summary>
+        /// Le rayon de la sphère qui contient le plan proche de la caméra (distance du centre à un coin) : la sphère de
+        /// collision doit être au moins aussi grosse, sinon un coin de l'image entre dans le mur.
+        /// </summary>
+        public static float RayonPlanProche(float procheDistance, float champVertical, float aspect)
+        {
+            float demiH = procheDistance * Mathf.Tan(champVertical * 0.5f * Mathf.Deg2Rad);
+            float demiL = demiH * aspect;
+            return Mathf.Sqrt(procheDistance * procheDistance + demiH * demiH + demiL * demiL);
         }
 
         /// <summary>

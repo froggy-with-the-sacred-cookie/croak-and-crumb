@@ -33,6 +33,8 @@ pour Froggy** (Unity 3D, multijoueur, FishNet, arènes) : les originaux pointaie
 | `composition-audio` | Eku `composition-eku` et `eku-game-audio-director` (GDD) |
 | `recherche-reference` | Eku `recherche-environnement` ; mémoire `feedback-recherche-avant-prompt` |
 | `tech-art` | Tech Art Bible (`references/tech_art_bible.md`) ; rendu de Lovecraft (météo, traces, eau, style, LOD) ; performance de Glouton |
+| `reseau-fishnet` | Froggy lui-même : P2-01 et P2-07 (novembre 2026), API lues dans FishNet 4.7.4 installé |
+| `test-multijoueur-local` | Froggy lui-même : P2-01 et P2-07 (novembre 2026), Multiplayer Play Mode 3.0 lu dans le moteur |
 
 ## Outils repris dans `Tools/`
 
