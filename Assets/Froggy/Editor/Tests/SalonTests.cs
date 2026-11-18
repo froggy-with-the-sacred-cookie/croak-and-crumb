@@ -49,6 +49,19 @@ namespace Froggy.Outils.Tests
         }
 
         [Test]
+        public void UnCodeEnLigneEstCeluiDeUnity()
+        {
+            // vrais codes donnés par Unity Relay le 18/11/2026 (P2-05) : 6 majuscules et chiffres
+            foreach (string vrai in new[] { "8NTDNR", "TMQJWD", "PCWW7R" })
+                Assert.That(CodeSalon.EstValideEnLigne(CodeSalon.Normaliser(vrai)), Is.True, vrai);
+            Assert.That(CodeSalon.Normaliser(" tmq-jwd "), Is.EqualTo("TMQJWD"), "tapé en minuscules, avec un tiret");
+            Assert.That(CodeSalon.EstValideEnLigne("AB"), Is.False, "trop court");
+            Assert.That(CodeSalon.EstValideEnLigne("ABCDEFGHIJKLM"), Is.False, "trop long");
+            Assert.That(CodeSalon.EstValideEnLigne("TMQ!WD"), Is.False, "caractère interdit");
+            Assert.That(CodeSalon.EstValideEnLigne(null), Is.False);
+        }
+
+        [Test]
         public void LaReponseDeLHoteSeLit()
         {
             Assert.That(RechercheSalon.Lire("FROGGY!KRBF:7771", "KRBF", out ushort port), Is.True);

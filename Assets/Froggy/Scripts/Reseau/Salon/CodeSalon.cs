@@ -38,6 +38,18 @@ namespace Froggy.Reseau
             return code.ToString();
         }
 
+        /// <summary>
+        /// Code en ligne (P2-05) : c'est Unity Relay qui le donne, lettres et chiffres (format non documenté par Unity :
+        /// on accepte 4 à 12 caractères). Déjà normalisé.
+        /// </summary>
+        public static bool EstValideEnLigne(string code)
+        {
+            if (code == null || code.Length < 4 || code.Length > 12) return false;
+            foreach (char c in code)
+                if (!(c >= 'A' && c <= 'Z') && !(c >= '0' && c <= '9')) return false;
+            return true;
+        }
+
         /// <summary>Vrai si le code (déjà normalisé) a la bonne longueur et seulement des lettres permises.</summary>
         public static bool EstValide(string code)
         {

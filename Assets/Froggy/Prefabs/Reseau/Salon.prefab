@@ -16,6 +16,8 @@ GameObject:
   - component: {fileID: 8855389395515572912}
   - component: {fileID: 5314834940727127546}
   - component: {fileID: 8514345590106383939}
+  - component: {fileID: 3817561598320308218}
+  - component: {fileID: 4376440821833965224}
   m_Layer: 0
   m_Name: Salon
   m_TagString: Untagged
@@ -117,6 +119,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b071ae692242e684eab7d613ef14fbf5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Froggy.Reseau.Salon
+  enLigne: 1
   scenePartie: Vitrine_JardinJaponais
   prefabJoueur: {fileID: 291364705442974439, guid: 3b18444832543a441b0a5971cb50b554, type: 3}
   apparitions:
@@ -165,6 +168,49 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Froggy.Reseau.CoupeJoueurLocal
   objetsACouper:
   - PlayerTemplate
+--- !u!114 &3817561598320308218
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 85164157687960675}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3841a4dc0f87d764c885c585e6f95828, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Froggy.Reseau.RelaisSalon
+  protocole: dtls
+--- !u!114 &4376440821833965224
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 85164157687960675}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1cdcee4396754c63a1574492499cffc8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FishyUnityTransport::FishNet.Transporting.UTP.UnityTransport
+  m_ProtocolType: 0
+  m_UseWebSockets: 0
+  m_UseEncryption: 0
+  m_MaxPacketQueueSize: 128
+  m_MaxPayloadSize: 6144
+  m_HeartbeatTimeoutMS: 500
+  m_ConnectTimeoutMS: 1000
+  m_MaxConnectAttempts: 60
+  m_DisconnectTimeoutMS: 30000
+  ConnectionData:
+    Address: 127.0.0.1
+    Port: 7777
+    ServerListenAddress: 
+  DebugSimulator:
+    PacketDelayMS: 0
+    PacketJitterMS: 0
+    PacketDropRate: 0
+  m_MaximumClients: 4095
 --- !u!1 &1399341733759452858
 GameObject:
   m_ObjectHideFlags: 0

@@ -25,10 +25,19 @@ namespace Froggy.Reseau
     /// L'hôte décide de tout (EtatSalon) ; chacun en reçoit une copie (SalonReseau). Au lancement, la scène de partie
     /// est chargée chez tous et chaque joueur reçoit un personnage provisoire (capsule de P2-01, en attendant P2-02).
     /// La partie revient seule au salon quelques secondes après l'événement « partie finie » (P3-03, P2-04).
+    ///
+    /// Deux façons de se retrouver (P2-05) : <b>en ligne</b> (par défaut), par Unity Relay, avec le code donné par
+    /// Unity, depuis n'importe quelle maison ; <b>réseau local</b> (salon.EnLigne = false), sans internet, avec un code
+    /// de 4 lettres trouvé sur le réseau local. Les deux passent par le transport Unity (UnityTransport) du prefab.
     /// </summary>
     [RequireComponent(typeof(NetworkManager), typeof(AuthentificateurSalon), typeof(RechercheSalon))]
+    [RequireComponent(typeof(RelaisSalon))]
     public class Salon : MonoBehaviour
     {
+        [Header("En ligne")]
+        [Tooltip("Coché : par internet (Unity Relay). Décoché : réseau local seulement, sans internet.")]
+        [SerializeField] private bool enLigne = true;
+
         [Header("Partie")]
         [Tooltip("Scène chargée chez tous au lancement (doit être dans les Build Settings).")]
         [SerializeField] private string scenePartie = "Vitrine_JardinJaponais";
@@ -68,6 +77,8 @@ namespace Froggy.Reseau
         private NetworkManager reseau;
         private AuthentificateurSalon porte;
         private RechercheSalon recherche;
+        private RelaisSalon relais;
+        private FishNet.Transporting.UTP.UnityTransport transport;   // null si le prefab garde Tugboat
         private EtatSalon etat;                       // hôte seulement
         private readonly Dictionary<int, NetworkObject> joueurs = new();
         private NetworkObject partie;                 // hôte : les règles de la partie en cours
@@ -144,11 +155,25 @@ namespace Froggy.Reseau
 
         // ---------------------------------------------------------------- Actions (tout le monde)
 
+        /// <summary>
+        /// En ligne (Unity Relay, depuis n'importe où) ou réseau local (sans internet). Ne change qu'hors d'un salon.
+        /// </summary>
+        public bool EnLigne
+        {
+            get => enLigne;
+            set
+            {
+                if (Occupe || Connecte) return;
+                enLigne = value;
+                Change?.Invoke();
+            }
+        }
+
         /// <summary>Ouvre un salon : cette fenêtre devient l'hôte et reçoit un code.</summary>
         public void Creer()
         {
             if (Occupe || reseau.IsClientStarted || reseau.IsServerStarted) return;
-            enCours = StartCoroutine(CreerSalon());
+            enCours = StartCoroutine(enLigne ? CreerEnLigne() : CreerSalon());
         }
 
         /// <summary>Rejoint le salon de ce code (majuscules, espaces et tirets acceptés).</summary>
@@ -156,12 +181,13 @@ namespace Froggy.Reseau
         {
             if (Occupe || reseau.IsClientStarted || reseau.IsServerStarted) return;
             string code = CodeSalon.Normaliser(saisie);
-            if (!CodeSalon.EstValide(code))
+            if (enLigne ? !CodeSalon.EstValideEnLigne(code) : !CodeSalon.EstValide(code))
             {
-                Signaler($"Un code, c'est {CodeSalon.Longueur} lettres (sans O ni I).");
+                Signaler(enLigne ? "Code incomplet : recopier le code affiché chez l'hôte."
+                                 : $"Un code, c'est {CodeSalon.Longueur} lettres (sans O ni I).");
                 return;
             }
-            enCours = StartCoroutine(RejoindreSalon(code));
+            enCours = StartCoroutine(enLigne ? RejoindreEnLigne(code) : RejoindreSalon(code));
         }
 
         /// <summary>Quitte le salon ; pour l'hôte, le ferme pour tout le monde.</summary>
@@ -208,6 +234,9 @@ namespace Froggy.Reseau
             reseau = GetComponent<NetworkManager>();
             porte = GetComponent<AuthentificateurSalon>();
             recherche = GetComponent<RechercheSalon>();
+            relais = GetComponent<RelaisSalon>();
+            transport = GetComponent<FishNet.Transporting.UTP.UnityTransport>();
+            if (transport == null) enLigne = false;   // sans transport Unity, pas de relais possible
             Local = this;
         }
 
@@ -266,7 +295,9 @@ namespace Froggy.Reseau
 
                 Etat = $"Ouverture du salon (port {port})…";
                 Change?.Invoke();
-                reseau.TransportManager.Transport.SetPort(port);
+                // transport Unity : connexion directe (pas le relais), à l'écoute sur toutes les cartes réseau
+                if (transport != null) transport.SetConnectionData("127.0.0.1", port, "0.0.0.0");
+                else reseau.TransportManager.Transport.SetPort(port);
                 etatServeur = LocalConnectionState.Starting;
                 reseau.ServerManager.StartConnection();
                 yield return new WaitUntil(() => etatServeur == LocalConnectionState.Started
@@ -281,7 +312,7 @@ namespace Froggy.Reseau
                 porte.PreparerHote();
                 porte.CodeAPresenter = code;
                 recherche.Annoncer(code, port);
-                reseau.ClientManager.StartConnection("localhost", port);
+                reseau.ClientManager.StartConnection("127.0.0.1", port);   // une adresse : le transport Unity ne lit pas « localhost »
                 Etat = $"Salon {code} ouvert";
                 enCours = null;
                 Change?.Invoke();
@@ -313,7 +344,76 @@ namespace Froggy.Reseau
             Etat = $"Connexion au salon {code} ({adresse}:{port})…";
             Change?.Invoke();
             porte.CodeAPresenter = code;
+            if (transport != null) transport.SetConnectionData(adresse, port);   // remet aussi le mode direct
             reseau.ClientManager.StartConnection(adresse, port);
+        }
+
+        // ---------------------------------------------------------------- En ligne (Unity Relay, P2-05)
+
+        private IEnumerator CreerEnLigne()
+        {
+            DerniereErreur = "";
+            Etat = "Création du salon en ligne…";
+            Change?.Invoke();
+
+            var reservation = relais.Heberger(EtatSalon.JoueursMax);
+            yield return new WaitUntil(() => reservation.IsCompleted);
+            var resultat = reservation.IsFaulted ? null : reservation.Result;
+            if (resultat == null)
+            {
+                enCours = null;
+                Signaler(string.IsNullOrEmpty(relais.Erreur) ? "Impossible de créer le salon en ligne." : relais.Erreur);
+                yield break;
+            }
+
+            string code = CodeSalon.Normaliser(resultat.Value.code);
+            etat = new EtatSalon(code, couleurs.Length);
+            porte.Juge = etat.Examiner;
+            transport.SetRelayServerData(resultat.Value.donnees);
+
+            etatServeur = LocalConnectionState.Starting;
+            reseau.ServerManager.StartConnection();
+            yield return new WaitUntil(() => etatServeur == LocalConnectionState.Started
+                                             || etatServeur == LocalConnectionState.Stopped);
+            if (etatServeur != LocalConnectionState.Started)
+            {
+                etat = null;
+                enCours = null;
+                Signaler("Impossible d'ouvrir le salon en ligne (relais injoignable).");
+                yield break;
+            }
+
+            NetworkObject salon = Instantiate(prefabSalonReseau);
+            reseau.ServerManager.Spawn(salon);
+            SalonReseau.Actuel?.Publier(etat);
+
+            porte.PreparerHote();
+            porte.CodeAPresenter = code;
+            reseau.ClientManager.StartConnection();   // le client de l'hôte, par le même relais
+            Etat = $"Salon {code} ouvert (en ligne)";
+            enCours = null;
+            Change?.Invoke();
+        }
+
+        private IEnumerator RejoindreEnLigne(string code)
+        {
+            DerniereErreur = "";
+            Etat = $"Connexion au salon {code} (en ligne)…";
+            Change?.Invoke();
+
+            var place = relais.Rejoindre(code);
+            yield return new WaitUntil(() => place.IsCompleted);
+            var donnees = place.IsFaulted ? null : place.Result;
+            enCours = null;
+            if (donnees == null)
+            {
+                Signaler(string.IsNullOrEmpty(relais.Erreur) ? "Impossible de rejoindre." : relais.Erreur);
+                yield break;
+            }
+
+            porte.CodeAPresenter = code;
+            transport.SetRelayServerData(donnees.Value);
+            reseau.ClientManager.StartConnection();
         }
 
         private void Fermer()
@@ -323,8 +423,10 @@ namespace Froggy.Reseau
             recherche.Arreter();
             porte.OublierHote();
             if (reseau == null) return;
-            if (reseau.IsClientStarted) reseau.ClientManager.StopConnection();
+            // Le serveur d'abord : il prévient chaque joueur (le client de l'hôte compris) pendant que tous sont encore
+            // là. Dans l'autre ordre, le transport Unity écrit « stale connection » en rouge (vu le 18/11/2026, P2-05).
             if (reseau.IsServerStarted) reseau.ServerManager.StopConnection(true);
+            if (reseau.IsClientStarted) reseau.ClientManager.StopConnection();
         }
 
         // ---------------------------------------------------------------- Hôte : décisions
