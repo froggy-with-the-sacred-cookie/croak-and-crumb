@@ -41,10 +41,17 @@ namespace Froggy.Deplacement
         [System.NonSerialized] private Entrees entrees;
         [System.NonSerialized] private bool imposees, sautAppuye, auto;
         [System.NonSerialized] private float coyote, tampon;
-        [System.NonSerialized] private bool montee;
+        [System.NonSerialized] private bool montee, etaitAuSol;
 
         public bool AuSol { get; private set; }
         public bool CourseAuto => auto;
+        /// <summary>Le collider sur lequel Froggy se tient (ou presque : à groundCheckDistance près), sinon null.</summary>
+        public Collider SolTouche { get; private set; }
+        /// <summary>
+        /// Froggy vient de se poser, avec le sol touché : au pas physique où il redevient « au sol », même s'il repart
+        /// aussitôt par le tampon de saut (il n'a alors jamais touché le sol physiquement). Parcours de test, sons, poussière…
+        /// </summary>
+        public event System.Action<Collider> Atterrissage;
 
         private void Initialiser()
         {
@@ -130,6 +137,9 @@ namespace Froggy.Deplacement
 
             Vector3 v = corps.linearVelocity;
             AuSol = v.y <= 0.01f && Sol();   // en montée, on ne se recolle pas au sol
+            // annoncé avant le saut éventuel du même pas : un saut enchaîné par le tampon part sans contact physique
+            if (AuSol && !etaitAuSol) Atterrissage?.Invoke(SolTouche);
+            etaitAuSol = AuSol;
             coyote = AuSol ? reglages.coyoteTime : coyote - dt;
             tampon -= dt;
             if (AuSol) montee = false;
@@ -189,8 +199,10 @@ namespace Froggy.Deplacement
             Vector3 taille = Vector3.Scale(boite.size, transform.lossyScale);
             Vector3 demi = new Vector3(taille.x * 0.45f, 0.05f, taille.z * 0.45f);
             float distance = taille.y * 0.5f - demi.y + reglages.groundCheckDistance;
-            return gameObject.scene.GetPhysicsScene().BoxCast(transform.TransformPoint(boite.center), demi, Vector3.down,
-                out _, transform.rotation, distance, reglages.groundLayers, QueryTriggerInteraction.Ignore);
+            bool sol = gameObject.scene.GetPhysicsScene().BoxCast(transform.TransformPoint(boite.center), demi, Vector3.down,
+                out var touche, transform.rotation, distance, reglages.groundLayers, QueryTriggerInteraction.Ignore);
+            SolTouche = sol ? touche.collider : null;
+            return sol;
         }
     }
 }
