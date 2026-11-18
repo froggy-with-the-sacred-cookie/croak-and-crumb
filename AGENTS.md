@@ -100,6 +100,13 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
   vitrine tant que les objets, la torgnole, la météo et le cookie sacré ne sont pas en réseau. `PartieJardinTests`
   vérifie que chaque système y est une fois, et **échoue si un système d'une scène de test de poste y manque**. En
   partie, Échap ou Start ouvre la pause (`MenuPause` : reprendre, rejouer, retour au menu ; le solo se fige).
+- Froggy en ligne (`Assets/Froggy/Scripts/Reseau/FroggyReseau.cs`, P2-02, première version sans prédiction) : le salon
+  fait apparaître `Prefabs/Reseau/FroggyReseau` pour chaque joueur, un objet réseau invisible (NetworkTransform, client
+  autoritaire) plus une copie de la Froggy du jardin (`PlayerTemplate`), faite sur chaque machine comme les bots.
+  Chez son propriétaire, elle garde contrôleur, caméra et touches ; chez les autres, elle suit la position reçue, corps
+  cinématique, animée par `FroggyApparence.VitesseExterne` / `AuSolExterne`. Elle porte les cookies sous le numéro du
+  joueur dans le salon. Prévu avec la #128 : un effet qui déplace un joueur (coup, onde, gel) se décide chez l'hôte puis
+  s'applique chez le propriétaire de la Froggy touchée. Revenir aux capsules de test : `prefabJoueur` du `Salon.prefab` sur `CapsuleReseau`.
 
 ## Les branches
 
