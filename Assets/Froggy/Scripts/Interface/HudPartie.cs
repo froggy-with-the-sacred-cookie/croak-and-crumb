@@ -292,8 +292,8 @@ namespace Froggy.Interface
         }
 
         /// <summary>
-        /// Le joueur de cette machine : en réseau, son numéro dans le salon ; sinon la Froggy qui a un PlayerInput (comme
-        /// PartieTorgnoles.JoueurLocal).
+        /// Le joueur de cette machine : en réseau, son numéro dans le salon ; sinon la Froggy dont le PlayerInput est
+        /// allumé (comme PartieTorgnoles.JoueurLocal et BotsPartie.Humain).
         /// </summary>
         private int JoueurLocal()
         {
@@ -305,8 +305,19 @@ namespace Froggy.Interface
             }
             if (cookies != null)
                 foreach (var p in cookies.Porteurs)
-                    if (p != null && p.TryGetComponent(out PlayerInput _)) return p.Joueur;
+                    if (EstJoueurLocal(p)) return p.Joueur;
             return ReglesPartie.Personne;
+        }
+
+        /// <summary>
+        /// Vrai pour la Froggy du joueur de cette machine : un PlayerInput <b>allumé</b>, et pas de cerveau de bot. Un bot
+        /// garde un PlayerInput éteint (exigé par FroggyApparence) : le reconnaître à la seule présence du composant
+        /// faisait afficher son score sur la ligne « (toi) » (#132, 18 novembre 2026).
+        /// </summary>
+        public static bool EstJoueurLocal(Component froggy)
+        {
+            return froggy != null && froggy.TryGetComponent(out PlayerInput entree) && entree.enabled
+                   && !froggy.TryGetComponent(out Bots.CerveauBot _);
         }
 
         /// <summary>La couleur du joueur : celle choisie au salon en réseau, sinon celle de son repère d'apparition.</summary>
