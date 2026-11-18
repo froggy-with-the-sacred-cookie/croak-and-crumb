@@ -38,6 +38,9 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
 - Scènes de test : une par poste dans `Assets/Froggy/Postes/`, presque vide, qui charge le jardin par-dessus
   (`DecorDeTest`). À deux sur le même poste : menu **Froggy ▸ Scènes de test ▸ Nouvelle scène perso** (ignorée par
   Git). Ce qui se partage vit dans un préfabriqué, pas dans une scène.
+- Cookies (`Assets/Froggy/Scripts/Regles/`) : `ReglesCookies` porte les règles en C# pur (sans scène ni réseau, c'est
+  ce que l'hôte fera tourner) ; `PartieCookies` les fait vivre dans une scène à partir des repères « Apparition de
+  cookies » du Bâtisseur ; `PorteurCookies` donne le score d'une Froggy. Les valeurs sont dans `ReglagesCookies`.
 
 ## Les branches
 
