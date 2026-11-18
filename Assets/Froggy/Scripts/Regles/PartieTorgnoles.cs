@@ -9,9 +9,10 @@ namespace Froggy.Regles
     /// La torgnole dans une scène (P4-10), sans réseau : le coup de poing de base, sans objet. Le joueur local frappe avec V
     /// (ou le bouton ouest de la manette) ; le joueur touché lâche un cookie par PartieCookies.FaireLacher, à l'opposé du
     /// frappeur, et recule. Un joueur intouchable (P3-04) ne lâche rien et ne recule pas. Les règles sont dans ReglesTorgnole.
-    /// Le coup joue le geste « Torgnole » du modèle affiché (FroggyApparence.Jouer) et émet « coup donné ».
-    /// Pas encore : le cookie sacré (P5-08, #56), le gel d'image et la secousse (il n'y a pas encore de chemin unique
-    /// pour eux), le son. Les touches viennent d'ici en attendant les options (P6-05) : V (F est à l'objet, le clic gauche à la caméra).
+    /// Le coup joue le geste « Torgnole » du modèle affiché (FroggyApparence.Jouer) et émet « coup donné ». Le cookie sacré
+    /// écoute cet événement : le porteur touché le lâche aussi, même sans autre cookie (PartieCookieSacre, P5-08).
+    /// Pas encore : le gel d'image et la secousse (il n'y a pas encore de chemin unique pour eux), le son. Les touches
+    /// viennent d'ici en attendant les options (P6-05) : V (F est à l'objet, le clic gauche à la caméra).
     /// </summary>
     public class PartieTorgnoles : MonoBehaviour
     {
