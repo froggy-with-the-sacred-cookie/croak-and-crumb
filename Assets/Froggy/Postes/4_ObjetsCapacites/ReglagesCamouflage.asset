@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e385de63d560b8d48ac9ab8adc70c09c, type: 3}
+  m_Name: ReglagesCamouflage
+  m_EditorClassIdentifier: Assembly-CSharp::Froggy.Objets.ReglagesCamouflage
+  fiche: {fileID: 11400000, guid: 051e2819d626442cbeb58fe6be8b7b81, type: 2}
+  duree: 6
+  opaciteImmobile: 0.04
+  opaciteEnCourse: 0.22
+  vitesseDeCourse: 6
+  chatoiement: 0.08
+  frequence: 5
+  fondu: 0.35
+  revelePar:
+  - {fileID: 11400000, guid: 04d9627e273a1b448aa74d70dad03284, type: 2}
