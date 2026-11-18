@@ -97,8 +97,12 @@ pose onze pièces dans `Assets/Froggy/Prefabs/Gris`, sans jamais remplacer une p
 | Plate-forme de saut (orange) | 1,2 m | demande un saut |
 | Rampe | 1 m sur 4 m | monter sans sauter |
 | Mur, pilier (foncés) | 2,5 et 3 m | bloquent |
-| Nénuphar (vert) | 2 m de large | se saute |
+| Nénuphar (vert) | 2 m de large | se saute, s'enfonce sous le poids |
 | Eau 8×8 (bleue, sans collision) | — | se nage ; l'analyse la reconnaît à son nom |
+
+Les nénuphars (le gris comme ceux du jardin) **s'enfoncent sous le poids** de Froggy, plongent à l'atterrissage et
+penchent vers qui se tient au bord : seul leur dessin bouge, leur collision reste où tu l'as posée, donc la mesure des
+sauts ne change pas. Le réglage est commun : `Postes/1_MouvementCamera/ReglagesNenuphar.asset`.
 
 Un damier de **1 m** sur chaque face fait lire les distances d'un coup d'œil. Dans ① Terrain, la palette s'ouvre sur la
 catégorie « Gris » et **Aimanter à la grille** est à portée de main. Pour passer au vrai décor : sélectionne les

@@ -121,10 +121,21 @@ namespace Froggy.Deplacement
             var clavier = Keyboard.current;
             if (clavier != null && clavier[toucheDepart].wasPressedThisFrame) { AuDepart(); return; }
 
+            // une chute compte seulement sous le parcours : ailleurs (le jardin, un autre outil de test posé plus bas),
+            // Froggy n'est pas à nous ; sans ça, tout ce qui est plus bas que 4 m sous le parcours le renvoyait au départ
             Lister();
             float plusBas = float.PositiveInfinity;
-            foreach (var p in plateformes) plusBas = Mathf.Min(plusBas, p.GetComponent<Collider>().bounds.max.y);
-            if (corps.position.y < plusBas - margeChute)
+            var emprise = new Bounds(transform.position, Vector3.zero);
+            foreach (var p in plateformes)
+            {
+                var b = p.GetComponent<Collider>().bounds;
+                plusBas = Mathf.Min(plusBas, b.max.y);
+                emprise.Encapsulate(b);
+            }
+            emprise.Expand(new Vector3(10f, 0f, 10f));   // 5 m autour : plus loin qu'un saut raté ne peut porter
+            bool dessous = Mathf.Abs(corps.position.x - emprise.center.x) < emprise.extents.x
+                           && Mathf.Abs(corps.position.z - emprise.center.z) < emprise.extents.z;
+            if (dessous && corps.position.y < plusBas - margeChute)
             {
                 rates++;
                 AuDepart();

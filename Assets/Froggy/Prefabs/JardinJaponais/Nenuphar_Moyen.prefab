@@ -63,6 +63,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: dfd261e42545a43e9920fcc9ff7c61ac, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1067553422261077445}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: dfd261e42545a43e9920fcc9ff7c61ac, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3820975642476551679}
   m_SourcePrefab: {fileID: 100100000, guid: dfd261e42545a43e9920fcc9ff7c61ac, type: 3}
 --- !u!1 &8356333656230416946 stripped
 GameObject:
@@ -91,3 +94,17 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -3096862920013816941, guid: dfd261e42545a43e9920fcc9ff7c61ac, type: 3}
+--- !u!114 &3820975642476551679
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8356333656230416946}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91fc8ac1e85b9904c94c8784b7363659, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Froggy.Deplacement.Nenuphar
+  reglages: {fileID: 11400000, guid: db93f3119151aa84589e1d0c7009294a, type: 2}
+  dessin: {fileID: 0}
