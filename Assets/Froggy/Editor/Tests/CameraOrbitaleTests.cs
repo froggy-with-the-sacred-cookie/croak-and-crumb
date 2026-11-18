@@ -94,6 +94,121 @@ namespace Froggy.Outils.Tests
             Assert.That(lacet, Is.EqualTo(40f));
         }
 
+        // ---- Voir où l'on atterrit (#15) ----
+
+        private const float G = 9.81f;
+
+        [TestCase(30)]
+        [TestCase(60)]
+        [TestCase(144)]
+        public void UnSautNormalNeFaitPresquePasMonterLeCadre(int ips)
+        {
+            float dt = 1f / ips, v0 = Mathf.Sqrt(2f * G * 1.5f), h = 0f, vh = 0f, avant = 0f, hautMax = 0f;
+            for (float t = dt; t < 2f * v0 / G; t += dt)
+            {
+                float y = v0 * t - 0.5f * G * t * t;
+                h = CameraOrbitale.HauteurCadre(h, ref vh, y, 0f, false, 1.2f, 2f, 0.2f, dt);
+                Assert.That(h, Is.LessThanOrEqualTo(y + 1e-4f), "le cadre passe au-dessus de Froggy");
+                Assert.That(Mathf.Abs(h - avant), Is.LessThan(8f * dt), "saut du cadre");
+                hautMax = Mathf.Max(hautMax, h);
+                avant = h;
+            }
+            Assert.That(hautMax, Is.LessThan(0.3f), "un saut de 1,5 m ne doit faire monter le cadre que de 0,3 m au plus");
+        }
+
+        [TestCase(30)]
+        [TestCase(60)]
+        [TestCase(144)]
+        public void SousLeDernierSolLeCadreSuitSansRetard(int ips)
+        {
+            float dt = 1f / ips, h = 0f, vh = 0f;
+            for (float t = dt; t < 1.2f; t += dt)
+            {
+                float y = -0.5f * G * t * t;   // Froggy tombe d'un rebord
+                h = CameraOrbitale.HauteurCadre(h, ref vh, y, 0f, false, 1.2f, 2f, 0.2f, dt);
+                Assert.That(h, Is.EqualTo(y).Within(1e-3f), "en chute, le cadre suit Froggy sans traîner");
+            }
+        }
+
+        [TestCase(30)]
+        [TestCase(60)]
+        [TestCase(144)]
+        public void PoseSurUnSolPlusHautLeCadreSeRecaleSansDepasser(int ips)
+        {
+            float dt = 1f / ips, h = 0f, vh = 0f;
+            for (float t = 0f; t < 1f; t += dt)
+            {
+                h = CameraOrbitale.HauteurCadre(h, ref vh, 2f, 2f, true, 1.2f, 2f, 0.2f, dt);
+                Assert.That(h, Is.LessThanOrEqualTo(2f + 1e-4f), "dépassement");
+            }
+            Assert.That(h, Is.EqualTo(2f).Within(0.01f));
+        }
+
+        [Test]
+        public void MemeCadreQuelleQueSoitLaFrequence()
+        {
+            float A(int ips)
+            {
+                float dt = 1f / ips, h = 0f, vh = 0f, v0 = Mathf.Sqrt(2f * G * 3f);   // un grand saut : le cadre monte
+                for (float t = dt; t <= 0.7f; t += dt)
+                    h = CameraOrbitale.HauteurCadre(h, ref vh, v0 * t - 0.5f * G * t * t, 0f, false, 1.2f, 2f, 0.2f, dt);
+                return h;
+            }
+            Assert.That(A(30), Is.EqualTo(A(144)).Within(0.1f));
+        }
+
+        [Test]
+        public void PointDeChuteSurUnSolPlat()
+        {
+            var scene = UnityEditor.SceneManagement.EditorSceneManager.NewPreviewScene();
+            try
+            {
+                var sol = new GameObject("Sol");
+                UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(sol, scene);
+                sol.AddComponent<BoxCollider>().size = new Vector3(40f, 1f, 40f);
+                sol.transform.position = new Vector3(0f, -0.5f, 0f);
+                Physics.SyncTransforms();
+                var touches = new RaycastHit[32];
+                bool trouve = CameraOrbitale.PointDeChute(scene.GetPhysicsScene(), new Vector3(0f, 3f, 0f),
+                    new Vector3(4f, 0f, 0f), new Vector3(0f, -G, 0f), 2.5f, ~0, null, touches, out var point);
+                Assert.That(trouve, Is.True);
+                Assert.That(point.y, Is.EqualTo(0f).Within(0.01f));
+                Assert.That(point.x, Is.EqualTo(4f * Mathf.Sqrt(6f / G)).Within(0.05f), "x = v·√(2h/g)");
+
+                bool vide = CameraOrbitale.PointDeChute(scene.GetPhysicsScene(), new Vector3(100f, 3f, 0f),
+                    Vector3.zero, new Vector3(0f, -G, 0f), 2.5f, ~0, null, touches, out _);
+                Assert.That(vide, Is.False, "au-dessus du vide, rien de prévu");
+            }
+            finally { UnityEditor.SceneManagement.EditorSceneManager.ClosePreviewScene(scene); }
+        }
+
+        [Test]
+        public void LeRegardSeBaissePourVoirLaChute()
+        {
+            var cam = new Vector3(0f, 2f, -6f);
+            // 12 m plus bas, 8 m devant : 56° sous l'horizon ; le bas utile de l'image est à 18 + 60 × 0,35 = 39°
+            Assert.That(CameraOrbitale.InclinaisonManquante(cam, 18f, 0f, new Vector3(0f, -10f, 2f), 60f, 0.15f),
+                Is.EqualTo(Mathf.Atan2(12f, 8f) * Mathf.Rad2Deg - 39f).Within(0.01f));
+            Assert.That(CameraOrbitale.InclinaisonManquante(cam, 18f, 0f, new Vector3(0f, 0f, 2f), 60f, 0.15f),
+                Is.EqualTo(0f), "déjà dans l'image");
+            Assert.That(CameraOrbitale.InclinaisonManquante(cam, 18f, 0f, new Vector3(0f, -10f, -9f), 60f, 0.15f),
+                Is.EqualTo(0f), "derrière la caméra : baisser le regard n'y change rien");
+            // le cap compte : la même chute vue d'une caméra tournée de 90°
+            var tournee = Quaternion.Euler(0f, 90f, 0f);
+            Assert.That(CameraOrbitale.InclinaisonManquante(tournee * cam, 18f, 90f, tournee * new Vector3(0f, -10f, 2f), 60f, 0.15f),
+                Is.EqualTo(Mathf.Atan2(12f, 8f) * Mathf.Rad2Deg - 39f).Within(0.01f));
+        }
+
+        [Test]
+        public void LePlanProcheTientDansLaSphereDeCollision()
+        {
+            // réglages du PlayerTemplate (plan proche 0,1 m) en 16:9 et 21:9, 3e et 1re personne
+            Assert.That(CameraOrbitale.RayonPlanProche(0.1f, 60f, 16f / 9f), Is.LessThan(0.25f));
+            Assert.That(CameraOrbitale.RayonPlanProche(0.1f, 75f, 21f / 9f), Is.LessThan(0.25f));
+            Assert.That(CameraOrbitale.RayonPlanProche(0.3f, 60f, 16f / 9f), Is.GreaterThan(0.25f),
+                "au plan proche par défaut de Unity, la sphère doit grossir");
+        }
+
         [Test]
         public void MoletteJusquaLaPremierePersonneEtRetour()
         {

@@ -137,7 +137,7 @@ namespace Froggy.Cameras
                 GUI.Label(new Rect(12f, 8f, 420f, 22f), "Touche au-dessus de Tab : menu de debug");
                 return;
             }
-            float hauteur = 560f + (contour != null ? 160f : 0f) + (voltige != null ? 120f : 0f) + (apparence != null ? 70f + 22f * nomsFroggy.Length : 0f);
+            float hauteur = 585f +(contour != null ? 160f : 0f) + (voltige != null ? 120f : 0f) + (apparence != null ? 70f + 22f * nomsFroggy.Length : 0f);
             GUILayout.BeginArea(new Rect(16f, 16f, 400f, hauteur), GUI.skin.box);
             GUILayout.Label("Caméra (debug) · la même touche pour fermer");
             var actuel = Actuel;
@@ -154,6 +154,7 @@ namespace Froggy.Cameras
                 wow.ChampTroisiemePersonne = Curseur("Champ de vision (°)", wow.ChampTroisiemePersonne, 40f, 90f, "0");
                 wow.DistanceMax = Curseur("Distance max (m)", wow.DistanceMax, 4f, 30f, "0.0");
                 wow.InverserY = GUILayout.Toggle(wow.InverserY, " Inverser l'axe vertical");
+                wow.VoirAtterrissage = GUILayout.Toggle(wow.VoirAtterrissage, " Voir où l'on atterrit (cadre posé en l'air, regard vers la chute)");
                 GUILayout.Label($"Distance actuelle : {wow.Distance:0.0} m{(wow.PremierePersonne ? " (première personne)" : "")}");
             }
             if (contour != null)
