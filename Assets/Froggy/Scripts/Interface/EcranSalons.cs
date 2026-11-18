@@ -27,10 +27,13 @@ namespace Froggy.Interface
 
             f.Texte("Code du salon", panneau, 40, FabriqueMenu.Ivoire, TextAnchor.MiddleCenter,
                 new Vector2(0f, 220f), new Vector2(900f, 60f));
-            code = SaisieCode.Construire(f, panneau, new Vector2(0f, 105f));
+            // en ligne (P2-05, par défaut) : le code de Unity, 6 lettres et chiffres ; en réseau local : 4 lettres
+            bool enLigne = Salon.Local == null || Salon.Local.EnLigne;
+            code = SaisieCode.Construire(f, panneau, new Vector2(0f, 105f), enLigne);
             code.Change += Rafraichir;
             code.Valide += Rejoindre;
-            f.Texte("Les 4 lettres données par l'hôte.", panneau, 28, FabriqueMenu.Brume, TextAnchor.MiddleCenter,
+            f.Texte(enLigne ? "Le code donné par l'hôte (lettres et chiffres)." : "Les 4 lettres données par l'hôte.",
+                panneau, 28, FabriqueMenu.Brume, TextAnchor.MiddleCenter,
                 new Vector2(0f, 10f), new Vector2(900f, 44f));
             etat = f.Texte("", panneau, 30, FabriqueMenu.Ivoire, TextAnchor.MiddleCenter,
                 new Vector2(0f, -60f), new Vector2(980f, 80f));

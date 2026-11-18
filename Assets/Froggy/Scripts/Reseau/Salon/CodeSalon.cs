@@ -38,6 +38,12 @@ namespace Froggy.Reseau
             return code.ToString();
         }
 
+        /// <summary>Code en ligne : longueur des codes vus chez Unity Relay le 18/11/2026 (non documentée par Unity).</summary>
+        public const int LongueurEnLigne = 6;
+
+        /// <summary>Caractères d'un code en ligne : majuscules et chiffres.</summary>
+        public const string LettresEnLigne = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
         /// <summary>
         /// Code en ligne (P2-05) : c'est Unity Relay qui le donne, lettres et chiffres (format non documenté par Unity :
         /// on accepte 4 à 12 caractères). Déjà normalisé.

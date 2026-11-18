@@ -62,6 +62,23 @@ namespace Froggy.Outils.Tests
         }
 
         [Test]
+        public void LeChampDuMenuPrendUnCodeEnLigne()
+        {
+            // écran « Rejoindre » du poste 6 (P6-03) : en ligne, 6 cases, lettres et chiffres
+            var saisie = new Froggy.Interface.CodeEnSaisie(enLigne: true);
+            Assert.That(saisie.Longueur, Is.EqualTo(CodeSalon.LongueurEnLigne));
+            saisie.Coller("pcww7r");
+            Assert.That(saisie.Code, Is.EqualTo("PCWW7R"), "minuscules et chiffres acceptés");
+            Assert.That(saisie.Complet, Is.True);
+            saisie.Effacer();
+            Assert.That(saisie.Complet, Is.False, "une case vide : pas encore");
+
+            var local = new Froggy.Interface.CodeEnSaisie();
+            Assert.That(local.Longueur, Is.EqualTo(CodeSalon.Longueur), "réseau local : toujours 4 lettres");
+            Assert.That(local.Taper('7'), Is.False, "pas de chiffre en réseau local");
+        }
+
+        [Test]
         public void LaReponseDeLHoteSeLit()
         {
             Assert.That(RechercheSalon.Lire("FROGGY!KRBF:7771", "KRBF", out ushort port), Is.True);
