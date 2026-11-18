@@ -86,6 +86,17 @@ Pièges :
 - Une capture prise après l'arrêt du mode Play montre l'aperçu de l'éditeur : vérifier `isPlaying`.
 - Les captures vont dans un dossier ignoré par git (`Captures/`) ; sortir en JPG, le disque se remplit vite.
 - Comparer : composer les captures côte à côte et regarder ; un écart de pixels chiffré ne suffit pas.
+- **Par le Unity CLI** (Froggy, novembre 2026, Windows) : `capture screenshot --view game` ne rend que la caméra, sans
+  l'interface IMGUI (`OnGUI`). `capture game_view --source screen --save_path <chemin>` la montre. Le chemin doit être
+  dans le projet, et un chemin relatif `Temp/x.png` atterrit dans **`Assets/Temp/`** (importé, et partagé avec les
+  fenêtres Multiplayer Play Mode) : déplacer l'image hors du projet, puis `AssetDatabase.DeleteAsset("Assets/Temp")`
+  pour ne pas laisser de `Assets/Temp.meta` dans `git status`.
+- **Poser un clip humanoïde sans jouer** (Froggy, 18 novembre 2026, gestes de Froggy P) : en mode édition,
+  `AnimationClip.SampleAnimation` et un `PlayableGraph` évalué laissent le modèle au repos (os et formes immobiles).
+  Seul `AnimationMode.StartAnimationMode()` puis `BeginSampling` / `SampleAnimationClip` / `EndSampling` pose la pose,
+  formes comprises ; `StopAnimationMode()` dans un `finally`. Et un `cam.Render()` dans le même appel montre encore
+  l'ancien skinning : cuire la pose (`smr.BakeMesh(m, false)`, l'objet du FBX porte une échelle de 100) dans un
+  maillage fixe et photographier celui-là. Une capture qui montre le repos ne prouve rien : mesurer d'abord un os.
 - **Simuler des appuis par le MCP ne marche pas** (Froggy, 28 octobre 2026, MCP officiel de Unity, `Unity_RunCommand`) :
   `InputSystem.QueueStateEvent` sur un clavier ou une manette virtuelle, puis `Step()` ou `InputSystem.Update()`, ne
   change pas l'état de l'appareil (éditeur sans focus), même en passant `backgroundBehavior` à `IgnoreFocus`. Et ce
@@ -115,6 +126,20 @@ Pièges :
   Relancer avant d'accuser le code.
 
 ## 6. Pièges Unity 6 rencontrés
+
+- **Unity CLI, à savoir** (Froggy, novembre 2026, Windows) :
+  - `unity open <projet>` puis `unity status --until-ready --project-path <projet> --timeout 600` pour attendre
+    l'éditeur ; `unity close <projet>` **quitte sans enregistrer** : vérifier d'abord `scene.isDirty` de chaque scène
+    ouverte. Fermer puis rouvrir libère un port réseau resté pris.
+  - Viser une fenêtre Multiplayer Play Mode : `--project-path <projet>/Library/VP/<vpId>` (skill
+    `test-multijoueur-local`).
+  - Un menu se teste par script : `EditorApplication.ExecuteMenuItem("Froggy/…")` rend vrai s'il existe ; la liste
+    d'un menu : `UnityEditor.Unsupported.GetSubmenus("Froggy")`. Dans `[MenuItem]`, un sous-menu se fait avec `/`,
+    pas avec « ▸ ».
+  - `unity recompile --format json` : lire `data.summary.errors` et `data.errors[].message` ; `success` vaut faux s'il
+    y a une erreur de compilation.
+  - Les scripts de l'IA (`eval_file`, PowerShell) vont dans le scratchpad : Unity vide `Temp/` à chaque démarrage.
+  - Dans PowerShell, `Test-Path a -and b` est une erreur : `(Test-Path a) -and (Test-Path b)`.
 
 - `GetInstanceID` est obsolète en erreur depuis Unity 6.6.
 - USS : `-unity-slice-scale` exige une unité (`0.5px`).

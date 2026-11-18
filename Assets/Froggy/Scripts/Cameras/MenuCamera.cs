@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Froggy.Template;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -13,8 +14,9 @@ namespace Froggy.Cameras
     /// Les réglages changés ici ne vivent que le temps de la partie. Menu ouvert : le curseur reste libre et la caméra
     /// ignore la souris, pour qu'un clic sur un bouton ne la fasse pas tourner. Si la scène a un ChoixMuraille (vitrines
     /// du jardin), le menu propose aussi de changer le contour de l'arène ; si le joueur a un FroggyApparence, de changer
-    /// de Froggy (B, Kawaii, P… ou la forme provisoire) et de lancer sa Victoire ; si elle a une VoltigeSakura, d'allumer
-    /// et d'éteindre les deux versions des pétales de sakura.
+    /// de Froggy (B, Kawaii, P… ou la forme provisoire) et, juste dessous, de jouer chacun de ses gestes (victoire,
+    /// torgnole, croassement, nage…) ; si elle a une VoltigeSakura, d'allumer et d'éteindre les deux versions des pétales
+    /// de sakura. Le menu défile quand il dépasse la vue.
     /// </summary>
     public class MenuCamera : MonoBehaviour
     {
@@ -42,6 +44,7 @@ namespace Froggy.Cameras
         private Froggy.Jardin.ChoixMuraille contour;
         private Froggy.Personnages.FroggyApparence apparence;
         private string[] nomsFroggy;
+        [System.NonSerialized] private Vector2 defilement;
         private Froggy.Jardin.VoltigeSakura voltige;
         private bool rouvert;
         private Keyboard ecoute;
@@ -137,8 +140,17 @@ namespace Froggy.Cameras
                 GUI.Label(new Rect(12f, 8f, 420f, 22f), "Touche au-dessus de Tab : menu de debug");
                 return;
             }
-            float hauteur = 585f +(contour != null ? 160f : 0f) + (voltige != null ? 120f : 0f) + (apparence != null ? 70f + 22f * nomsFroggy.Length : 0f);
-            GUILayout.BeginArea(new Rect(16f, 16f, 400f, hauteur), GUI.skin.box);
+            // les gestes lus une fois par passe : choisir un autre Froggy en cours de passe ne change pas le nombre de
+            // boutons entre la mise en page et le dessin (IMGUI l'exige)
+            var gestes = apparence != null ? apparence.Gestes : null;
+            int rangees = gestes != null && gestes.Count > 0 ? Mathf.CeilToInt(gestes.Count / 3f) + 2 : 0;
+            float hauteur = 585f +(contour != null ? 160f : 0f) + (voltige != null ? 120f : 0f)
+                            + (apparence != null ? 70f + 22f * nomsFroggy.Length + 26f * rangees : 0f);
+            // fenêtre plus basse que le menu (#99) : le cadre s'arrête au bas de l'écran et son contenu défile, à la
+            // molette ou à la barre. Menu ouvert, la caméra ne lit plus la molette : pas de zoom en même temps.
+            float visible = HauteurVisible(hauteur, Screen.height / e, 16f);
+            GUILayout.BeginArea(new Rect(16f, 16f, 400f, visible), GUI.skin.box);
+            defilement = GUILayout.BeginScrollView(defilement, false, visible < hauteur);
             GUILayout.Label("Caméra (debug) · la même touche pour fermer");
             var actuel = Actuel;
             int choix = GUILayout.SelectionGrid((int)actuel, Noms, 1);
@@ -183,14 +195,31 @@ namespace Froggy.Cameras
                 int f = apparence.Courant + 1;
                 int choixFroggy = GUILayout.SelectionGrid(f, nomsFroggy, 1);
                 if (choixFroggy != f) apparence.Afficher(choixFroggy - 1);
-                GUI.enabled = apparence.Courant >= 0;
-                if (GUILayout.Button("Victoire")) apparence.Celebrer();
-                GUI.enabled = true;
+                if (gestes != null && gestes.Count > 0) Gestes(gestes);
             }
             GUILayout.FlexibleSpace();
             GUILayout.Label("Les réglages changés ici s'oublient à la fin de la partie.");
+            GUILayout.EndScrollView();
             GUILayout.EndArea();
         }
+
+        /// <summary>Les gestes du Froggy affiché (torgnole, croassement, nage…), un bouton chacun, sous son nom.</summary>
+        private void Gestes(IReadOnlyList<string> gestes)
+        {
+            GUILayout.Label($"Gestes de {apparence.NomCourant} : un clic les joue");
+            for (int i = 0; i < gestes.Count; i += 3)
+            {
+                GUILayout.BeginHorizontal();
+                for (int j = i; j < Mathf.Min(i + 3, gestes.Count); j++)
+                    if (GUILayout.Button(gestes[j], GUILayout.Width(112f))) apparence.Jouer(gestes[j]);
+                GUILayout.EndHorizontal();
+            }
+            if (GUILayout.Button("Revenir au déplacement (après une boucle)")) apparence.Jouer("Deplacement");
+        }
+
+        /// <summary>La hauteur du cadre du menu : la sienne, ou ce que l'écran laisse sous et sur la marge s'il est plus bas.</summary>
+        public static float HauteurVisible(float hauteurMenu, float hauteurEcran, float marge) =>
+            Mathf.Min(hauteurMenu, Mathf.Max(120f, hauteurEcran - 2f * marge));
 
         private static float Curseur(string nom, float valeur, float min, float max, string format)
         {

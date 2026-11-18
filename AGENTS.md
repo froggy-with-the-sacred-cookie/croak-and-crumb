@@ -23,8 +23,9 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
 
 - Unity **6000.6.7f1** (tout le monde exactement la même ; en changer se décide en équipe, par une PR), URP, Input
   System (`Assets/InputSystem_Actions.inputactions`).
-- Réseau : **FishNet** (choisi dans Notion, pas encore installé). Vérifier la documentation de la version installée
-  avant d'écrire du code réseau : ne jamais écrire une API FishNet de mémoire.
+- Réseau : **FishNet 4.7.4** (épinglé sur un commit, pas sur le tag : voir `Docs/Reseau/GUIDE.md`) et Multiplayer
+  Play Mode pour tester à plusieurs. Vérifier le code de la version installée avant d'écrire du code réseau : ne
+  jamais écrire une API FishNet de mémoire. Test hôte-client et règles d'un script réseau : `Docs/Reseau/GUIDE.md`.
 - Gestion de projet : le [tableau GitHub Projects](https://github.com/orgs/froggy-with-the-sacred-cookie/projects/1),
   voir « Les tâches ».
 - Dépôt : https://github.com/froggy-with-the-sacred-cookie/croak-and-crumb
@@ -38,6 +39,13 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
 - Scènes de test : une par poste dans `Assets/Froggy/Postes/`, presque vide, qui charge le jardin par-dessus
   (`DecorDeTest`). À deux sur le même poste : menu **Froggy ▸ Scènes de test ▸ Nouvelle scène perso** (ignorée par
   Git). Ce qui se partage vit dans un préfabriqué, pas dans une scène.
+- Cookies (`Assets/Froggy/Scripts/Regles/`) : `ReglesCookies` porte les règles en C# pur (sans scène ni réseau, c'est
+  ce que l'hôte fera tourner) ; `PartieCookies` les fait vivre dans une scène à partir des repères « Apparition de
+  cookies » du Bâtisseur ; `PorteurCookies` donne le score d'une Froggy. Les valeurs sont dans `ReglagesCookies`.
+  Faire lâcher un cookie à un joueur (un coup, un malus) : `PartieCookies.FaireLacher(porteur, direction)`.
+- Déroulement d'une partie (même dossier) : `ReglesPartie` (compte à rebours, durée, gagnant, prolongation, en C# pur)
+  et `DeroulementPartie` dans la scène. Le porteur du cookie sacré se donne par `PorteurCookieSacre` ; le début et la
+  fin partent en événements du socle (`PartieCommencee`, `PartieFinie`).
 
 ## Les branches
 
@@ -98,6 +106,8 @@ d'écrire ; plusieurs si besoin.
 | Prendre une tâche du tableau, commit, push, pull request, relecture | `livrer` |
 | Piloter ou tester Unity par une IA (MCP), captures, tests, build | `unity-mcp` |
 | Réseau, autorité, synchronisation, bots, simulation d'équilibrage, anti-boule-de-neige | `multijoueur-equilibrage` |
+| Code FishNet (API de la version installée, prédiction, latence, port, NetworkManager) | `reseau-fishnet` |
+| Tester à 2, 3 ou 4 sur une machine (Multiplayer Play Mode), mémoire, fenêtres de joueur | `test-multijoueur-local` |
 | Contrôleur de Froggy, saut, nage, vitesse, tolérances | `ressenti-mouvement` |
 | Caméra 1re / 3e personne, cadrage, secousse | `camera` |
 | Coups, capacités, malus, gel d'image, vibration, lisibilité et équité | `impact-feedback` |

@@ -97,11 +97,11 @@ namespace Froggy.Cameras
         [Tooltip("Marge gardée sous le point d'atterrissage, en fraction de la hauteur de l'image.")]
         [Range(0f, 0.4f)] [SerializeField] private float margeBas = 0.15f;
         [Tooltip("Inclinaison ajoutée au plus pour voir où l'on tombe, en degrés.")]
-        [SerializeField] private float inclinaisonChuteMax = 35f;
+        [SerializeField] private float inclinaisonChuteMax = 60f;
         [Tooltip("Vitesse max de cette inclinaison, en degrés par seconde.")]
-        [SerializeField] private float vitesseInclinaisonChuteMax = 120f;
+        [SerializeField] private float vitesseInclinaisonChuteMax = 240f;
         [Tooltip("Temps du ressort de cette inclinaison, en s (le retour au sol prend le double).")]
-        [SerializeField] private float tempsInclinaisonChute = 0.2f;
+        [SerializeField] private float tempsInclinaisonChute = 0.1f;
         [Tooltip("Durée de vol prédite au plus, en s.")]
         [SerializeField] private float dureePrediction = 2.5f;
 
