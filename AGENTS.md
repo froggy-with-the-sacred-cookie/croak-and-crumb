@@ -59,6 +59,10 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
 - Torgnole (même dossier) : `ReglesTorgnole` (cône, portée, 5 s de recharge, en C# pur) et `PartieTorgnoles` dans la
   scène (touche F ou bouton ouest). Un bot ou l'hôte frappe par `PartieTorgnoles.Frapper(porteur)` ; le coup part en
   événement du socle (`CoupDonne`). Réglages : `Postes/4_ObjetsCapacites/ReglagesTorgnole.asset`.
+- Météo et événements (`Assets/Froggy/Scripts/Meteo/`) : `ReglesMeteo` (tirage pondéré, annonce, durée, en C# pur),
+  `GestionnaireMeteo` dans la scène, une fiche `ReglagesMeteo` par arène (événements et poids) et une
+  `DefinitionEvenement` par événement (durée, vitesse, saut, posés par les `Modificateurs`). Le rendu et le son d'un
+  événement écoutent `Annonce`, `Debut` et `Fin` du gestionnaire ; il démarre et s'arrête avec la partie.
 
 ## Les branches
 
