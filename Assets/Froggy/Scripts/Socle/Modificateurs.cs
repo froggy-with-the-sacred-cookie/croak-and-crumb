@@ -28,6 +28,22 @@ namespace Froggy.Socle
         /// <summary>Multiplie la hauteur du saut (la vitesse de départ en découle). 1 : rien ne change.</summary>
         public float Saut { get; private set; } = 1f;
 
+        // qui empêche cette Froggy d'agir (gel éclair…) : ni torgnole, ni objet
+        [NonSerialized] private readonly List<object> entraves = new List<object>();
+
+        /// <summary>Vrai tant qu'une source l'empêche d'agir : PartieTorgnoles et PartieObjets refusent alors.</summary>
+        public bool Entrave => entraves.Count > 0;
+
+        /// <summary>« source » empêche cette Froggy de frapper et d'utiliser son objet, jusqu'à Desentraver(source).</summary>
+        public void Entraver(object source)
+        {
+            if (source == null) throw new ArgumentNullException(nameof(source));
+            if (!entraves.Contains(source)) entraves.Add(source);
+        }
+
+        /// <summary>Lève l'entrave de « source ». Sans effet si elle n'en a pas posé.</summary>
+        public void Desentraver(object source) => entraves.Remove(source);
+
         /// <summary>Combien de modificateurs sont posés.</summary>
         public int Nombre => poses.Count;
 
@@ -57,6 +73,7 @@ namespace Froggy.Socle
         /// <summary>Retire tout (réapparition, fin de partie).</summary>
         public void Vider()
         {
+            entraves.Clear();
             if (poses.Count == 0) return;
             poses.Clear();
             Recalculer();
