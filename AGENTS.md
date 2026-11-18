@@ -59,12 +59,17 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
 - Torgnole (même dossier) : `ReglesTorgnole` (cône, portée, 5 s de recharge, en C# pur) et `PartieTorgnoles` dans la
   scène (touche F ou bouton ouest). Un bot ou l'hôte frappe par `PartieTorgnoles.Frapper(porteur)` ; le coup part en
   événement du socle (`CoupDonne`). Réglages : `Postes/4_ObjetsCapacites/ReglagesTorgnole.asset`.
+- Météo et événements (`Assets/Froggy/Scripts/Meteo/`) : `ReglesMeteo` (tirage pondéré, annonce, durée, en C# pur),
+  `GestionnaireMeteo` dans la scène, une fiche `ReglagesMeteo` par arène (événements et poids) et une
+  `DefinitionEvenement` par événement (durée, vitesse, saut, posés par les `Modificateurs`). Le rendu et le son d'un
+  événement écoutent `Annonce`, `Debut` et `Fin` du gestionnaire ; il démarre et s'arrête avec la partie.
 - Cookie sacré et gobelin (dossier `Regles/`) : `ReglesCookieSacre` (le gobelin arrive dans la dernière minute,
   capture, lâcher, ramassage, en C# pur) et `PartieCookieSacre` dans la scène, qui fait fuir le gobelin (`FuiteGobelin`,
   préfabriqué `Assets/Froggy/Gobelin/Gobelin_Kappa`, menu **Froggy ▸ Gobelin**) depuis le repère « Départ du gobelin »
   et tient `PorteurCookieSacre` à jour. Une torgnole (`CoupDonne`) ou un cookie lâché le font tomber ; un autre coup
   passe par `PartieCookieSacre.FaireLacher(porteur, direction)`. Réglages :
-  `Postes/5_MeteoEvenements/ReglagesCookieSacre.asset`.
+  `Postes/5_MeteoEvenements/ReglagesCookieSacre.asset`. En réseau, il n'est pas encore dans `PartieReseau` ; chez un
+  joueur qui n'est pas l'hôte (« Miroir »), il ne décide rien.
 
 ## Les branches
 

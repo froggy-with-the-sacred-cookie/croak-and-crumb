@@ -127,3 +127,22 @@ Exemple complet : `Assets/Froggy/Scripts/Reseau/Salon/` (prefab `Prefabs/Reseau/
   à `null` à l'entrée (les connexions sont réutilisées).
 - Testé le 18/11/2026 à 2 fenêtres : créer, rejoindre, mauvais code, partie en cours, lancer, revenir, deux Play de
   suite.
+
+## 9. Règles décidées par l'hôte (P2-04)
+
+Exemple : `Assets/Froggy/Scripts/Reseau/Partie/PartieReseau.cs`.
+
+- **Réutiliser les règles locales** : l'hôte fait tourner les MonoBehaviours du poste 3 tels quels ; chez les autres,
+  un drapeau `Miroir` coupe toute décision (dans `Pas` lui-même, pas seulement dans `FixedUpdate`) et `Refleter(...)`
+  montre l'état reçu.
+- **Publier les différences** : l'hôte compare et n'écrit dans `SyncList` / `SyncVar` que ce qui a changé (LateUpdate).
+  Défaut des types synchronisés : canal **fiable**, envoi toutes les **0,1 s**. Ne pas passer `SyncTypeSettings(0f)`
+  pour « envoyer tout de suite » : une valeur nulle ressemble au réglage par défaut.
+- **Événements** : `[ObserversRpc(ExcludeServer = true)]` (le client de l'hôte a déjà émis les siens). Un RPC part
+  **tout de suite**, l'état synchronisé au plus 0,1 s après : un client qui réagit au RPC lit l'ancien état. Mettre
+  dans le message ce qu'il faut (nouveau score, gagnant) et le garder jusqu'à ce que l'état synchronisé le rattrape.
+- **Numéroter par le salon**, pas par la position ; chercher un joueur par son numéro (trous possibles : 1 et 3).
+- **`Start()` qui remet à zéro** : un objet apparu puis réglé dans la même image est remis à zéro par son `Start()` à
+  l'image suivante ; attendre une image (coroutine) avant de commencer.
+- Vérifier « en même temps » sans dépendre du réseau : poser les deux joueurs sur le cookie **pendant le compte à
+  rebours** (règles en pause), la décision se fait au premier pas de jeu.
