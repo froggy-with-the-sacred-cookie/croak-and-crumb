@@ -42,7 +42,14 @@ namespace Froggy.Bots
         [Header("Ramassage")]
         [Tooltip("Il va chercher une boîte à objets si elle est à moins de cette distance et qu'il n'a pas d'objet, en m.")]
         [Min(0f)] public float rayonBoite = 8f;
-        [Tooltip("Il sprinte pour fuir et pour la course au cookie sacré.")]
-        public bool sprinter = true;
+        [Header("Dash (#134, à la place du sprint)")]
+        [Tooltip("Il se sert du dash : rattraper une cible à portée, le gobelin ou le cookie sacré, fuir une menace toute proche.")]
+        public bool dasher = true;
+        [Tooltip("Il dashe vers une cible à au moins cette distance, en m (plus près, il marche). PROPOSITION.")]
+        [Min(0f)] public float dashMin = 2f;
+        [Tooltip("Il dashe vers une cible à au plus cette distance, en m (le dash fait 4 m). PROPOSITION.")]
+        [Min(0f)] public float dashMax = 5f;
+        [Tooltip("Il dashe pour fuir une menace à moins de cette distance, en m. PROPOSITION.")]
+        [Min(0f)] public float dashFuite = 3f;
     }
 }

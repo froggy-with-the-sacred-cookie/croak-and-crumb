@@ -100,6 +100,12 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
   cinématique, animée par `FroggyApparence.VitesseExterne` / `AuSolExterne`. Elle porte les cookies sous le numéro du
   joueur dans le salon. Prévu avec la #128 : un effet qui déplace un joueur (coup, onde, gel) se décide chez l'hôte puis
   s'applique chez le propriétaire de la Froggy touchée. Revenir aux capsules de test : `prefabJoueur` du `Salon.prefab` sur `CapsuleReseau`.
+- **Pas de sprint : un dash** (#134, décision de Florent du 18/11/2026). Action « Dash » de l'Input System (Maj gauche,
+  R1). Au sol seulement, 4 m en 0,2 s, recharge 3 s (`Postes/1_MouvementCamera/Resources/ReglagesDash.asset`). Le
+  geste est dans `DeplacementWow.Dasher` (sauter ou quitter le sol le coupe à la vitesse de course : les portées de
+  saut ne changent pas) ; `ReglesDash` (C# pur) tient recharges et assommements ; `PartieDash` s'installe seul en jeu,
+  lit la touche du joueur local, bouscule la Froggy percutée et assomme les deux si elles dashaient toutes les deux.
+  Un bot ou l'hôte dashe par `PartieDash.Actuel.Dasher(froggy)`. Pas encore en réseau pour le choc (avec la #128).
 
 ## Les branches
 

@@ -7,7 +7,7 @@ namespace Froggy.Deplacement
 {
     /// <summary>
     /// La nage de Froggy (P1-02) : quand son centre est dans une ZoneEau, DeplacementWow lui passe la main. Froggy flotte
-    /// la tête hors de l'eau, nage plus lentement qu'elle ne court (sans sprint), plonge tant qu'on tient la touche de
+    /// la tête hors de l'eau, nage plus lentement qu'elle ne court (sans dash), plonge tant qu'on tient la touche de
     /// plongée (C, ou le bouton est de la manette : l'action Crouch), et ressort en sautant sur un bord ou un nénuphar.
     /// Dans l'eau, la gravité est coupée : la hauteur suit la surface. Le demi-tour reste net ; l'inertie se verra par
     /// l'animation et les éclaboussures (pas encore). Les Modificateurs du socle jouent aussi dans l'eau.
@@ -87,7 +87,7 @@ namespace Froggy.Deplacement
             float facteurVitesse = modificateurs != null ? modificateurs.Vitesse : 1f;
             float facteurSaut = modificateurs != null ? modificateurs.Saut : 1f;
 
-            Vector3 voulue = DeplacementWow.Vitesse(deplacement, corps.rotation.eulerAngles.y, false, course, wow)
+            Vector3 voulue = DeplacementWow.Vitesse(deplacement, corps.rotation.eulerAngles.y, course, wow)
                              * reglages.facteurVitesse * facteurVitesse;
             Vector3 horizontal = Vector3.MoveTowards(new Vector3(v.x, 0f, v.z), voulue, reglages.acceleration * dt);
 

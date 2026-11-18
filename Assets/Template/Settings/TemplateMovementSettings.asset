@@ -13,7 +13,6 @@ MonoBehaviour:
   m_Name: TemplateMovementSettings
   m_EditorClassIdentifier: Assembly-CSharp::Froggy.Template.TemplateMovementSettings
   moveSpeed: 6
-  sprintMultiplier: 1.6
   groundAcceleration: 60
   airAcceleration: 25
   jumpHeight: 1.5

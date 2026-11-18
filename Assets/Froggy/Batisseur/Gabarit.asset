@@ -17,8 +17,6 @@ MonoBehaviour:
   hauteurMarche: 0.35
   penteMax: 40
   vitesseCourse: 6
-  avecSprint: 0
-  multiplicateurSprint: 1.6
   vitesseNage: 3
   sortieDeLEau: 0.6
   hauteurSaut: 1.5
