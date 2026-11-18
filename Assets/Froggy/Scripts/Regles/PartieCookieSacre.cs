@@ -15,6 +15,8 @@ namespace Froggy.Regles
     /// Lâcher : une torgnole (« coup donné », P4-10) le fait tomber, même à qui n'a pas d'autre cookie ; un joueur qui lâche
     /// un cookie pour une autre raison (« cookie lâché », P3-02) le lâche aussi ; le gel éclair appellera FaireLacher().
     /// Un joueur intouchable (P3-04) ne le lâche pas. Une nouvelle partie (« Rejouer ») le remet à zéro.
+    /// En réseau (P2-04), chez un joueur qui n'est pas l'hôte (DeroulementPartie en « Miroir »), il ne décide rien, comme
+    /// PartieCookies. Il n'est pas encore dans PartieReseau : la copie chez les joueurs reste à faire.
     /// Événement émis : « cookie sacré » (socle), à l'apparition (auteur : le gobelin), puis à chaque fois qu'il change de
     /// main ou tombe (auteur : le joueur). Le message à l'écran est provisoire, en attendant le HUD (P6-02).
     /// </summary>
@@ -82,6 +84,7 @@ namespace Froggy.Regles
         {
             if (Regles == null) Preparer();
             if (deroulement == null || deroulement.Regles == null || cookies == null) return;
+            if (deroulement.Miroir) return;   // en réseau, seul l'hôte décide (P2-04)
             if (deroulement.Regles != partieVue)
             {
                 if (partieVue != null) Preparer();
@@ -120,11 +123,11 @@ namespace Froggy.Regles
         /// <summary>
         /// Fait lâcher le cookie sacré à son porteur (gel éclair, malus). Il tombe à « distanceLacher » dans la direction
         /// donnée (nulle : derrière lui), sans traverser un mur. Rend false si ce joueur ne le portait pas ou s'il est
-        /// intouchable (il vient de réapparaître, P3-04), comme PartieCookies.FaireLacher.
+        /// intouchable (il vient de réapparaître, P3-04), ou en Miroir (réseau, pas l'hôte), comme PartieCookies.FaireLacher.
         /// </summary>
         public bool FaireLacher(PorteurCookies porteur, Vector3 direction)
         {
-            if (Regles == null || porteur == null || porteur.Intouchable) return false;
+            if (Regles == null || porteur == null || porteur.Intouchable || (deroulement != null && deroulement.Miroir)) return false;
             Vector3 chute = PointDeChute(porteur.transform, direction);
             if (!Regles.Lacher(porteur.Joueur, chute)) return false;
             Poser(chute);

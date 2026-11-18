@@ -336,6 +336,28 @@ namespace Froggy.Outils.Tests
             Assert.That(m.Sacre.Gobelin, Is.Not.Null, "et le gobelin revient dans la nouvelle partie");
         }
 
+        [Test]
+        public void EnMiroirLeGobelinNApparaitPasDeLuiMeme()
+        {
+            var m = Monter();
+            Avancer(m, 0.9f);   // il reste 3,1 s : pas encore de gobelin
+            m.Partie.Miroir = true;   // en réseau, chez un joueur qui n'est pas l'hôte (P2-04)
+            m.Partie.Refleter(Phase.EnJeu, 2f, 0f, ReglesPartie.Personne);
+            Avancer(m, 0.2f);
+            Assert.That(m.Sacre.Gobelin, Is.Null, "c'est l'hôte qui décide");
+        }
+
+        [Test]
+        public void EnMiroirOnNeLeFaitPasLacher()
+        {
+            var m = Monter();
+            Attraper(m);
+            m.Partie.Miroir = true;
+            Assert.That(m.Sacre.FaireLacher(m.Porteur, Vector3.right), Is.False);
+            m.Sacre.Reagir(new EvenementPartie(TypeEvenement.CoupDonne, m.Autre, m.Froggy, m.Froggy.transform.position));
+            Assert.That(m.Sacre.Regles.Etat, Is.EqualTo(EtatCookieSacre.Porte), "c'est l'hôte qui décide");
+        }
+
         private static void Avancer(Montage m, float secondes)
         {
             int pas = Mathf.Max(1, Mathf.RoundToInt(secondes / Dt));
