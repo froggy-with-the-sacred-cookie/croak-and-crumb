@@ -23,8 +23,9 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
 
 - Unity **6000.6.7f1** (tout le monde exactement la même ; en changer se décide en équipe, par une PR), URP, Input
   System (`Assets/InputSystem_Actions.inputactions`).
-- Réseau : **FishNet** (choisi dans Notion, pas encore installé). Vérifier la documentation de la version installée
-  avant d'écrire du code réseau : ne jamais écrire une API FishNet de mémoire.
+- Réseau : **FishNet 4.7.4** (épinglé sur un commit, pas sur le tag : voir `Docs/Reseau/GUIDE.md`) et Multiplayer
+  Play Mode pour tester à plusieurs. Vérifier le code de la version installée avant d'écrire du code réseau : ne
+  jamais écrire une API FishNet de mémoire. Test hôte-client et règles d'un script réseau : `Docs/Reseau/GUIDE.md`.
 - Gestion de projet : le [tableau GitHub Projects](https://github.com/orgs/froggy-with-the-sacred-cookie/projects/1),
   voir « Les tâches ».
 - Dépôt : https://github.com/froggy-with-the-sacred-cookie/croak-and-crumb
