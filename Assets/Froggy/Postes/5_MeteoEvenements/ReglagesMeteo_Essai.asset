@@ -17,6 +17,8 @@ MonoBehaviour:
     poids: 1
   - evenement: {fileID: 11400000, guid: 04d9627e273a1b448aa74d70dad03284, type: 2}
     poids: 1
+  - evenement: {fileID: 11400000, guid: 9fa776a3d0a14ef6bcc066e91eecd03b, type: 2}
+    poids: 1
   annonce: 3
   pauseMin: 5
   pauseMax: 8
