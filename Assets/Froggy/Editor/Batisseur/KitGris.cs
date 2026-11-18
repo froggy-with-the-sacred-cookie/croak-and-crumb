@@ -22,7 +22,7 @@ namespace Froggy.Outils
 
         private class Piece
         {
-            public string nom; public Vector3 taille; public Forme forme; public Color couleur; public bool collision = true, eau;
+            public string nom; public Vector3 taille; public Forme forme; public Color couleur; public bool collision = true, eau, nenuphar;
         }
 
         private static readonly Color Sol = new Color(.62f, .62f, .6f), Bloc = new Color(.78f, .78f, .76f), Bloque = new Color(.42f, .42f, .44f),
@@ -39,7 +39,7 @@ namespace Froggy.Outils
             new Piece { nom = "Gris_Rampe", taille = new Vector3(2, 1, 4), forme = Forme.Rampe, couleur = Bloc },
             new Piece { nom = "Gris_Mur", taille = new Vector3(4, 2.5f, .5f), forme = Forme.Boite, couleur = Bloque },
             new Piece { nom = "Gris_Pilier", taille = new Vector3(.6f, 3, .6f), forme = Forme.Boite, couleur = Bloque },
-            new Piece { nom = "Gris_Nenuphar", taille = new Vector3(2, .08f, 2), forme = Forme.Cylindre, couleur = Nenuphar },
+            new Piece { nom = "Gris_Nenuphar", taille = new Vector3(2, .08f, 2), forme = Forme.Cylindre, couleur = Nenuphar, nenuphar = true },
             new Piece { nom = "Gris_Eau_8x8", taille = new Vector3(8, 0, 8), forme = Forme.Plan, couleur = Eau, collision = false, eau = true },
         };
 
@@ -69,6 +69,14 @@ namespace Froggy.Outils
                 {
                     if (p.forme == Forme.Boite) { var b = go.AddComponent<BoxCollider>(); b.center = new Vector3(0, p.taille.y / 2, 0); b.size = p.taille; }
                     else go.AddComponent<MeshCollider>().sharedMesh = maillage;
+                }
+                if (p.nenuphar)
+                {
+                    // il s'enfonce sous le poids et penche (#16) ; seul son dessin bouge, le collider reste
+                    var so = new SerializedObject(go.AddComponent<Froggy.Deplacement.Nenuphar>());
+                    so.FindProperty("reglages").objectReferenceValue =
+                        AssetDatabase.LoadAssetAtPath<Froggy.Deplacement.ReglagesNenuphar>(Froggy.Deplacement.Nenuphar.CheminReglages);
+                    so.ApplyModifiedPropertiesWithoutUndo();
                 }
                 PrefabUtility.SaveAsPrefabAsset(go, chemin);
                 Object.DestroyImmediate(go);

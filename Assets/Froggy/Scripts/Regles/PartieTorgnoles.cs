@@ -100,6 +100,8 @@ namespace Froggy.Regles
         {
             Preparer();
             if (frappeur == null || partie == null || partie.EnPause) return null;
+            var entrave = frappeur.GetComponent<Modificateurs>();
+            if (entrave != null && entrave.Entrave) { dernier = "Impossible de frapper : gelé."; return null; }
 
             autres.Clear();
             foreach (var p in partie.Porteurs)

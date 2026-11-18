@@ -459,6 +459,67 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &775160690
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 775160693}
+  - component: {fileID: 775160692}
+  - component: {fileID: 775160691}
+  m_Layer: 0
+  m_Name: "Gel \xE9clair"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &775160691
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 775160690}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ced3939f5694104dbb7f62dfaa52b33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Froggy.Objets.EssaiGelEclair
+  effet: {fileID: 775160692}
+  partie: {fileID: 410000033}
+--- !u!114 &775160692
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 775160690}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6db57041bc63f1c40a443b1204c0330c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Froggy.Objets.EffetGelEclair
+  reglages: {fileID: 11400000, guid: 0cc90e8e3b2a30f4680db3804a17cf4d, type: 2}
+  visuelProvisoire: 1
+--- !u!4 &775160693
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 775160690}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1390845078
 GameObject:
   m_ObjectHideFlags: 0
@@ -622,3 +683,4 @@ SceneRoots:
   - {fileID: 524309999}
   - {fileID: 1390845084}
   - {fileID: 565861202}
+  - {fileID: 775160693}
