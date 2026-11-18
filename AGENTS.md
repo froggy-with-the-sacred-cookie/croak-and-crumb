@@ -59,6 +59,12 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
 - Torgnole (même dossier) : `ReglesTorgnole` (cône, portée, 5 s de recharge, en C# pur) et `PartieTorgnoles` dans la
   scène (touche F ou bouton ouest). Un bot ou l'hôte frappe par `PartieTorgnoles.Frapper(porteur)` ; le coup part en
   événement du socle (`CoupDonne`). Réglages : `Postes/4_ObjetsCapacites/ReglagesTorgnole.asset`.
+- Cookie sacré et gobelin (dossier `Regles/`) : `ReglesCookieSacre` (le gobelin arrive dans la dernière minute,
+  capture, lâcher, ramassage, en C# pur) et `PartieCookieSacre` dans la scène, qui fait fuir le gobelin (`FuiteGobelin`,
+  préfabriqué `Assets/Froggy/Gobelin/Gobelin_Kappa`, menu **Froggy ▸ Gobelin**) depuis le repère « Départ du gobelin »
+  et tient `PorteurCookieSacre` à jour. Une torgnole (`CoupDonne`) ou un cookie lâché le font tomber ; un autre coup
+  passe par `PartieCookieSacre.FaireLacher(porteur, direction)`. Réglages :
+  `Postes/5_MeteoEvenements/ReglagesCookieSacre.asset`.
 
 ## Les branches
 
