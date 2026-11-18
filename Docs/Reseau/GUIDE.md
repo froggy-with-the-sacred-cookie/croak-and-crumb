@@ -119,6 +119,37 @@ et testées dans `Assets/Froggy/Editor/Tests/SalonTests.cs`. Le prefab `Assets/F
 contient le NetworkManager, le salon, la recherche par code, le panneau, les 4 points d'apparition et la caméra ; la
 scène de partie est un champ de `Salon` (`Vitrine_JardinJaponais` pour l'instant).
 
+## Les règles de partie en réseau (P2-04)
+
+**Seul l'hôte décide** : cookie ramassé (le plus proche ; à égalité, le plus petit numéro), cookie lâché, score,
+temps, gagnant, porteur du cookie sacré. Il fait tourner les règles du poste 3 (`PartieCookies`, `DeroulementPartie`)
+telles quelles. Chez les autres joueurs, ces composants sont en **Miroir** : ils ne décident rien et montrent ce que
+l'hôte a décidé. Tout passe par le canal fiable : rien ne se perd, même avec « Mauvaise connexion ».
+
+Comment le voir : le salon (section précédente), **Lancer la partie**. Le jardin s'ouvre avec 5 cookies provisoires,
+compte à rebours, partie de 30 s (`ReglagesPartie_Essai`), score en haut à gauche, temps en haut, gagnant à la fin,
+puis retour au salon. Le panneau du salon passe en bas à gauche pendant la partie.
+
+**Pour un poste qui écoute** (son, effets, HUD) : rien ne change. `EvenementsPartie` part chez **chaque** joueur
+(l'hôte renvoie les siens aux autres) ; au moment où l'événement arrive, `PorteurCookies.Nombre` et
+`DeroulementPartie.Gagnant` sont déjà à jour.
+
+**Pour un poste qui décide** (torgnole P4-10, cookie sacré P5-08) : décider **sur l'hôte seulement**, par
+`PartieReseau.Actuelle` (`Assets/Froggy/Scripts/Reseau/Partie/PartieReseau.cs`) :
+
+```csharp
+var partie = PartieReseau.Actuelle;              // null hors partie
+if (partie != null && partie.IsServerStarted)    // seulement sur l'hôte
+{
+    partie.FaireLacher(numeroJoueur, directionDuCoup);   // la torgnole fait tomber un cookie
+    partie.PorteurCookieSacre = numeroJoueur;            // ReglesPartie.Personne : personne
+}
+```
+
+Le prefab `Assets/Froggy/Prefabs/Reseau/PartieReseau.prefab` (règles du poste 3 + 5 repères **provisoires** dans le
+jardin) apparaît quand tous les joueurs ont leur personnage et disparaît au retour au salon. Une vraie arène
+apportera ses repères.
+
 ## Les 5 règles d'un script réseau
 
 1. **Un objet partagé porte un `NetworkObject`.** Sans lui, chaque joueur a sa propre copie, invisible des autres. Un
@@ -193,6 +224,12 @@ avec P2-02 (#23).
   `OnApplicationQuit` l'a évité ; `TestReseau` passe en plus au port suivant si besoin.
 - **Arrivée pendant une partie** : FishNet envoie à tout nouveau joueur les scènes « globales » déjà chargées, donc il
   tomberait en pleine partie. Le salon refuse donc l'entrée tant que la partie dure (P2-06 décidera mieux).
+- **Un message (RPC) arrive avant l'état copié** : FishNet envoie l'état synchronisé toutes les 0,1 s, un message
+  tout de suite. Un client qui réagit au message lirait l'ancien score : `PartieReseau` met donc le nouveau score (ou
+  le gagnant) dans le message. Vu le 18/11/2026 (« partie finie » reçue, gagnant encore vide).
+- **Unity qui plante à plusieurs fenêtres** (« d3d12: Device removed ») : machine à bout de mémoire. Après une
+  réouverture ou une recompilation, Unity lance 3 « AssetImportWorker » (≈ 4 Go) ; les fermer avant le Play libère de
+  la place (Unity les relance seul si besoin).
 - **Recharger la scène qui contient le NetworkManager** en fait apparaître un second. Le salon garde donc sa scène
   chargée et ajoute / retire la scène de partie par-dessus.
 - **Mémoire** : chaque joueur de Multiplayer Play Mode est un Unity complet (≈ 3 Go). Quand la mémoire manque, Windows

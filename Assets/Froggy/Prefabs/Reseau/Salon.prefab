@@ -125,6 +125,7 @@ MonoBehaviour:
   - {fileID: 3222339831896545340}
   - {fileID: 8980249939493891821}
   delaiRetour: 5
+  prefabPartie: {fileID: 8323199054783479740, guid: 33c4308f485596247bd723ed1f92d488, type: 3}
   prefabSalonReseau: {fileID: 3181023737485712873, guid: 0775264e016dca84a80665dcf38e3200, type: 3}
   couleurs:
   - {r: 0.3, g: 0.8, b: 0.35, a: 1}
