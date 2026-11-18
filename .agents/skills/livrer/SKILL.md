@@ -14,6 +14,14 @@ skill dit l'ordre des gestes. Il ne donne aucun droit en plus : chaque commit et
    son domaine, priorité Haute d'abord. Une carte « En cours » ou « En revue » appartient à quelqu'un.
 2. Lire l'issue en entier. Si « Résultat attendu » ou « C'est fini quand… » manque ou reste flou, poser la question en
    commentaire et laisser la carte où elle est.
+   - **Vérifier les dépendances, et ce qu'elles supposent** : chaque « Dépend de » est-il fermé ? Et ce que le
+     résultat attendu nomme existe-t-il déjà ? (Novembre 2026 : P2-02 demandait de synchroniser « sauts et nage », alors
+     que la nage, P1-02, n'avait ni code ni eau avec collision, et que le contrôleur P1-01 était ouvert : ticket bloqué,
+     pris à la place P2-07.) Bloqué : le dire en commentaire et prendre une autre carte du poste.
+   - **Le critère « fini quand… » se vérifie sur le matériel réel** : s'il demande 4 instances, 4 fenêtres Unity
+     dépassent un poste à 16 Go (skill `test-multijoueur-local`). Le savoir avant de promettre, et le dire dans la PR.
+   - Une IA garde les notes de travail du ticket **hors du dépôt** (dossier de la session ou du poste), pas dans
+     `Docs/` : seul ce qui sert à l'équipe entre dans le dépôt.
 3. S'assigner l'issue (`gh issue edit <n> --add-assignee @me`), passer la carte « En cours », et écrire sa branche
    dans un commentaire de l'issue.
 

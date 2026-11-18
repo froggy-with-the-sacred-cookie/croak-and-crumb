@@ -36,6 +36,11 @@ qu'un humain joue, dépenser des crédits pour rien, annoncer « fini » sans v�
   (skill `production-assets`, section 1). Les clés (`.env`) ne se lisent jamais.
 - **Supprimer** : déplacer plutôt que supprimer un asset (le mode auto refuse `AssetDatabase.DeleteAssets`, et on
   garde une trace). Garder l'ancienne version commutable tant que l'équipe n'a pas tranché.
+- **Ressources du poste** (Froggy, novembre 2026) : avant un test lourd (plusieurs fenêtres Unity, build, bake),
+  lire la place libre sur C: et la RAM libre, et les relire après. Quand la mémoire manque, Windows agrandit
+  `C:\pagefile.sys` (vu : 25 Go) ; le disque se remplit et des Unity se ferment **sans message**. La cause d'un
+  « plantage sans erreur » est d'abord là, pas dans le code. Fermer des Unity rend la place. Détails : skill
+  `test-multijoueur-local`, section 1.
 - **Un serveur MCP ajouté en cours de session** n'apparaît qu'à la session suivante : le dire, et passer par la ligne
   de commande en attendant (`Blender -b -P script.py`, client HTTP du MCP de Unity).
 - **Une IA ne compose pas les arènes à la place de l'équipe.** Sur Eku (22 octobre 2026), après une journée de placement
