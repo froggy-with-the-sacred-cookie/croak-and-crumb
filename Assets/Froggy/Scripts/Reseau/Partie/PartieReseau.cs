@@ -119,6 +119,9 @@ namespace Froggy.Reseau
             yield return null;
             cookies.Miroir = false;
             deroulement.Miroir = false;
+            // la Froggy en ligne (P2-02) porte les cookies sur sa copie visible, pas sur l'objet réseau que le salon
+            // connaît : on prend aussi les joueurs numérotés de la scène
+            foreach (var p in Joueurs()) if (!joueurs.Contains(p)) joueurs.Add(p);
             cookies.DemarrerNumerotes(Reperes(), joueurs);
             deroulement.Preparer();
             deroulement.Lancer();
@@ -264,7 +267,7 @@ namespace Froggy.Reseau
                 if (r.sorte == RepereArene.Sorte.Cookie) yield return r;
         }
 
-        /// <summary>Les personnages de la partie (capsules en attendant P2-02), numérotés par le salon.</summary>
+        /// <summary>Les personnages de la partie (Froggy en ligne ou capsules de test), numérotés par le salon.</summary>
         private static IEnumerable<PorteurCookies> Joueurs()
         {
             foreach (var p in FindObjectsByType<PorteurCookies>())
