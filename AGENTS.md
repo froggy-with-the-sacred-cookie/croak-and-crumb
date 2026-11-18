@@ -56,6 +56,10 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
   `ApparitionJoueurs` dans la scène, qui pose les Froggy sur les repères « Apparition d'un joueur » du Bâtisseur.
   Avant de frapper un joueur, lire `PorteurCookies.Intouchable` (tombé ou tout juste réapparu) ; `FaireLacher` le
   refuse déjà. Le retour part en événement du socle (`JoueurReapparu`).
+- Météo et événements (`Assets/Froggy/Scripts/Meteo/`) : `ReglesMeteo` (tirage pondéré, annonce, durée, en C# pur),
+  `GestionnaireMeteo` dans la scène, une fiche `ReglagesMeteo` par arène (événements et poids) et une
+  `DefinitionEvenement` par événement (durée, vitesse, saut, posés par les `Modificateurs`). Le rendu et le son d'un
+  événement écoutent `Annonce`, `Debut` et `Fin` du gestionnaire ; il démarre et s'arrête avec la partie.
 
 ## Les branches
 
