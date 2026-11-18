@@ -91,8 +91,18 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
   salon (P2-03) ; `MenuPrincipal` s'y installe seul et montre un écran à la fois (accueil de Julien, Paramètres,
   Rejoindre un salon, Salle d'attente), à la souris comme à la manette. La partie se charge par-dessus et le menu se
   cache jusqu'au retour. Les écrans ne passent que par `Salon.Local` ; leurs textes sont dans `ContenuSalle` (C# pur).
-  Les réglages du joueur (volumes, secousses, flashs, vibrations, de 0 à 1) : `ReglagesJoueur.Actuels`, à lire au
-  moment où l'effet part ; les tests écrivent dans un fichier de test, jamais dans le vrai.
+  Les réglages du joueur (volumes, secousses, flashs, vibrations, de 0 à 1 ; champ de vision en degrés ; touches) :
+  `ReglagesJoueur.Actuels`, à lire au moment où l'effet part ; les tests écrivent dans un fichier de test, jamais dans
+  le vrai. Paramètres (`PanneauReglages`) s'ouvre aussi depuis la pause.
+- Commandes (P6-05, `Scripts/Interface/Commandes.cs`) : **toute touche du jeu est une action de la carte « Player »
+  d'`InputSystem_Actions`**, avec une liaison clavier et une manette ; le joueur la change dans Paramètres ▸ Commandes.
+  Un poste prend sa copie par `Commandes.Creer("NomAction")` (rendue par `Commandes.Liberer`), ou appelle
+  `Commandes.Suivre(playerInput.actions)` ; jamais de `new InputAction` avec une touche écrite en dur. Une nouvelle
+  commande s'ajoute aussi à `Commandes.Lignes`. Une touche affichée se lit sur l'action : son icône par
+  `IconesTouches.Pour(action, index)` (manette branchée, toutes les touches du clavier du pack), sinon son nom
+  (`GetBindingDisplayString`). Icônes **provisoires, à faire valider** : pack « Input Prompts » 1.5a de Kenney (CC0)
+  dans `Interface/Resources/Touches`, importées en sprites par `ImportIconesTouches` ; `IconesTouches.Actives = false`
+  remet le texte.
 - Partie complète : `Assets/Froggy/Scenes/Partie_JardinJaponais.unity`, lancée par « Solo » (avec 3 bots). Comme une
   scène de test, elle charge le jardin par-dessus (`DecorDeTest`) et assemble tous les systèmes avec leurs vrais
   réglages (3 min, météo du jardin). **Un nouveau système de jeu s'y ajoute aussi**, pas seulement dans la scène de test

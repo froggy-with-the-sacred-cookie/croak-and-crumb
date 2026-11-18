@@ -127,7 +127,7 @@ namespace Froggy.Interface
         /// <summary>Échap au clavier, B à la manette : l'action « Cancel » du module d'interface (réaffectable).</summary>
         private static bool RetourDemande()
         {
-            if (EventSystem.current == null) return false;
+            if (EventSystem.current == null || PanneauReglages.EnEcoute) return false;   // Échap annule l'écoute d'une touche
             var module = EventSystem.current.currentInputModule as InputSystemUIInputModule;
             var action = module != null && module.cancel != null ? module.cancel.action : null;
             return action != null && action.WasPressedThisFrame();
