@@ -15,6 +15,8 @@ namespace Froggy.Regles
     /// Les joueurs sont ceux de PartieCookies ; seuls ceux qui ont un Rigidbody se déplacent (un mannequin reste où il est).
     /// Le clignotement de l'intouchable est provisoire, en attendant un vrai effet (poste 6) ; il passe par
     /// Renderer.forceRenderingOff et laisse « enabled » au choix du modèle.
+    /// En réseau (#144, ReapparitionReseau) : l'hôte décide (Miroir chez les autres), et la Froggy d'une autre machine est
+    /// posée chez son propriétaire (PoserAilleurs, puis Poser).
     /// </summary>
     public class ApparitionJoueurs : MonoBehaviour
     {
@@ -36,6 +38,40 @@ namespace Froggy.Regles
         public ReglesReapparition Regles { get; private set; }
         public ReglagesReapparition Reglages => reglages;
         public PartieCookies Partie => partie;
+
+        // ---- en réseau (#144) : l'hôte décide, les autres montrent (ReapparitionReseau)
+
+        /// <summary>
+        /// Chez un joueur qui n'est pas l'hôte : aucune chute ni réapparition décidée ici. L'état de chaque joueur
+        /// (tombé, intouchable) arrive par Refleter ; la Froggy de ce joueur est posée par Poser, sur ordre de l'hôte.
+        /// </summary>
+        [System.NonSerialized] public bool Miroir;
+
+        /// <summary>Faux en réseau : le salon a déjà posé chaque Froggy sur son point de départ.</summary>
+        [System.NonSerialized] public bool PoserAuDepart = true;
+
+        /// <summary>
+        /// Hôte : une Froggy pilotée par une autre machine (corps cinématique, elle suit le réseau) ne bouge pas si on la
+        /// pose ici. Elle reçoit sa position et sa rotation de réapparition, et son propriétaire la pose.
+        /// </summary>
+        public System.Action<PorteurCookies, Vector3, Quaternion> PoserAilleurs { get; set; }
+
+        private readonly Dictionary<int, EtatReapparition> etatsRecus = new Dictionary<int, EtatReapparition>();
+
+        // Hôte : la copie d'une Froggy posée ailleurs reste sous l'arène jusqu'à ce que sa nouvelle place arrive par le
+        // réseau ; d'ici là, elle compte à sa place de réapparition, sinon elle « retomberait » aussitôt.
+        private readonly Dictionary<int, (Vector3 place, float jusqua)> enRoute = new Dictionary<int, (Vector3, float)>();
+        private const float AttenteMaxEnRoute = 1f;
+
+        /// <summary>Miroir : l'état de ce joueur décidé par l'hôte.</summary>
+        public void Refleter(int joueur, EtatReapparition etat) => etatsRecus[joueur] = etat;
+
+        /// <summary>Où en est ce joueur : les règles d'ici, ou en Miroir l'état reçu de l'hôte.</summary>
+        public EtatReapparition Etat(int joueur)
+        {
+            if (Miroir) return etatsRecus.TryGetValue(joueur, out var e) ? e : EtatReapparition.EnJeu;
+            return Regles != null ? Regles.Etat(joueur) : EtatReapparition.EnJeu;
+        }
 
         /// <summary>Pour un test : des réglages et une partie de cookies à soi.</summary>
         public void Regler(ReglagesReapparition r, PartieCookies p)
@@ -73,6 +109,7 @@ namespace Froggy.Regles
             if (partie == null) partie = FindAnyObjectByType<PartieCookies>();
             foreach (var p in caches.Keys.ToList()) Montrer(p, true);
             caches.Clear();
+            enRoute.Clear();
 
             var tous = reperes.Where(r => r != null).ToList();
             int nombre = partie != null ? partie.Porteurs.Count : 0;
@@ -95,6 +132,7 @@ namespace Froggy.Regles
             float plusBas = points.Count > 0 ? points.Min(p => p.position.y) : 0f;
             Regles = new ReglesReapparition(points, plusBas - reglages.profondeurChute, reglages.delai, reglages.dureeIntouchable);
 
+            if (!PoserAuDepart) return;
             foreach (var p in joueurs)
                 if (Regles.Depart(p.Joueur, out Vector3 depart)) Placer(p, depart);
         }
@@ -108,19 +146,31 @@ namespace Froggy.Regles
         /// <summary>Un pas, au pas physique (un test l'appelle hors jeu).</summary>
         public void Pas(float dt)
         {
-            if (Regles == null || partie == null) return;
-            positions.Clear();
-            foreach (var p in partie.Porteurs)
-                if (p != null && p.isActiveAndEnabled) positions.Add((p.Joueur, p.transform.position));
-            reapparus.Clear();
-            Regles.Pas(dt, positions, reapparus);
-
-            foreach (var r in reapparus)
+            if (partie == null || (Regles == null && !Miroir)) return;
+            if (!Miroir)
             {
-                var porteur = Porteur(r.Joueur);
-                if (porteur == null || porteur.GetComponent<Rigidbody>() == null) continue;
-                Placer(porteur, r.Point);
-                EvenementsPartie.Emettre(TypeEvenement.JoueurReapparu, porteur.gameObject, null, porteur.transform.position);
+                positions.Clear();
+                foreach (var p in partie.Porteurs)
+                {
+                    if (p == null || !p.isActiveAndEnabled) continue;
+                    Vector3 ou = p.transform.position;
+                    if (enRoute.TryGetValue(p.Joueur, out var route))
+                    {
+                        if (ou.y >= Regles.HauteurChute || horloge >= route.jusqua) enRoute.Remove(p.Joueur);
+                        else ou = route.place;
+                    }
+                    positions.Add((p.Joueur, ou));
+                }
+                reapparus.Clear();
+                Regles.Pas(dt, positions, reapparus);
+
+                foreach (var r in reapparus)
+                {
+                    var porteur = Porteur(r.Joueur);
+                    if (porteur == null || porteur.GetComponent<Rigidbody>() == null) continue;
+                    Placer(porteur, r.Point);
+                    EvenementsPartie.Emettre(TypeEvenement.JoueurReapparu, porteur.gameObject, null, porteur.transform.position);
+                }
             }
 
             horloge += dt;
@@ -128,7 +178,7 @@ namespace Froggy.Regles
             foreach (var p in partie.Porteurs)
             {
                 if (p == null) continue;
-                var etat = Regles.Etat(p.Joueur);
+                var etat = Etat(p.Joueur);
                 p.Intouchable = etat != EtatReapparition.EnJeu;
                 if (p.GetComponent<Rigidbody>() == null) continue;
                 Montrer(p, !clignoter || etat != EtatReapparition.Intouchable || allume);
@@ -151,6 +201,19 @@ namespace Froggy.Regles
                 regard.y = 0f;
                 if (regard.sqrMagnitude > 0.01f) rotation = Quaternion.LookRotation(regard.normalized, Vector3.up);
             }
+            var cinematique = porteur.GetComponent<Rigidbody>();
+            if (cinematique != null && cinematique.isKinematic && PoserAilleurs != null)
+            {
+                PoserAilleurs(porteur, position, rotation);
+                enRoute[porteur.Joueur] = (position, horloge + AttenteMaxEnRoute);
+            }
+            Poser(porteur, position, rotation);
+        }
+
+        /// <summary>Pose une Froggy à cette place, immobile (en réseau : sa réapparition reçue de l'hôte).</summary>
+        public void Poser(PorteurCookies porteur, Vector3 position, Quaternion rotation)
+        {
+            if (porteur == null) return;
             porteur.transform.SetPositionAndRotation(position, rotation);
             var corps = porteur.GetComponent<Rigidbody>();
             if (corps == null) return;
