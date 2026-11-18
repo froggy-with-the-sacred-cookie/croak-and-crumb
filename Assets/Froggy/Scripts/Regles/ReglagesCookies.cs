@@ -24,6 +24,14 @@ namespace Froggy.Regles
         [Tooltip("Nombre de cookies qu'un joueur peut porter. 0 : pas de limite (le score est le nombre de cookies portés).")]
         [Min(0)] public int maxPortes;
 
+        [Header("Cookie lâché (P3-02)")]
+        [Tooltip("Un cookie lâché tombe à cette distance du joueur, en m. PROVISOIRE.")]
+        [Min(0f)] public float distanceLacher = 1.5f;
+
+        [Tooltip("Celui qui vient de lâcher un cookie ne peut pas le reprendre avant ce délai, en s (sinon il le " +
+                 "reprendrait aussitôt). Les autres peuvent le prendre tout de suite. PROVISOIRE.")]
+        [Min(0f)] public float delaiRepriseLacheur = 1f;
+
         [Header("Porteur")]
         [Tooltip("Chaque cookie porté retire cette part de la vitesse (0,1 : −10 % par cookie, qui se multiplient). " +
                  "0 : sans effet, À TRANCHER par l'équipe avant d'y toucher.")]

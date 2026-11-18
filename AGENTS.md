@@ -41,6 +41,7 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
 - Cookies (`Assets/Froggy/Scripts/Regles/`) : `ReglesCookies` porte les règles en C# pur (sans scène ni réseau, c'est
   ce que l'hôte fera tourner) ; `PartieCookies` les fait vivre dans une scène à partir des repères « Apparition de
   cookies » du Bâtisseur ; `PorteurCookies` donne le score d'une Froggy. Les valeurs sont dans `ReglagesCookies`.
+  Faire lâcher un cookie à un joueur (un coup, un malus) : `PartieCookies.FaireLacher(porteur, direction)`.
 
 ## Les branches
 

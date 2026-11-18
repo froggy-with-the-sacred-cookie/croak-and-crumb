@@ -170,6 +170,120 @@ namespace Froggy.Outils.Tests
             Assert.That(partie.Regles.Present(0), Is.True);
         }
 
+        // ---- P3-02 : cookies lâchés
+
+        [Test]
+        public void LacherRetireUnCookieDuScoreEtLePoseAuSol()
+        {
+            var regles = new ReglesCookies(TroisPoints, 1f, 0f, 0, delaiRepriseLacheur: 1f);
+            Assert.That(regles.Lacher(1, Vector3.zero), Is.EqualTo(-1), "sans cookie, rien à lâcher");
+            regles.Pas(1f / 60f, Joueurs((1, TroisPoints[0])), prises);
+            regles.Pas(1f / 60f, Joueurs((1, TroisPoints[1])), prises);
+            Assert.That(regles.Portes(1), Is.EqualTo(2));
+
+            var chute = new Vector3(50f, 0f, 0f);
+            int numero = regles.Lacher(1, chute);
+            Assert.That(numero, Is.GreaterThanOrEqualTo(0));
+            Assert.That(regles.Portes(1), Is.EqualTo(1), "un cookie de moins");
+            Assert.That(regles.NombreAuSol, Is.EqualTo(1));
+            Assert.That(regles.CookieAuSol(0).position, Is.EqualTo(chute));
+            Assert.That(regles.CookieAuSol(0).numero, Is.EqualTo(numero));
+        }
+
+        [Test]
+        public void LeCookieLacheVaAuPremierQuiLeRamasseEtLesScoresRestentJustes()
+        {
+            var regles = new ReglesCookies(TroisPoints, 1f, 0f, 0, delaiRepriseLacheur: 1f);
+            foreach (var point in TroisPoints) regles.Pas(1f / 60f, Joueurs((1, point)), prises);
+            Assert.That(regles.Portes(1), Is.EqualTo(3));
+            prises.Clear();
+
+            // le critère de l'issue : un joueur fait lâcher un cookie à un autre, le ramasse, les deux scores sont justes
+            var chute = new Vector3(50f, 0f, 0f);
+            int numero = regles.Lacher(1, chute);
+            Assert.That(regles.Portes(1) + regles.Portes(2) + regles.NombreAuSol, Is.EqualTo(3), "aucun cookie perdu ni créé");
+            regles.Pas(1f / 60f, Joueurs((1, new Vector3(-50f, 0f, 0f)), (2, chute + new Vector3(0.5f, 0f, 0f))), prises);
+            Assert.That(regles.Portes(1), Is.EqualTo(2));
+            Assert.That(regles.Portes(2), Is.EqualTo(1));
+            Assert.That(regles.NombreAuSol, Is.EqualTo(0));
+            Assert.That(prises.Count, Is.EqualTo(1));
+            Assert.That(prises[0].Lache, Is.EqualTo(numero));
+            Assert.That(prises[0].Point, Is.EqualTo(-1));
+            Assert.That(prises[0].Joueur, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void CeluiQuiLacheNeReprendPasSonCookieToutDeSuite()
+        {
+            var regles = new ReglesCookies(TroisPoints, 1f, 0f, 0, delaiRepriseLacheur: 1f);
+            regles.Pas(0.1f, Joueurs((1, TroisPoints[0])), prises);
+            var chute = new Vector3(50f, 0f, 0f);
+            regles.Lacher(1, chute);
+            var dessus = Joueurs((1, chute));
+            for (int i = 0; i < 9; i++) regles.Pas(0.1f, dessus, prises);
+            Assert.That(regles.Portes(1), Is.EqualTo(0), "0,9 s : il attend encore");
+            Assert.That(regles.NombreAuSol, Is.EqualTo(1));
+            for (int i = 0; i < 2; i++) regles.Pas(0.1f, dessus, prises);
+            Assert.That(regles.Portes(1), Is.EqualTo(1), "1,1 s : il peut le reprendre");
+
+            // un autre joueur, lui, n'attend pas
+            regles.Lacher(1, chute);
+            regles.Pas(0.1f, Joueurs((1, chute), (2, chute + new Vector3(0.9f, 0f, 0f))), prises);
+            Assert.That(regles.Portes(2), Is.EqualTo(1), "l'autre le prend tout de suite, même plus loin que le lâcheur");
+            Assert.That(regles.Portes(1), Is.EqualTo(0));
+        }
+
+        [Test]
+        public void DansUneSceneFaireLacherPoseLeCookieAuSolEtPrevient()
+        {
+            var reglages = ScriptableObject.CreateInstance<ReglagesCookies>();
+            aDetruire.Add(reglages);
+            reglages.delaiReapparition = 0f;
+            scene = EditorSceneManager.NewPreviewScene();
+            var sol = Objet("Sol", new Vector3(0f, -0.5f, 0f));
+            sol.AddComponent<BoxCollider>().size = new Vector3(200f, 1f, 200f);   // le dessus du sol est à y = 0
+            scene.GetPhysicsScene().Simulate(0.01f);   // la physique de la scène d'aperçu prend le sol en compte
+
+            var reperes = new List<RepereArene> { Repere(Vector3.zero, RepereArene.Sorte.Cookie) };
+            var victime = Objet("Victime", new Vector3(0f, 0.5f, 0f));
+            var autre = Objet("Autre", new Vector3(40f, 0.5f, 0f));
+            var partie = Objet("Partie", Vector3.zero).AddComponent<PartieCookies>();
+            partie.Regler(reglages);
+            partie.Demarrer(reperes, new[] { victime, autre });
+            var porteurVictime = victime.GetComponent<PorteurCookies>();
+            var porteurAutre = autre.GetComponent<PorteurCookies>();
+
+            Assert.That(partie.FaireLacher(porteurVictime, Vector3.right), Is.False, "elle ne porte rien encore");
+            partie.Pas(1f / 60f);
+            Assert.That(porteurVictime.Nombre, Is.EqualTo(1), "elle a ramassé le cookie du repère");
+
+            var recus = new List<EvenementPartie>();
+            System.Action<EvenementPartie> ecoute = e => recus.Add(e);
+            EvenementsPartie.Emis += ecoute;
+            try
+            {
+                Assert.That(partie.FaireLacher(porteurVictime, Vector3.right), Is.True);
+                Assert.That(porteurVictime.Nombre, Is.EqualTo(0));
+                Assert.That(recus.Count, Is.EqualTo(1));
+                Assert.That(recus[0].Type, Is.EqualTo(TypeEvenement.CookieLache));
+                Assert.That(recus[0].Auteur, Is.SameAs(victime));
+                Vector3 chute = recus[0].Position;
+                Assert.That(chute.x, Is.EqualTo(reglages.distanceLacher).Within(0.01f), "tombé à la distance réglée, dans la direction du coup");
+                Assert.That(chute.y, Is.EqualTo(reglages.hauteur).Within(0.01f), "posé sur le sol, à la hauteur d'un cookie");
+                Assert.That(partie.Regles.NombreAuSol, Is.EqualTo(1));
+
+                autre.transform.position = chute;
+                partie.Pas(1f / 60f);
+                Assert.That(porteurAutre.Nombre, Is.EqualTo(1), "l'autre joueur le ramasse");
+                Assert.That(porteurVictime.Nombre, Is.EqualTo(0));
+                Assert.That(partie.Regles.NombreAuSol, Is.EqualTo(0));
+                Assert.That(recus.Count, Is.EqualTo(2));
+                Assert.That(recus[1].Type, Is.EqualTo(TypeEvenement.CookieRamasse));
+                Assert.That(recus[1].Auteur, Is.SameAs(autre));
+            }
+            finally { EvenementsPartie.Emis -= ecoute; }
+        }
+
         private GameObject Objet(string nom, Vector3 position)
         {
             var go = new GameObject(nom);

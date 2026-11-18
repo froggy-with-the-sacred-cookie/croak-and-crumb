@@ -12,7 +12,8 @@ namespace Froggy.Regles
     /// Fait tourner les règles des cookies dans une scène (P3-01), sans réseau : un cookie à chaque repère « Apparition
     /// de cookies » (RepereArene, posé avec le Bâtisseur), ramassé par la Froggy qui passe à portée. Les règles sont dans
     /// ReglesCookies ; ce composant leur donne les positions, montre les cookies, tient PorteurCookies à jour et émet
-    /// l'événement « cookie ramassé » du socle.
+    /// les événements « cookie ramassé » et « cookie lâché » du socle.
+    /// FaireLacher() fait tomber un cookie d'un joueur (P3-02) : c'est ce que la torgnole (P4-10) appellera.
     /// Le cookie affiché est provisoire (un disque) tant que « visuel » est vide : P7-06 fournit le vrai.
     /// Le score à l'écran est provisoire aussi : le HUD est P6-02.
     /// </summary>
@@ -28,6 +29,7 @@ namespace Froggy.Regles
 
         private readonly List<PorteurCookies> porteurs = new List<PorteurCookies>();
         private readonly List<GameObject> cookies = new List<GameObject>();
+        private readonly Dictionary<int, GameObject> auSol = new Dictionary<int, GameObject>();   // les cookies lâchés, par numéro
         private readonly List<(int, Vector3)> positions = new List<(int, Vector3)>();
         private readonly List<ReglesCookies.Prise> prises = new List<ReglesCookies.Prise>();
         private GUIStyle style;
@@ -50,7 +52,9 @@ namespace Froggy.Regles
         public void Demarrer()
         {
             var reperes = FindObjectsByType<RepereArene>().Where(r => r.sorte == RepereArene.Sorte.Cookie);
-            var froggys = FindObjectsByType<DeplacementWow>().Select(f => f.gameObject);
+            // les Froggy, et tout ce qui porte déjà un PorteurCookies (un mannequin de test, plus tard un bot)
+            var froggys = FindObjectsByType<DeplacementWow>().Select(f => f.gameObject)
+                .Concat(FindObjectsByType<PorteurCookies>().Select(p => p.gameObject)).Distinct();
             Demarrer(reperes, froggys);
         }
 
@@ -59,13 +63,16 @@ namespace Froggy.Regles
         {
             if (reglages == null) reglages = ScriptableObject.CreateInstance<ReglagesCookies>();
             foreach (var c in cookies) if (c != null) Detruire(c);
+            foreach (var c in auSol.Values) if (c != null) Detruire(c);
             cookies.Clear();
+            auSol.Clear();
             porteurs.Clear();
 
             // un ordre qui ne dépend pas de la machine : les numéros de points et de joueurs sont les mêmes partout
             var points = reperes.Select(r => r.transform.position + Vector3.up * reglages.hauteur)
                 .OrderBy(p => p.x).ThenBy(p => p.z).ThenBy(p => p.y).ToList();
-            Regles = new ReglesCookies(points, reglages.rayonRamassage, reglages.delaiReapparition, reglages.maxPortes);
+            Regles = new ReglesCookies(points, reglages.rayonRamassage, reglages.delaiReapparition, reglages.maxPortes,
+                reglages.delaiRepriseLacheur);
             foreach (var p in points) cookies.Add(Montrer(p));
 
             foreach (var froggy in froggys.OrderBy(f => f.transform.position.x).ThenBy(f => f.transform.position.z))
@@ -93,13 +100,73 @@ namespace Froggy.Regles
             foreach (var prise in prises)
             {
                 var porteur = porteurs[prise.Joueur - 1];
-                int portes = Regles.Portes(prise.Joueur);
-                porteur.Fixer(portes, reglages.FacteurVitesse(portes));
-                EvenementsPartie.Emettre(TypeEvenement.CookieRamasse, porteur.gameObject, cookies[prise.Point], Regles.Point(prise.Point));
+                MettreAJour(porteur);
+                if (prise.Lache < 0)
+                {
+                    EvenementsPartie.Emettre(TypeEvenement.CookieRamasse, porteur.gameObject, cookies[prise.Point], Regles.Point(prise.Point));
+                    continue;
+                }
+                // un cookie lâché : il disparaît du sol
+                auSol.TryGetValue(prise.Lache, out GameObject tombe);
+                Vector3 ou = tombe != null ? tombe.transform.position : porteur.transform.position;
+                EvenementsPartie.Emettre(TypeEvenement.CookieRamasse, porteur.gameObject, tombe, ou);
+                if (tombe != null) Detruire(tombe);
+                auSol.Remove(prise.Lache);
             }
             for (int i = 0; i < cookies.Count; i++)
                 if (cookies[i] != null && cookies[i].activeSelf != Regles.Present(i)) cookies[i].SetActive(Regles.Present(i));
         }
+
+        /// <summary>
+        /// Fait lâcher un cookie à un joueur (P3-02). Le cookie tombe au sol à « distanceLacher » dans la direction donnée
+        /// (celle du coup ; nulle : derrière lui), sans traverser un mur, et va au premier qui le ramasse.
+        /// Rend false si le joueur ne porte rien ou n'est pas de la partie.
+        /// </summary>
+        public bool FaireLacher(PorteurCookies porteur, Vector3 direction)
+        {
+            if (Regles == null || porteur == null || !porteurs.Contains(porteur)) return false;
+            Vector3 chute = PointDeChute(porteur.transform, direction);
+            int numero = Regles.Lacher(porteur.Joueur, chute);
+            if (numero < 0) return false;
+            GameObject cookie = Montrer(chute);
+            auSol[numero] = cookie;
+            MettreAJour(porteur);
+            EvenementsPartie.Emettre(TypeEvenement.CookieLache, porteur.gameObject, cookie, chute);
+            return true;
+        }
+
+        private void MettreAJour(PorteurCookies porteur)
+        {
+            int portes = Regles.Portes(porteur.Joueur);
+            porteur.Fixer(portes, reglages.FacteurVitesse(portes));
+        }
+
+        /// <summary>Où le cookie lâché se pose : devant un mur s'il y en a un, puis au sol sous ce point.</summary>
+        private Vector3 PointDeChute(Transform joueur, Vector3 direction)
+        {
+            direction.y = 0f;
+            if (direction.sqrMagnitude < 1e-4f) direction = -joueur.forward;
+            direction.y = 0f;
+            direction = direction.sqrMagnitude < 1e-4f ? Vector3.back : direction.normalized;
+
+            var physique = joueur.gameObject.scene.GetPhysicsScene();
+            Vector3 depart = joueur.position;
+            float distance = reglages.distanceLacher;
+            // le premier obstacle qui n'est pas le joueur lui-même raccourcit la chute
+            int n = physique.Raycast(depart, direction, touches, distance, ~0, QueryTriggerInteraction.Ignore);
+            for (int i = 0; i < n; i++)
+                if (!touches[i].transform.IsChildOf(joueur)) distance = Mathf.Min(distance, Mathf.Max(0f, touches[i].distance - 0.3f));
+            Vector3 dessus = depart + direction * distance;
+
+            float sol = dessus.y - 0.5f;   // sans sol trouvé : à peu près aux pieds du joueur
+            float plusProche = float.MaxValue;
+            n = physique.Raycast(dessus + Vector3.up * 0.5f, Vector3.down, touches, 30f, ~0, QueryTriggerInteraction.Ignore);
+            for (int i = 0; i < n; i++)
+                if (!touches[i].transform.IsChildOf(joueur) && touches[i].distance < plusProche) { plusProche = touches[i].distance; sol = touches[i].point.y; }
+            return new Vector3(dessus.x, sol + reglages.hauteur, dessus.z);
+        }
+
+        private readonly RaycastHit[] touches = new RaycastHit[16];
 
         private GameObject Montrer(Vector3 position)
         {
