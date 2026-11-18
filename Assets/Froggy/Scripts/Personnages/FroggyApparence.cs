@@ -82,6 +82,13 @@ namespace Froggy.Personnages
         public int Nombre => modeles.Count;
         public string Nom(int index) => modeles[index].nom;
 
+        /// <summary>
+        /// Pour une Froggy pilotée ailleurs (un autre joueur en réseau, P2-02) : sa vitesse et son contact au sol, lus ici
+        /// au lieu du Rigidbody et du contrôleur (qui sont coupés chez les autres). Vide : comme avant.
+        /// </summary>
+        public System.Func<Vector3> VitesseExterne { get; set; }
+        public System.Func<bool> AuSolExterne { get; set; }
+
         /// <summary>Les gestes du modèle affiché (Saut, Victoire, Torgnole, Croassement…), dans l'ordre alphabétique.</summary>
         public IReadOnlyList<string> Gestes => gestes;
 
@@ -123,8 +130,9 @@ namespace Froggy.Personnages
             if (animator == null)
                 return;
 
-            Vector3 v = body.linearVelocity;
-            bool auSol = wow != null && wow.enabled ? wow.AuSol : controleur == null || controleur.IsGrounded;
+            Vector3 v = VitesseExterne != null ? VitesseExterne() : body.linearVelocity;
+            bool auSol = AuSolExterne != null ? AuSolExterne()
+                : wow != null && wow.enabled ? wow.AuSol : controleur == null || controleur.IsGrounded;
             animator.SetFloat(Vitesse, new Vector2(v.x, v.z).magnitude, 0.1f, Time.deltaTime);
             animator.SetBool(AuSol, auSol);
             if (etaitAuSol && !auSol && v.y > 0.5f)
