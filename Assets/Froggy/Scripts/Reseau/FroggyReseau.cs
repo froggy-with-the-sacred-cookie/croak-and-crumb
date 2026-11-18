@@ -160,6 +160,10 @@ namespace Froggy.Reseau
             var porteur = copie.GetComponent<PorteurCookies>();
             if (porteur == null) porteur = copie.AddComponent<PorteurCookies>();
             if (numerote) porteur.Numeroter(numero);
+            // chez l'hôte, une Froggy qui arrive après le début de la partie s'y inscrit (sinon elle ne ramasse rien)
+            var partie = PartieReseau.Actuelle;
+            if (IsServerStarted && numerote && partie != null && partie.Cookies != null && partie.Cookies.Regles != null)
+                partie.Cookies.Inscrire(porteur);
 
             copie.transform.SetParent(null, true);
             ScenesUnity.MoveGameObjectToScene(copie, source.scene);
