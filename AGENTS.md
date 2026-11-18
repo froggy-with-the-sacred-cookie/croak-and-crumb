@@ -50,13 +50,15 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
 - Objets (`Assets/Froggy/Scripts/Objets/`) : `ReglesObjets` porte les règles en C# pur (boîtes, tirage, recharge) ;
   `PartieObjets` les fait vivre dans une scène à partir des repères « Boîte à objets » du Bâtisseur ; `PorteurObjet`
   donne l'emplacement d'objet d'une Froggy. Un objet = une `FicheObjet`, listée dans `ReglagesObjets`. L'effet d'un
-  objet écoute `PorteurObjet.Utilise`, ou l'événement `ObjetUtilise` du socle.
+  objet écoute `PorteurObjet.Utilise`, ou l'événement `ObjetUtilise` du socle. Premier effet : `EffetSuperCroassement`
+  (élan, puis onde qui repousse les joueurs au sol ; son événement `Onde` sert au camouflage pour révéler les
+  camouflés), réglé par `Postes/4_ObjetsCapacites/ReglagesSuperCroassement.asset`.
 - Réapparition (même dossier) : `ReglesReapparition` (chute, délai, point le plus loin des autres, en C# pur) et
   `ApparitionJoueurs` dans la scène, qui pose les Froggy sur les repères « Apparition d'un joueur » du Bâtisseur.
   Avant de frapper un joueur, lire `PorteurCookies.Intouchable` (tombé ou tout juste réapparu) ; `FaireLacher` le
   refuse déjà. Le retour part en événement du socle (`JoueurReapparu`).
 - Torgnole (même dossier) : `ReglesTorgnole` (cône, portée, 5 s de recharge, en C# pur) et `PartieTorgnoles` dans la
-  scène (touche F ou bouton ouest). Un bot ou l'hôte frappe par `PartieTorgnoles.Frapper(porteur)` ; le coup part en
+  scène (touche V ou bouton ouest). Un bot ou l'hôte frappe par `PartieTorgnoles.Frapper(porteur)` ; le coup part en
   événement du socle (`CoupDonne`). Réglages : `Postes/4_ObjetsCapacites/ReglagesTorgnole.asset`.
 - Météo et événements (`Assets/Froggy/Scripts/Meteo/`) : `ReglesMeteo` (tirage pondéré, annonce, durée, en C# pur),
   `GestionnaireMeteo` dans la scène, une fiche `ReglagesMeteo` par arène (événements et poids) et une
