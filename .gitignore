@@ -128,3 +128,7 @@ CLAUDE.local.md
 
 # Fichiers de macOS
 .DS_Store
+
+# Scènes de test perso (Froggy ▸ Scènes de test ▸ Nouvelle scène perso) : à chacun les siennes
+/Assets/Froggy/Postes/_Perso/
+/Assets/Froggy/Postes/_Perso.meta
