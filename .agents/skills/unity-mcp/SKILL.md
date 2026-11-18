@@ -179,3 +179,11 @@ Pièges :
   `GrabPixels(RenderTexture, Rect)` du `HostView` (champ `m_Parent` de l'`EditorWindow`, par réflexion), le rectangle en
   **pixels** (taille × `EditorGUIUtility.pixelsPerPoint`). L'image sort **à l'envers** : retourner les lignes avant
   d'enregistrer. Marche aussi pour la vue Scène, avec les poignées et les panneaux dessinés par les outils.
+- **Rejouer un clip hors du mode Play (`PlayableGraph.Evaluate`) : régler l'Animator sur `AlwaysAnimate`** (Froggy,
+  18 novembre 2026, kappa). Un modèle importé a souvent `CullUpdateTransforms` : sans caméra qui le voit, les os ne
+  bougent pas, et mesurer `localEulerAngles` juste après `Evaluate` donne la pose de repos pour tous les clips (on a cru
+  les clips cassés). Et toujours créer l'objet dans un appel, l'évaluer dans le suivant.
+- **Ouvrir une scène peut décharger un `ScriptableObject` tout juste créé** (Froggy, 18 novembre 2026, outil du
+  gobelin) : `CreateInstance` puis `AssetDatabase.CreateAsset`, puis `EditorSceneManager.NewScene` en mode `Single`, et
+  la référence gardée en mémoire ne pointait plus sur rien : la scène s'est enregistrée avec ces champs vides, sans
+  erreur. Relire l'asset par `AssetDatabase.LoadAssetAtPath` après l'ouverture de la scène, et contrôler les champs.
