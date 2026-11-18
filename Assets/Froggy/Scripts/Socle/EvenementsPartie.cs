@@ -11,6 +11,10 @@ namespace Froggy.Socle
         ObjetUtilise,
         /// <summary>HYPOTHÈSE : un seul type pour le cookie sacré, T-01 ne dit pas s'il faut séparer apparition et capture.</summary>
         CookieSacre,
+        /// <summary>Le compte à rebours est fini, on joue (P3-03).</summary>
+        PartieCommencee,
+        /// <summary>La partie est finie ; « Auteur » est le gagnant, s'il y en a un (P3-03).</summary>
+        PartieFinie,
     }
 
     /// <summary>Un événement de partie : quoi, par qui, avec quoi, où. « Auteur » et « Objet » peuvent être vides.</summary>

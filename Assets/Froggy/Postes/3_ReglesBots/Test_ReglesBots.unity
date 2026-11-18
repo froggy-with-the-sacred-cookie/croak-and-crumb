@@ -476,6 +476,7 @@ GameObject:
   - component: {fileID: 1647959248}
   - component: {fileID: 1647959247}
   - component: {fileID: 1647959249}
+  - component: {fileID: 1647959250}
   m_Layer: 0
   m_Name: Partie de cookies
   m_TagString: Untagged
@@ -527,6 +528,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Froggy.Regles.EssaiLacher
   partie: {fileID: 1647959247}
   cible: {fileID: 1408684127}
+--- !u!114 &1647959250
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1647959246}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b6b9dcb40ec481740b25a86a8ac57c2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Froggy.Regles.DeroulementPartie
+  reglages: {fileID: 11400000, guid: 5ffa4034cd5cb68499d3f52397584265, type: 2}
+  cookies: {fileID: 1647959247}
+  lancerAuDepart: 1
+  affichageProvisoire: 1
 --- !u!1 &2072140222
 GameObject:
   m_ObjectHideFlags: 0
