@@ -17,6 +17,8 @@ namespace Froggy.Socle
         PartieFinie,
         /// <summary>Un joueur tombé hors de l'arène vient de réapparaître ; « Auteur » est ce joueur (P3-04).</summary>
         JoueurReapparu,
+        /// <summary>Un joueur a donné une torgnole ; « Auteur » le frappeur, « Objet » le joueur touché, vide si raté (P4-10).</summary>
+        CoupDonne,
     }
 
     /// <summary>Un événement de partie : quoi, par qui, avec quoi, où. « Auteur » et « Objet » peuvent être vides.</summary>
