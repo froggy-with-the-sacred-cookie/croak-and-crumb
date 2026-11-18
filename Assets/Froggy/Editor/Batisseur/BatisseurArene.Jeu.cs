@@ -57,13 +57,13 @@ namespace Froggy.Outils
             return g;
         }
 
-        /// <summary>Relit la course, le sprint et le saut du contrôleur actuel (TemplateMovementSettings), en attendant celui de Froggy (P1-01).</summary>
+        /// <summary>Relit la course et le saut du contrôleur actuel (TemplateMovementSettings), en attendant celui de Froggy (P1-01).</summary>
         private static bool ReprendreDuControleur(GabaritFroggy g)
         {
             var guid = AssetDatabase.FindAssets("t:TemplateMovementSettings").FirstOrDefault();
             var r = guid == null ? null : AssetDatabase.LoadAssetAtPath<TemplateMovementSettings>(AssetDatabase.GUIDToAssetPath(guid));
             if (r == null) return false;
-            g.vitesseCourse = r.moveSpeed; g.multiplicateurSprint = r.sprintMultiplier; g.hauteurSaut = r.jumpHeight;
+            g.vitesseCourse = r.moveSpeed; g.hauteurSaut = r.jumpHeight;
             return true;
         }
 
@@ -316,7 +316,7 @@ namespace Froggy.Outils
                 var it = gabaritSO.GetIterator(); bool entrer = true;
                 while (it.NextVisible(entrer)) { entrer = false; if (it.name != "m_Script") EditorGUILayout.PropertyField(it, true); }
                 if (gabaritSO.ApplyModifiedProperties()) { AssetDatabase.SaveAssetIfDirty(gabarit); PerimerAnalyse(); }
-                if (GUILayout.Button(new GUIContent("Reprendre du contrôleur", "Relit la course, le sprint et le saut du contrôleur actuel (TemplateMovementSettings)")))
+                if (GUILayout.Button(new GUIContent("Reprendre du contrôleur", "Relit la course et le saut du contrôleur actuel (TemplateMovementSettings)")))
                 {
                     Undo.RecordObject(gabarit, "Reprendre du contrôleur");
                     if (ReprendreDuControleur(gabarit)) { EditorUtility.SetDirty(gabarit); AssetDatabase.SaveAssetIfDirty(gabarit); PerimerAnalyse(); }

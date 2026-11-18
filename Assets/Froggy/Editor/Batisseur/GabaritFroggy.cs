@@ -21,8 +21,6 @@ namespace Froggy.Outils
 
         [Header("Vitesses")]
         [Tooltip("Course, en m/s (contrôleur actuel : 6). PROVISOIRE.")] [Min(.1f)] public float vitesseCourse = 6;
-        [Tooltip("Compter avec le sprint")] public bool avecSprint;
-        [Tooltip("Multiplicateur du sprint (contrôleur actuel : 1,6). PROVISOIRE.")] [Min(1)] public float multiplicateurSprint = 1.6f;
         [Tooltip("Nage, en m/s. HYPOTHÈSE : la moitié de la course, en attendant P1-02.")] [Min(.1f)] public float vitesseNage = 3;
         [Tooltip("Sortir de l'eau sur une berge : hauteur franchie, en mètres. HYPOTHÈSE.")] [Min(0)] public float sortieDeLEau = .6f;
 
@@ -46,7 +44,7 @@ namespace Froggy.Outils
             float k = m == Meteo.Pluie ? multiplicateurPluie : m == Meteo.Neige ? multiplicateurNeige : 1;
             return new TrajetsArene.Mouvement
             {
-                course = vitesseCourse * (avecSprint ? multiplicateurSprint : 1) * k,
+                course = vitesseCourse * k,   // pas de sprint ; le dash, au sol seulement, ne rallonge pas un saut (#134)
                 nage = vitesseNage * k,
                 hauteurSaut = hauteurSaut,
                 gravite = Mathf.Abs(Physics.gravity.y),

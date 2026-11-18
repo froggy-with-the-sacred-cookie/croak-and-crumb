@@ -36,13 +36,13 @@ namespace Froggy.Outils.Tests
         [Test]
         public void VitessesDansLeRepereDuCap()
         {
-            Vector3 avant = DeplacementWow.Vitesse(new Vector2(0f, 1f), 90f, false, course, wow);
+            Vector3 avant = DeplacementWow.Vitesse(new Vector2(0f, 1f), 90f, course, wow);
             Assert.That(Vector3.Distance(avant, new Vector3(course.moveSpeed, 0f, 0f)), Is.LessThan(1e-4f), "cap 90 : vers +x");
-            Vector3 recul = DeplacementWow.Vitesse(new Vector2(0f, -1f), 0f, false, course, wow);
+            Vector3 recul = DeplacementWow.Vitesse(new Vector2(0f, -1f), 0f, course, wow);
             Assert.That(recul.z, Is.EqualTo(-course.moveSpeed * wow.facteurRecul).Within(1e-4f), "recul plus lent");
-            Vector3 cote = DeplacementWow.Vitesse(new Vector2(1f, 0f), 0f, false, course, wow);
+            Vector3 cote = DeplacementWow.Vitesse(new Vector2(1f, 0f), 0f, course, wow);
             Assert.That(cote.x, Is.EqualTo(course.moveSpeed).Within(1e-4f), "pas de côté à pleine vitesse");
-            Vector3 diag = DeplacementWow.Vitesse(new Vector2(1f, 1f), 0f, false, course, wow);
+            Vector3 diag = DeplacementWow.Vitesse(new Vector2(1f, 1f), 0f, course, wow);
             Assert.That(diag.magnitude, Is.EqualTo(course.moveSpeed).Within(1e-4f), "la diagonale ne va pas plus vite");
         }
 

@@ -124,7 +124,50 @@ namespace Froggy.Outils.Tests
             s.rivaux.Add(Rival(2, 0f, 15f, cookies: 4));
             var i = Decider(s);
             Assert.That(i.cible, Is.EqualTo(2), "3 cookies d'avance : il le chasse plutôt que le cookie à 2 m");
-            Assert.That(i.sprint, Is.True, "en sprint, sinon il ne rattrape jamais un leader qui fuit");
+            Assert.That(i.dash, Is.False, "à 15 m, il court : le dash (4 m) part une fois le leader à portée");
+        }
+
+        [Test]
+        public void IlDasheQuandLaCibleEstAPortee()
+        {
+            // #134 : le dash remplace le sprint ; il part vers un leader entre dashMin et dashMax, s'il est prêt
+            var s = Situation(cookies: 1);
+            s.dashPret = true;
+            s.torgnolePrete = false;
+            s.rivaux.Add(Rival(2, 0f, 4f, cookies: 4));
+            Assert.That(Decider(s).dash, Is.True, "leader à 4 m : un dash pour le rattraper");
+
+            s.rivaux.Clear();
+            s.rivaux.Add(Rival(2, 0f, 1f, cookies: 4));
+            Assert.That(Decider(s).dash, Is.False, "à 1 m, trop près : il marche");
+
+            s.rivaux.Clear();
+            s.rivaux.Add(Rival(2, 0f, 4f, cookies: 4));
+            s.dashPret = false;
+            Assert.That(Decider(s).dash, Is.False, "dash en recharge");
+        }
+
+        [Test]
+        public void IlDashePourFuirUneMenaceProche()
+        {
+            var s = Situation(cookies: 3);
+            s.dashPret = true;
+            s.torgnolePrete = false;   // pas de riposte : il fuit
+            s.rivaux.Add(Rival(2, 0f, 2.5f));
+            var i = Decider(s);
+            Assert.That(i.sorte, Is.EqualTo(IntentionBot.Sorte.Fuir));
+            Assert.That(i.dash, Is.True, "menace à 2,5 m : un dash pour s'échapper");
+        }
+
+        [Test]
+        public void JamaisDeDashPourUnSimpleCookie()
+        {
+            var s = Situation();
+            s.dashPret = true;
+            s.cookiesVisibles.Add(new Vector3(0f, 0f, 3f));
+            var i = Decider(s);
+            Assert.That(i.raison, Does.Contain("cookie"));
+            Assert.That(i.dash, Is.False, "le dash se garde pour rattraper, fuir ou le cookie sacré");
         }
 
         [Test]
@@ -185,7 +228,7 @@ namespace Froggy.Outils.Tests
             s.rivaux.Add(Rival(3, 15f, 0f, sacre: true));
             var i = Decider(s);
             Assert.That(i.cible, Is.EqualTo(3));
-            Assert.That(i.sprint, Is.True);
+            Assert.That(i.dash, Is.False, "à 15 m, il court ; le dash part à portée");
         }
 
         [Test]

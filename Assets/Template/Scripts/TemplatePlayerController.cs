@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 namespace Froggy.Template
 {
     /// <summary>
-    /// Déplacement de référence : course relative à la caméra, sprint, saut avec coyote time, tampon et saut variable.
+    /// Déplacement de référence : course relative à la caméra, saut avec coyote time, tampon et saut variable.
     /// Les entrées se captent dans Update et se consomment au pas physique (FixedUpdate).
     /// Les actions viennent de PlayerInput (Assets/InputSystem_Actions, carte « Player ») : clavier/souris et manette.
     /// </summary>
@@ -25,11 +25,9 @@ namespace Froggy.Template
         private BoxCollider box;
         private InputAction moveAction;
         private InputAction jumpAction;
-        private InputAction sprintAction;
 
         // Entrées captées dans Update.
         private Vector2 moveInput;
-        private bool sprintHeld;
         private bool jumpHeld;
         private bool jumpPressed;
 
@@ -47,14 +45,12 @@ namespace Froggy.Template
 
             var actions = GetComponent<PlayerInput>().actions;
             moveAction = actions["Move"];
-            jumpAction = actions["Jump"];
-            sprintAction = actions["Sprint"];
+            jumpAction = actions["Jump"];   // pas de sprint dans Froggy : le dash le remplace (#134)
         }
 
         private void Update()
         {
             moveInput = moveAction.ReadValue<Vector2>();
-            sprintHeld = sprintAction.IsPressed();
             jumpHeld = jumpAction.IsPressed();
             if (jumpAction.WasPressedThisFrame())
                 jumpPressed = true;
@@ -85,7 +81,7 @@ namespace Froggy.Template
             Vector3 direction = Quaternion.Euler(0f, yaw, 0f) * new Vector3(moveInput.x, 0f, moveInput.y);
             direction = Vector3.ClampMagnitude(direction, 1f);
 
-            float speed = settings.moveSpeed * (sprintHeld ? settings.sprintMultiplier : 1f);
+            float speed = settings.moveSpeed;
             float acceleration = IsGrounded ? settings.groundAcceleration : settings.airAcceleration;
             Vector3 horizontal = Vector3.MoveTowards(new Vector3(velocity.x, 0f, velocity.z), direction * speed,
                 acceleration * dt);
