@@ -78,6 +78,7 @@ namespace Froggy.Personnages
 
         public string NomCourant => courant >= 0 ? modeles[courant].nom : "";
         public int Courant => courant;
+        public Animator Animateur => animator;
         public int Nombre => modeles.Count;
         public string Nom(int index) => modeles[index].nom;
 

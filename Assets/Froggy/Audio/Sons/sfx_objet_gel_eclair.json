@@ -1,0 +1,170 @@
+{
+  "generator": "sound-forge 0.6.0",
+  "preset": null,
+  "sound": {
+    "name": "Gel éclair",
+    "layers": [
+      {
+        "name": "Givre qui part",
+        "waveform": "white_noise",
+        "pitch": {
+          "start": 440.0,
+          "end": 440.0,
+          "time": 0.22
+        },
+        "envelope": {
+          "attack": 0.018,
+          "decay": 0.22,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "band_pass",
+          "cutoff": {
+            "start": 550.0,
+            "end": 5640.0,
+            "time": 0.22
+          },
+          "resonance": 0.2
+        },
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.77,
+        "start": 0.0,
+        "resonator": null
+      },
+      {
+        "name": "Premier cristal",
+        "waveform": "white_noise",
+        "pitch": {
+          "start": 1070.0,
+          "end": 1070.0,
+          "time": 0.008
+        },
+        "envelope": {
+          "attack": 0.0012,
+          "decay": 0.008,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "low_pass",
+          "cutoff": {
+            "start": 5100.0,
+            "end": 5100.0,
+            "time": 0.008
+          },
+          "resonance": 0.2
+        },
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.45,
+        "start": 0.063,
+        "resonator": {
+          "material": "glass",
+          "decay": 0.25,
+          "brightness": 0.53,
+          "dry": 0.12
+        }
+      },
+      {
+        "name": "Craquement figé",
+        "waveform": "white_noise",
+        "pitch": {
+          "start": 1440.0,
+          "end": 1440.0,
+          "time": 0.008
+        },
+        "envelope": {
+          "attack": 0.0012,
+          "decay": 0.008,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "low_pass",
+          "cutoff": {
+            "start": 5100.0,
+            "end": 5100.0,
+            "time": 0.008
+          },
+          "resonance": 0.2
+        },
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.63,
+        "start": 0.136,
+        "resonator": {
+          "material": "glass",
+          "decay": 0.2,
+          "brightness": 0.63,
+          "dry": 0.12
+        }
+      },
+      {
+        "name": "Dernier éclat",
+        "waveform": "white_noise",
+        "pitch": {
+          "start": 1935.0,
+          "end": 1935.0,
+          "time": 0.008
+        },
+        "envelope": {
+          "attack": 0.0012,
+          "decay": 0.008,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "low_pass",
+          "cutoff": {
+            "start": 5100.0,
+            "end": 5100.0,
+            "time": 0.008
+          },
+          "resonance": 0.2
+        },
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.27,
+        "start": 0.205,
+        "resonator": {
+          "material": "glass",
+          "decay": 0.23,
+          "brightness": 0.55,
+          "dry": 0.12
+        }
+      }
+    ],
+    "effects": {
+      "drive": null,
+      "echo": null,
+      "reverb": null
+    },
+    "peak_db": -5.8
+  },
+  "variants": 3,
+  "amount": 0.2,
+  "seed": 62293,
+  "files": [
+    "sfx_objet_gel_eclair_01.wav",
+    "sfx_objet_gel_eclair_02.wav",
+    "sfx_objet_gel_eclair_03.wav"
+  ]
+}

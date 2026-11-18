@@ -104,6 +104,10 @@ pour un modèle à armer. Budget de faces : ~6 000 pour un objet, ~30 000 pour u
 
 ## 4. Dans Unity
 
+- **Un personnage animé seulement par ses propres clips s'importe en `Generic`** (Froggy, 18 novembre 2026, le kappa :
+  modèle Meshy, squelette et clips faits par script Blender). En humanoïde, Unity écrasait ses postures tenues (penché
+  en avant, cookie serré, bras croisés) : le clip rejouait presque la pose A ; en générique, il rend exactement Blender
+  (vérifié de face et de profil). L'humanoïde ne sert que pour partager des clips entre squelettes (les Froggy).
 - **Personnage** : type humanoïde, avatar créé depuis le modèle avec la correspondance automatique. Si on remplace le
   FBX, **vider `humanDescription`**, sinon l'avatar n'est plus humain. **Ne pas forcer la pose T** dans
   `humanDescription.skeleton` : la configuration automatique le fait (Lovecraft : l'écraser a penché le corps de 29°).

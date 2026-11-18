@@ -1,0 +1,165 @@
+{
+  "generator": "sound-forge 0.6.0",
+  "preset": null,
+  "sound": {
+    "name": "Entrée dans l’eau",
+    "layers": [
+      {
+        "name": "Gerbe",
+        "waveform": "white_noise",
+        "pitch": {
+          "start": 440.0,
+          "end": 440.0,
+          "time": 0.26
+        },
+        "envelope": {
+          "attack": 0.005,
+          "decay": 0.26,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "band_pass",
+          "cutoff": {
+            "start": 4100.0,
+            "end": 770.0,
+            "time": 0.26
+          },
+          "resonance": 0.2
+        },
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.88,
+        "start": 0.0,
+        "resonator": null
+      },
+      {
+        "name": "Cavité d’eau",
+        "waveform": "sine",
+        "pitch": {
+          "start": 205.0,
+          "end": 64.0,
+          "time": 0.269
+        },
+        "envelope": {
+          "attack": 0.009,
+          "decay": 0.269,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": null,
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.67,
+        "start": 0.0,
+        "resonator": null
+      },
+      {
+        "name": "Eau qui retombe",
+        "waveform": "white_noise",
+        "pitch": {
+          "start": 440.0,
+          "end": 440.0,
+          "time": 0.21
+        },
+        "envelope": {
+          "attack": 0.04,
+          "decay": 0.21,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "band_pass",
+          "cutoff": {
+            "start": 2500.0,
+            "end": 1350.0,
+            "time": 0.21
+          },
+          "resonance": 0.2
+        },
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.38,
+        "start": 0.143,
+        "resonator": null
+      },
+      {
+        "name": "Goutte proche",
+        "waveform": "sine",
+        "pitch": {
+          "start": 581.0,
+          "end": 901.0,
+          "time": 0.097
+        },
+        "envelope": {
+          "attack": 0.007,
+          "decay": 0.097,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": null,
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.19,
+        "start": 0.114,
+        "resonator": null
+      },
+      {
+        "name": "Goutte éloignée",
+        "waveform": "sine",
+        "pitch": {
+          "start": 868.0,
+          "end": 704.0,
+          "time": 0.069
+        },
+        "envelope": {
+          "attack": 0.005,
+          "decay": 0.069,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": null,
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.14,
+        "start": 0.228,
+        "resonator": null
+      }
+    ],
+    "effects": {
+      "drive": null,
+      "echo": null,
+      "reverb": null
+    },
+    "peak_db": -5.0
+  },
+  "variants": 4,
+  "amount": 0.33,
+  "seed": 61250,
+  "files": [
+    "sfx_froggy_plouf_01.wav",
+    "sfx_froggy_plouf_02.wav",
+    "sfx_froggy_plouf_03.wav",
+    "sfx_froggy_plouf_04.wav"
+  ]
+}

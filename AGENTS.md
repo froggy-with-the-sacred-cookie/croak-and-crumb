@@ -45,24 +45,32 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
   Faire lâcher un cookie à un joueur (un coup, un malus) : `PartieCookies.FaireLacher(porteur, direction)`.
 - Déroulement d'une partie (même dossier) : `ReglesPartie` (compte à rebours, durée, gagnant, prolongation, en C# pur)
   et `DeroulementPartie` dans la scène. Le porteur du cookie sacré se donne par `PorteurCookieSacre` ; le début et la
-  fin partent en événements du socle (`PartieCommencee`, `PartieFinie`).
+  fin partent en événements du socle (`PartieCommencee`, `PartieFinie`). En fin de partie, « Rejouer » (bouton ou R,
+  provisoire en attendant le salon) appelle `DeroulementPartie.Rejouer()`.
 - Objets (`Assets/Froggy/Scripts/Objets/`) : `ReglesObjets` porte les règles en C# pur (boîtes, tirage, recharge) ;
   `PartieObjets` les fait vivre dans une scène à partir des repères « Boîte à objets » du Bâtisseur ; `PorteurObjet`
   donne l'emplacement d'objet d'une Froggy. Un objet = une `FicheObjet`, listée dans `ReglagesObjets`. L'effet d'un
-  objet écoute `PorteurObjet.Utilise`, ou l'événement `ObjetUtilise` du socle.
-  fin partent en événements du socle (`PartieCommencee`, `PartieFinie`). En fin de partie, « Rejouer » (bouton ou R,
-  provisoire en attendant le salon) appelle `DeroulementPartie.Rejouer()`.
+  objet écoute `PorteurObjet.Utilise`, ou l'événement `ObjetUtilise` du socle. Premier effet : `EffetSuperCroassement`
+  (élan, puis onde qui repousse les joueurs au sol ; son événement `Onde` sert au camouflage pour révéler les
+  camouflés), réglé par `Postes/4_ObjetsCapacites/ReglagesSuperCroassement.asset`.
 - Réapparition (même dossier) : `ReglesReapparition` (chute, délai, point le plus loin des autres, en C# pur) et
   `ApparitionJoueurs` dans la scène, qui pose les Froggy sur les repères « Apparition d'un joueur » du Bâtisseur.
   Avant de frapper un joueur, lire `PorteurCookies.Intouchable` (tombé ou tout juste réapparu) ; `FaireLacher` le
   refuse déjà. Le retour part en événement du socle (`JoueurReapparu`).
 - Torgnole (même dossier) : `ReglesTorgnole` (cône, portée, 5 s de recharge, en C# pur) et `PartieTorgnoles` dans la
-  scène (touche F ou bouton ouest). Un bot ou l'hôte frappe par `PartieTorgnoles.Frapper(porteur)` ; le coup part en
+  scène (touche V ou bouton ouest). Un bot ou l'hôte frappe par `PartieTorgnoles.Frapper(porteur)` ; le coup part en
   événement du socle (`CoupDonne`). Réglages : `Postes/4_ObjetsCapacites/ReglagesTorgnole.asset`.
 - Météo et événements (`Assets/Froggy/Scripts/Meteo/`) : `ReglesMeteo` (tirage pondéré, annonce, durée, en C# pur),
   `GestionnaireMeteo` dans la scène, une fiche `ReglagesMeteo` par arène (événements et poids) et une
   `DefinitionEvenement` par événement (durée, vitesse, saut, posés par les `Modificateurs`). Le rendu et le son d'un
   événement écoutent `Annonce`, `Debut` et `Fin` du gestionnaire ; il démarre et s'arrête avec la partie.
+- Cookie sacré et gobelin (dossier `Regles/`) : `ReglesCookieSacre` (le gobelin arrive dans la dernière minute,
+  capture, lâcher, ramassage, en C# pur) et `PartieCookieSacre` dans la scène, qui fait fuir le gobelin (`FuiteGobelin`,
+  préfabriqué `Assets/Froggy/Gobelin/Gobelin_Kappa`, menu **Froggy ▸ Gobelin**) depuis le repère « Départ du gobelin »
+  et tient `PorteurCookieSacre` à jour. Une torgnole (`CoupDonne`) ou un cookie lâché le font tomber ; un autre coup
+  passe par `PartieCookieSacre.FaireLacher(porteur, direction)`. Réglages :
+  `Postes/5_MeteoEvenements/ReglagesCookieSacre.asset`. En réseau, il n'est pas encore dans `PartieReseau` ; chez un
+  joueur qui n'est pas l'hôte (« Miroir »), il ne décide rien.
 - Nage (`Assets/Froggy/Scripts/Deplacement/`) : une `ZoneEau` (boîte déclencheur dont le dessus est la surface) sur
   chaque plan d'eau assez profond pour nager ; dedans, `DeplacementWow` passe la main à `NageFroggy` (flotte, nage à
   60 % de la course, plonge avec C ou le bouton est, ressort en sautant). Réglages : `ReglagesNage`. L'éclaboussure et
