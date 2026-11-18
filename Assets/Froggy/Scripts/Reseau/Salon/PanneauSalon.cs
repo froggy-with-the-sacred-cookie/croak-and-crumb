@@ -52,6 +52,8 @@ namespace Froggy.Reseau
         {
             GUILayout.Label(salon.Etat, texte);
             GUI.enabled = !salon.Occupe;
+            bool local = GUILayout.Toggle(!salon.EnLigne, " Réseau local (sans internet)");
+            if (local == salon.EnLigne) salon.EnLigne = !local;
             if (GUILayout.Button("Créer un salon", GUILayout.Height(28))) salon.Creer();
 
             GUILayout.Space(6);
@@ -67,6 +69,7 @@ namespace Froggy.Reseau
         {
             bool enPartie = salon.Phase == PhaseSalon.EnPartie;
             GUILayout.Label($"Code : <size=22><b>{salon.Code}</b></size>   {(salon.EstHote ? "(vous êtes l'hôte)" : "")}", texte);
+            GUILayout.Label(salon.EnLigne ? "<size=11>En ligne (Unity Relay)</size>" : "<size=11>Réseau local</size>", texte);
             GUILayout.Label(enPartie ? "<b>Partie en cours</b>" : "En attente des joueurs", texte);
 
             MembreSalon? moi = salon.Moi;

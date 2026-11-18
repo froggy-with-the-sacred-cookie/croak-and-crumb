@@ -1,0 +1,12 @@
+{
+  "name": "com.alven.fishnet.unitytransport",
+  "displayName": "FishyUnityTransport",
+  "description": "UnityTransport for FishNet. Copie de la 2.0.0-pre.2 officielle avec la correction de la PR #32 (Froggy, P2-05) : voir UnityTransport.cs, « FROGGY ».",
+  "version": "2.0.0-pre.2",
+  "unity": "2020.3",
+  "author": "Alven (https://github.com/ooonush)",
+  "homepage": "https://github.com/ooonush/FishyUnityTransport",
+  "dependencies": {
+    "com.unity.transport": "1.3.1"
+  }
+}
