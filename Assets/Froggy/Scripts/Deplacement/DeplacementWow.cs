@@ -34,6 +34,7 @@ namespace Froggy.Deplacement
         private BoxCollider boite;
         private TemplatePlayerController ancien;
         private Modificateurs modificateurs;
+        private NageFroggy nage;
         private InputAction moveAction, jumpAction, sprintAction, pasDeCote, courseAuto;
         private bool pret;
 
@@ -66,6 +67,9 @@ namespace Froggy.Deplacement
             // chaque Froggy en a un, pour que les autres postes le trouvent sans toucher au préfabriqué
             modificateurs = GetComponent<Modificateurs>();
             if (modificateurs == null) modificateurs = gameObject.AddComponent<Modificateurs>();
+            // la nage (P1-02) : sans effet tant que Froggy n'est pas dans une ZoneEau
+            nage = GetComponent<NageFroggy>();
+            if (nage == null) nage = gameObject.AddComponent<NageFroggy>();
             if (visuel == null) visuel = transform.Find("Visual");
             var entree = GetComponent<PlayerInput>();
             if (entree != null)
@@ -139,6 +143,19 @@ namespace Froggy.Deplacement
             sautAppuye = false;
 
             Vector3 v = corps.linearVelocity;
+
+            // dans l'eau, la nage prend la main (P1-02) ; un saut demandé peut servir à ressortir
+            if (nage != null && nage.Nager(dt, transform.TransformPoint(boite.center), entrees.deplacement, tampon > 0f,
+                    reglages, reglagesWow, modificateurs, corps, out bool sautUtilise))
+            {
+                AuSol = etaitAuSol = montee = false;
+                SolTouche = null;
+                coyote = 0f;
+                if (sautUtilise) tampon = 0f;
+                tampon -= dt;
+                return;
+            }
+
             AuSol = v.y <= 0.01f && Sol();   // en montée, on ne se recolle pas au sol
             // annoncé avant le saut éventuel du même pas : un saut enchaîné par le tampon part sans contact physique
             if (AuSol && !etaitAuSol) Atterrissage?.Invoke(SolTouche);
