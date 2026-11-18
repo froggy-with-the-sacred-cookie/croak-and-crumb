@@ -160,6 +160,7 @@ namespace Froggy.Objets
             if (modificateurs == null) modificateurs = joueur.AddComponent<Modificateurs>();
             var cle = new object();
             modificateurs.Poser(cle, 0f, 0f);
+            modificateurs.Entraver(cle);   // ni torgnole, ni objet tant qu'il est gelé (choix de Lucas, 18 novembre 2026)
             var corps = joueur.GetComponent<Rigidbody>();
             if (corps != null && !corps.isKinematic) corps.linearVelocity = new Vector3(0f, Mathf.Min(0f, corps.linearVelocity.y), 0f);
             geles[n] = (joueur, cle, visuelProvisoire ? Glace(joueur) : null);
@@ -182,7 +183,7 @@ namespace Froggy.Objets
             if (g.joueur != null)
             {
                 var modificateurs = g.joueur.GetComponent<Modificateurs>();
-                if (modificateurs != null) modificateurs.Retirer(g.cle);
+                if (modificateurs != null) { modificateurs.Retirer(g.cle); modificateurs.Desentraver(g.cle); }
             }
             if (g.glace != null) Destroy(g.glace.gameObject);
             Libere?.Invoke(g.joueur);

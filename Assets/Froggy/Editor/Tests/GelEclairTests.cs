@@ -86,10 +86,12 @@ namespace Froggy.Outils.Tests
             Assert.That(effet.EstGele(cible.gameObject), Is.True);
             Assert.That(m.Vitesse, Is.EqualTo(0f), "il ne bouge plus");
             Assert.That(m.Saut, Is.EqualTo(0f), "il ne saute plus");
+            Assert.That(m.Entrave, Is.True, "ni torgnole ni objet");
             Assert.That(effet.ProjectilesEnVol, Is.EqualTo(0), "le projectile s'arrête sur lui");
             for (int i = 0; i < 250; i++) effet.Pas(0.02f);
             Assert.That(effet.EstGele(cible.gameObject), Is.False);
             Assert.That(m.Vitesse, Is.EqualTo(1f), "et repart au bout de 5 s");
+            Assert.That(m.Entrave, Is.False, "et peut de nouveau agir");
         }
 
         [Test]
