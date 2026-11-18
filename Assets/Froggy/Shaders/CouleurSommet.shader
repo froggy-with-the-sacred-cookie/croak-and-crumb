@@ -1,6 +1,8 @@
 // Les modèles taillés et peints de Froggy (Tools/blender) : la couleur est dans les sommets, en sRGB, avec une lumière
 // douce déjà peinte. Ce shader éclaire par-dessus, doucement (pas d'ombre dure sur les facettes), reçoit les ombres et le
 // brouillard. L'ambiante est un dégradé ciel / sol réglé sur le matériau, en attendant la DA du jardin.
+// _Flotter > 0 : ce qui flotte (nénuphars, fleurs) houle sur place et penche vers le vent, retenu par sa tige ; chaque
+// instance a sa phase, tirée de sa position. Seul le dessin bouge : la collision reste où elle est.
 Shader "Froggy/CouleurSommet"
 {
     Properties
@@ -9,6 +11,7 @@ Shader "Froggy/CouleurSommet"
         _Ciel ("Ambiante venue du ciel", Color) = (0.62, 0.70, 0.80, 1)
         _Sol ("Ambiante venue du sol", Color) = (0.40, 0.38, 0.32, 1)
         _Douceur ("Douceur de la lumière", Range(0, 1)) = 0.45
+        _Flotter ("Flotter (0 : immobile)", Range(0, 2)) = 0
     }
     SubShader
     {
@@ -25,12 +28,14 @@ Shader "Froggy/CouleurSommet"
             #pragma multi_compile_fog
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+            #include "Bruit.hlsl"
 
             CBUFFER_START(UnityPerMaterial)
                 half4 _Teinte;
                 half4 _Ciel;
                 half4 _Sol;
                 half _Douceur;
+                half _Flotter;
             CBUFFER_END
 
             struct Entree { float4 positionOS : POSITION; float3 normalOS : NORMAL; half4 couleur : COLOR; };
@@ -43,14 +48,30 @@ Shader "Froggy/CouleurSommet"
                 half4 couleur : COLOR;
             };
 
+            float3 Flotter(float3 pw)
+            {
+                float3 pivot = TransformObjectToWorld(float3(0, 0, 0));
+                float h = Hachage1(floor(pivot.xz * 7.13));           // phase propre à chaque instance
+                float t = _Time.y;
+                float2 d = pw.xz - pivot.xz;
+                float a = sin(t * 0.23 + h * 40.0) * 0.05 * _Flotter;  // lacet : va-et-vient de ±3° autour de la tige
+                float ca = cos(a), sa = sin(a);
+                float2 dr = float2(d.x * ca - d.y * sa, d.x * sa + d.y * ca);
+                float2 vent = FroggyDirectionVent() * (0.3 + _FroggyVent.z);
+                float houle = (sin(t * 1.1 + h * 6.283) * 0.6 + sin(t * 1.9 + h * 17.0) * 0.4) * 0.012 * _Flotter;
+                float pente = sin(t * 0.8 + h * 9.0 + dot(pivot.xz, vent) * 0.4) * 0.02 * _Flotter;
+                return float3(pivot.x + dr.x, pw.y + houle + dot(dr, vent) * pente, pivot.z + dr.y);
+            }
+
             Sortie vert(Entree e)
             {
                 Sortie s;
-                VertexPositionInputs p = GetVertexPositionInputs(e.positionOS.xyz);
-                s.positionCS = p.positionCS;
-                s.positionWS = p.positionWS;
+                float3 pw = TransformObjectToWorld(e.positionOS.xyz);
+                if (_Flotter > 0) pw = Flotter(pw);
+                s.positionWS = pw;
+                s.positionCS = TransformWorldToHClip(pw);
                 s.normalWS = TransformObjectToWorldNormal(e.normalOS);
-                s.brouillard = ComputeFogFactor(p.positionCS.z);
+                s.brouillard = ComputeFogFactor(s.positionCS.z);
                 s.couleur = e.couleur;
                 return s;
             }

@@ -58,6 +58,20 @@ pour un modèle à armer. Budget de faces : ~6 000 pour un objet, ~30 000 pour u
 - Les exports anciens « …_withSkin » avaient des os figés dans une image de l'animation ; l'export riggé récent
   (`…_Meshy_Merged_Animations.fbx`) a un squelette Mixamo **juste** (Lovecraft, 26 octobre, vérifié par un rendu
   Blender de la marche et de la course). Vérifier par un rendu avant d'intégrer.
+- **Les courbes Prime ne se copient pas aveuglément sur le rig du catalogue.** Froggy B, 28 octobre 2026 : le FBX
+  du saut issu de `text_to_motion` puis `animate` a la même liste d'os que marche/course/victoire, mais l'armature est
+  tournée de 90° sur X et ses os au repos sont exprimés dans un autre repère. La marche et la course, elles,
+  partagent exactement les positions de repos du rig. Garder les FBX animés complets sur leurs squelettes propres,
+  ou retargeter explicitement en tenant compte des matrices de repos ; partager des noms d'os ne suffit pas pour
+  partager une action. Contrôler les matrices, puis les vrais rendus, avant un assemblage ou une intégration Unity.
+- **Un mouvement `text_to_motion` se réapplique à un autre rig pour 3 crédits** (`meshy_animate` avec son
+  `motion_task_id`, dans les 3 jours) au lieu de 13 pour un mouvement neuf. Froggy kawaii, 28 octobre 2026 : le saut
+  de B réutilisé ; les deux modèles ont ainsi le même saut, ce qui rend la comparaison juste.
+- **Yeux bavés** : quand le profil de la planche montre l'œil, Meshy mélange l'œil de face et celui de profil, et le
+  noir déborde sur les côtés de la tête (Froggy kawaii, 28 octobre 2026 ; parfait de face, taches de trois quarts).
+  Réparation gratuite, `Tools/blender/froggy_kawaii_corriger.py` : situer chaque texel en 3D, repeindre les yeux par
+  diffusion de la peau voisine, poser de vrais yeux (ellipsoïdes mesurés sur les texels vus de face) attachés à l'os
+  `Head`. Plutôt que de régénérer la texture (10 crédits, sans garantie).
 
 ## 4. Dans Unity
 
@@ -68,6 +82,13 @@ pour un modèle à armer. Budget de faces : ~6 000 pour un objet, ~30 000 pour u
 - Remplacer un FBX en gardant son GUID garde toutes les références. Clips de marche et de course en boucle, racine
   figée dans la pose s'ils sont sur place ; régler la vitesse de lecture sur la foulée **mesurée à la taille du jeu**
   (pied au sol), pas à l'œil.
+- **Un clip par FBX, chacun avec son propre avatar humanoïde** (Froggy, 28 octobre 2026) : le retargeting humanoïde
+  absorbe le repère différent du saut Prime (ligne du § 3). Réglages posés par `Assets/Froggy/Editor/ImportPersonnagesFroggy.cs`
+  pour tout `Assets/Froggy/Personnages/`, contrôleurs et scène de test par le menu *Froggy > Personnages* : y ranger un
+  nouveau modèle (`<Dossier>/Froggy_X_<Clip>.fbx`) suffit pour le comparer en jeu.
+- **Texture embarquée dans le FBX = modèle blanc dans Unity** tant qu'elle n'est pas extraite
+  (`ModelImporter.ExtractTextures`, puis réimport) ; `PersonnagesFroggy.Construire` le fait. Ne pas ranger un
+  personnage sous `Assets/Froggy/Models/` : `ImportModelesFroggy` y coupe les animations.
 - `bakeAxisConversion` comme les exports de Blender ; matériaux copiés d'un matériau du jeu puis remappés, pour garder
   le shader du projet.
 - **Poids des textures** (Glouton) : GLB converti en glTF avec textures externes réduites à 1024 px, compressées par

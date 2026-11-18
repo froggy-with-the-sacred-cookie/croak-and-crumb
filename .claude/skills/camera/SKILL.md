@@ -38,6 +38,10 @@ derrière les bâtiments).
 
 - **Rien ne devient transparent** : la silhouette fantôme à travers les murs a été refusée. Derrière un obstacle, la
   caméra cherche une place libre.
+- **Seuls le sol et les murs sont des obstacles**, pas le petit décor (pierres, rochers, arbres, bambous), que la caméra
+  traverse comme dans WoW. Froggy, 28 octobre 2026 : butée contre tout collider, la caméra du jardin se rapprochait à
+  chaque pierre, donc descendait (bras incliné) : « ça change tout le temps la hauteur, vraiment très désagréable ».
+  Marquer ce qui arrête (`BloqueCamera` sur le sol et la muraille), plutôt que de lister ce qui n'arrête pas.
 - Elle **se rapproche plutôt que de tourner** : chercher cap × inclinaison × distance dans un cône autour du cap habituel
   (Lovecraft : écart max 60°, inclinaison max 40°, distance jusqu'à 30 %). Retenir une place seulement si le joueur
   s'y voit **et** si le bras de caméra peut s'y tendre sans traverser.

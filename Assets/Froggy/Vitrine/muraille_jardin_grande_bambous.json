@@ -1,0 +1,454 @@
+{
+ "pieces": [
+  {
+   "nom": "Bordure_Bambous_2",
+   "pos": [
+    -24.0,
+    0.0,
+    -20.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Bordure_Bambous_1",
+   "pos": [
+    -20.0,
+    0.0,
+    -20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Bordure_Bambous_1",
+   "pos": [
+    -16.0,
+    0.0,
+    -20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Bordure_Bambous_2",
+   "pos": [
+    -12.0,
+    0.0,
+    -20.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Bordure_Bambous_1",
+   "pos": [
+    -8.0,
+    0.0,
+    -20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Bordure_Bambous_1",
+   "pos": [
+    -4.0,
+    0.0,
+    -20.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Bordure_Bambous_1",
+   "pos": [
+    0.0,
+    0.0,
+    -20.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Bordure_Bambous_1",
+   "pos": [
+    4.0,
+    0.0,
+    -20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Bordure_Bambous_2",
+   "pos": [
+    8.0,
+    0.0,
+    -20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Bordure_Bambous_2",
+   "pos": [
+    12.0,
+    0.0,
+    -20.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Bordure_Bambous_1",
+   "pos": [
+    16.0,
+    0.0,
+    -20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Bordure_Bambous_2",
+   "pos": [
+    20.0,
+    0.0,
+    -20.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Bordure_Bambous_1",
+   "pos": [
+    24.0,
+    0.0,
+    -20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Bordure_Bambous_1",
+   "pos": [
+    -24.0,
+    0.0,
+    20.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Bordure_Bambous_1",
+   "pos": [
+    -20.0,
+    0.0,
+    20.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Bordure_Bambous_2",
+   "pos": [
+    -16.0,
+    0.0,
+    20.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Bordure_Bambous_1",
+   "pos": [
+    -12.0,
+    0.0,
+    20.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Bordure_Bambous_2",
+   "pos": [
+    -8.0,
+    0.0,
+    20.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Bordure_Bambous_1",
+   "pos": [
+    -4.0,
+    0.0,
+    20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Bordure_Bambous_1",
+   "pos": [
+    0.0,
+    0.0,
+    20.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Bordure_Bambous_2",
+   "pos": [
+    4.0,
+    0.0,
+    20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Bordure_Bambous_1",
+   "pos": [
+    8.0,
+    0.0,
+    20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Bordure_Bambous_1",
+   "pos": [
+    12.0,
+    0.0,
+    20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Bordure_Bambous_1",
+   "pos": [
+    16.0,
+    0.0,
+    20.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Bordure_Bambous_2",
+   "pos": [
+    20.0,
+    0.0,
+    20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Bordure_Bambous_1",
+   "pos": [
+    24.0,
+    0.0,
+    20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Bordure_Bambous_1",
+   "pos": [
+    -26.6,
+    0.0,
+    -18.0
+   ],
+   "lacet": 270
+  },
+  {
+   "nom": "Bordure_Bambous_1",
+   "pos": [
+    -26.6,
+    0.0,
+    -14.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Bordure_Bambous_1",
+   "pos": [
+    -26.6,
+    0.0,
+    -10.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Bordure_Bambous_2",
+   "pos": [
+    -26.6,
+    0.0,
+    -6.0
+   ],
+   "lacet": 270
+  },
+  {
+   "nom": "Bordure_Bambous_2",
+   "pos": [
+    -26.6,
+    0.0,
+    -2.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Bordure_Bambous_1",
+   "pos": [
+    -26.6,
+    0.0,
+    2.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Bordure_Bambous_1",
+   "pos": [
+    -26.6,
+    0.0,
+    6.0
+   ],
+   "lacet": 270
+  },
+  {
+   "nom": "Bordure_Bambous_2",
+   "pos": [
+    -26.6,
+    0.0,
+    10.0
+   ],
+   "lacet": 270
+  },
+  {
+   "nom": "Bordure_Bambous_1",
+   "pos": [
+    -26.6,
+    0.0,
+    14.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Bordure_Bambous_2",
+   "pos": [
+    -26.6,
+    0.0,
+    18.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Bordure_Bambous_1",
+   "pos": [
+    26.6,
+    0.0,
+    -18.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Bordure_Bambous_2",
+   "pos": [
+    26.6,
+    0.0,
+    -14.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Bordure_Bambous_1",
+   "pos": [
+    26.6,
+    0.0,
+    -10.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Bordure_Bambous_1",
+   "pos": [
+    26.6,
+    0.0,
+    -6.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Bordure_Bambous_2",
+   "pos": [
+    26.6,
+    0.0,
+    -2.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Bordure_Bambous_2",
+   "pos": [
+    26.6,
+    0.0,
+    2.0
+   ],
+   "lacet": 270
+  },
+  {
+   "nom": "Bordure_Bambous_1",
+   "pos": [
+    26.6,
+    0.0,
+    6.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Bordure_Bambous_1",
+   "pos": [
+    26.6,
+    0.0,
+    10.0
+   ],
+   "lacet": 270
+  },
+  {
+   "nom": "Bordure_Bambous_1",
+   "pos": [
+    26.6,
+    0.0,
+    14.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Bordure_Bambous_1",
+   "pos": [
+    26.6,
+    0.0,
+    18.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Bordure_Bambous_Angle",
+   "pos": [
+    -26.6,
+    0.0,
+    -20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Bordure_Bambous_Angle",
+   "pos": [
+    -26.6,
+    0.0,
+    20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Bordure_Bambous_Angle",
+   "pos": [
+    26.6,
+    0.0,
+    -20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Bordure_Bambous_Angle",
+   "pos": [
+    26.6,
+    0.0,
+    20.6
+   ],
+   "lacet": 0
+  }
+ ]
+}

@@ -79,3 +79,21 @@ quand il ne se voit pas ; textures externes réduites et compressées (skill `ro
 - Un build peut retirer le post-traitement (`m_StripUnusedPostProcessingVariants`) : contrôler un build.
 - Écartés sur Lovecraft comme trop coûteux pour une petite équipe : destruction, océan FFT, volumétriques, GI, motion
   matching. À rouvrir seulement avec une raison.
+
+## 8. Jardin japonais : ce qui existe (Froggy, 28 octobre 2026)
+
+- **Le vent** : `Froggy.Jardin.VentJardin` pose `_FroggyVent` (xy : direction sur le sol, z : force, w : horloge du vent,
+  qui avance plus vite par grand vent). Les shaders l'incluent par `Assets/Froggy/Shaders/Bruit.hlsl`
+  (`FroggyHorloge`, `FroggyDirectionVent`, `BruitValeur`, `Fbm`, `Voronoi`). En C# : `VentJardin.Direction` et
+  `VentJardin.Force`. Aucune autre source de vent.
+- **`Froggy/Eau`** : couleur par profondeur (Beer-Lambert), réfraction protégée contre ce qui est devant la surface,
+  profondeur lissée sur 5 points d'écran, écume de rive en bandes, motif de Voronoï déformé, Fresnel vers le ciel,
+  éclats quantifiés. Il faut les textures de profondeur et de couleur de la caméra (cochées dans `PC_RPAsset`).
+  L'eau simple `Froggy/EauSimple` reste la version d'avant.
+- **`Froggy/Ciel`** : skybox procédural, avec un disque de soleil HDR (le bloom le fait rayonner) placé sur
+  `_MainLightPosition`, et des nuages à deux tons, nets, poussés par le vent.
+- **`Froggy/CouleurSommet` avec `_Flotter`** : ce qui flotte oscille dans le shader, la collision reste fixe.
+- **La bascule** : `RenduJardin.nouveauRendu` change d'un coup le ciel, l'eau, le brouillard et le post-traitement.
+- **Pièges** : le post-traitement pousse les roses vers le mauve si les ombres sont trop bleutées (ombres à
+  (0,97 ; 0,99 ; 1,05)) ; un brouillard qui commence à 30 m grise une vue d'ensemble prise à 40 m (55 à 170 m avec
+  le ciel).

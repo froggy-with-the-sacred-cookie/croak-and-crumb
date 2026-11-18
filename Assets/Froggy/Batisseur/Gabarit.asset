@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9bd07bfdc9b0a4fa49016711a5c54d50, type: 3}
+  m_Name: Gabarit
+  m_EditorClassIdentifier: Assembly-CSharp-Editor::Froggy.Outils.GabaritFroggy
+  rayon: 0.3
+  hauteur: 1
+  hauteurMarche: 0.35
+  penteMax: 40
+  vitesseCourse: 6
+  avecSprint: 0
+  multiplicateurSprint: 1.6
+  vitesseNage: 3
+  sortieDeLEau: 0.6
+  hauteurSaut: 1.5
+  multiplicateurPluie: 1.25
+  multiplicateurNeige: 0.75
+  pas: 0.5
+  plafond: 3
+  nomsEau: Eau
