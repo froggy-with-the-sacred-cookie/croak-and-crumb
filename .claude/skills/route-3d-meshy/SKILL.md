@@ -29,6 +29,12 @@ Pilotes d'Eku (18-19 octobre 2026), de Lovecraft (arbres, maisons, personnage au
   des **gestes humains**. Pour une démarche ou un saut de grenouille, `meshy_text_to_motion` (décrire la posture :
   accroupi, cuisses repliées, poussée des pattes arrière) avant `meshy_animate`. Une grenouille *humanoïde* (Notion)
   passe mieux par le rig humanoïde, mais ses proportions (grosse tête, jambes repliées) se vérifient au rendu.
+- **Un mouvement humain ne se voit pas sur un corps chibi.** Froggy P, 18 novembre 2026 : les 11 clips
+  `text_to_motion`, rejoués sur P par le retargeting de Unity, bougeaient le corps d'un bloc et presque pas les bras
+  (23 cm, sous une tête de 84 cm de large qui les cache vus de dos) : « le modèle semble ne pas être riggé ». Il
+  l'était. Pour un personnage à grosse tête et petits membres, animer à la main par script Blender
+  (`Tools/blender/froggy_p_animations.py` : le corps et la tête portent le geste, le visage l'émotion), et juger sur
+  une planche à trois vues dont **la vue de dos de la caméra**, pas seulement de face.
 
 ## 2. Coûts et chaîne (à annoncer en une fois)
 
