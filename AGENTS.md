@@ -49,7 +49,9 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
 - Objets (`Assets/Froggy/Scripts/Objets/`) : `ReglesObjets` porte les règles en C# pur (boîtes, tirage, recharge) ;
   `PartieObjets` les fait vivre dans une scène à partir des repères « Boîte à objets » du Bâtisseur ; `PorteurObjet`
   donne l'emplacement d'objet d'une Froggy. Un objet = une `FicheObjet`, listée dans `ReglagesObjets`. L'effet d'un
-  objet écoute `PorteurObjet.Utilise`, ou l'événement `ObjetUtilise` du socle.
+  objet écoute `PorteurObjet.Utilise`, ou l'événement `ObjetUtilise` du socle. Premier effet : `EffetSuperCroassement`
+  (élan, puis onde qui repousse les joueurs au sol ; son événement `Onde` sert au camouflage pour révéler les
+  camouflés), réglé par `Postes/4_ObjetsCapacites/ReglagesSuperCroassement.asset`.
   fin partent en événements du socle (`PartieCommencee`, `PartieFinie`). En fin de partie, « Rejouer » (bouton ou R,
   provisoire en attendant le salon) appelle `DeroulementPartie.Rejouer()`.
 - Réapparition (même dossier) : `ReglesReapparition` (chute, délai, point le plus loin des autres, en C# pur) et
@@ -57,7 +59,7 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
   Avant de frapper un joueur, lire `PorteurCookies.Intouchable` (tombé ou tout juste réapparu) ; `FaireLacher` le
   refuse déjà. Le retour part en événement du socle (`JoueurReapparu`).
 - Torgnole (même dossier) : `ReglesTorgnole` (cône, portée, 5 s de recharge, en C# pur) et `PartieTorgnoles` dans la
-  scène (touche F ou bouton ouest). Un bot ou l'hôte frappe par `PartieTorgnoles.Frapper(porteur)` ; le coup part en
+  scène (touche V ou bouton ouest). Un bot ou l'hôte frappe par `PartieTorgnoles.Frapper(porteur)` ; le coup part en
   événement du socle (`CoupDonne`). Réglages : `Postes/4_ObjetsCapacites/ReglagesTorgnole.asset`.
 
 ## Les branches
