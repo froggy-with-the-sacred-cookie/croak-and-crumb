@@ -42,6 +42,7 @@ pour Froggy** (Unity 3D, multijoueur, FishNet, arènes) : les originaux pointaie
 | `Tools/meshy/unpack_glb.py` | Glouton | GLB vers glTF avec textures externes réduites (build de 399 à 99 Mo) |
 | `Tools/blender/blender_lib.py` | Lovecraft | briques Blender des objets taillés et peints |
 | `Tools/unity_mcp.py` | Lovecraft | client HTTP de secours du MCP de Unity |
+| `Assets/Froggy/Editor/Batisseur/` | Lovecraft (`EditeurDeMonde`, `Tampons`, `JouerIci`, `RaccourcisBatisseur`, `VerificationMonde`) | le Bâtisseur d'arène, réécrit pour la 3D libre (29 octobre 2026) ; mode d'emploi `Docs/Outils/BATISSEUR.md` |
 | `Tools/art/carte_palette.py`, `Tools/art/juger_vision.py` | Eku | carte de palette à joindre à Gemini, mesure des tirages |
 | `Tools/sync_skills.py` | nouveau | recopie `.claude/skills/` vers `.agents/skills/` pour Codex |
 
@@ -56,6 +57,10 @@ pour Froggy** (Unity 3D, multijoueur, FishNet, arènes) : les originaux pointaie
 - **Les outils de Lovecraft liés à son code** (`unity_asset.py`, `test_recolte.py`, `fiches.py`, `refs_reelles.py`,
   `reconstruire_rig.py`, `integrer_objet.py`, `hiver_meshy.py`) : ils supposent son catalogue et ses chemins. À
   adapter au besoin depuis le dépôt `zharrow/lovecraft` (`Outils/`).
+- **Les outils du Bâtisseur de Lovecraft liés à sa grille de cases** (Bâtir à la Townscaper, peindre le sol et les
+  zones, changer la taille d'une carte, carte des vides, récoltes, nouvelle région, PNJ et quêtes, traversées) : Froggy
+  pose en 3D libre. La carte des vides (temps de marche sans rien rencontrer) serait utile à une arène, refaite sur un
+  NavMesh : `Assets/Lovecraft/Scripts/Editor/CarteDesVides.cs` et `EditeurDeMonde.Vides.cs` dans `zharrow/lovecraft`.
 - **Les 200 fiches de la Tech Art Bible** : gardées dans le fichier, mais à chercher, pas à lire (voir `tech-art`).
 - **Les états et décisions de chaque jeu** (personnages, biomes, quêtes, réglages chiffrés de leurs contrôleurs) : ils
   ne valent que pour leur jeu. Les chiffres cités dans les skills sont des points de départ, marqués comme tels.

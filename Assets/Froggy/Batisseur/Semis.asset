@@ -1,0 +1,115 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81fe48413d6fe4ba18f8d56ffe23ec8d, type: 3}
+  m_Name: Semis
+  m_EditorClassIdentifier: Assembly-CSharp-Editor::Froggy.Outils.SemisArene
+  melanges:
+  - nom: Sous-bois du jardin
+    note: "Foug\xE8res, hostas et iris, en touffes, au pied des arbres et le long des berges"
+    elements:
+    - modele: {fileID: 7739970425865972658, guid: 60a1c0b2bea6640b3bd83cb02daaa925, type: 3}
+      poids: 1
+      suivreLaPente: 0
+      enfoncement: 0
+    - modele: {fileID: 7941130937146889243, guid: 790dc2c1212724f40b2594b074cd7094, type: 3}
+      poids: 1
+      suivreLaPente: 0
+      enfoncement: 0
+    - modele: {fileID: 6853653066281315891, guid: 4dfe131b2e07f4c18b067485bc34971b, type: 3}
+      poids: 0.5
+      suivreLaPente: 0
+      enfoncement: 0
+    densite: 0.4
+    espacement: 0.8
+    massifs: 0.5
+    tailleMin: 0.85
+    tailleMax: 1.15
+    penteMax: 35
+    altitudeMin: -1000
+    altitudeMax: 1000
+    eviterLesObjets: 1
+  - nom: Pierres et mousse
+    note: "Rochers moussus enfonc\xE9s, pierres de gu\xE9 et plaques de mousse"
+    elements:
+    - modele: {fileID: 7051910480741705744, guid: ffba74ac625c64acab410e6f113d2f8e, type: 3}
+      poids: 1
+      suivreLaPente: 1
+      enfoncement: 0.1
+    - modele: {fileID: 6314906296680873637, guid: c8f441a06ee5e4331bcae530c1093971, type: 3}
+      poids: 0.5
+      suivreLaPente: 1
+      enfoncement: 0.05
+    - modele: {fileID: 6025891470075794119, guid: 3fa6e3b6f17f645e5a040c7a4203a8ab, type: 3}
+      poids: 1
+      suivreLaPente: 1
+      enfoncement: 0
+    densite: 0.15
+    espacement: 1.5
+    massifs: 0.6
+    tailleMin: 0.7
+    tailleMax: 1.3
+    penteMax: 35
+    altitudeMin: -1000
+    altitudeMax: 1000
+    eviterLesObjets: 1
+  - nom: Massif de karikomi
+    note: "Buissons taill\xE9s en boule, serr\xE9s en massifs"
+    elements:
+    - modele: {fileID: 2252926573181537004, guid: 9f92a28e7fa234c47bc7faa3e358a58c, type: 3}
+      poids: 2
+      suivreLaPente: 0
+      enfoncement: 0
+    - modele: {fileID: 3555450543777764374, guid: bb16d55be24f74b7c9de1b63a2c5a821, type: 3}
+      poids: 1
+      suivreLaPente: 0
+      enfoncement: 0
+    - modele: {fileID: 6102140500946491307, guid: 3bc8ea5b12a8b495dabf3215b8fc64be, type: 3}
+      poids: 1
+      suivreLaPente: 0
+      enfoncement: 0
+    densite: 0.2
+    espacement: 1.4
+    massifs: 0.5
+    tailleMin: 0.85
+    tailleMax: 1.15
+    penteMax: 35
+    altitudeMin: -1000
+    altitudeMax: 1000
+    eviterLesObjets: 1
+  - nom: "Bosquet d'\xE9rables et de cerisiers"
+    note: "Des arbres espac\xE9s, quelques pins niwaki"
+    elements:
+    - modele: {fileID: 1933958981392531696, guid: 2c05254525d5e4e4c810c7f4c1c664bf, type: 3}
+      poids: 1
+      suivreLaPente: 0
+      enfoncement: 0
+    - modele: {fileID: 3635049175093476976, guid: 7d90367cc39784b0f9016f133d6c169b, type: 3}
+      poids: 1
+      suivreLaPente: 0
+      enfoncement: 0
+    - modele: {fileID: 1425385000106596544, guid: 28fdfabdf50d44fcfa23c9ecb0e86ba0, type: 3}
+      poids: 1
+      suivreLaPente: 0
+      enfoncement: 0
+    - modele: {fileID: 2001805948006013165, guid: 9110a824a215b452badae21711634c6f, type: 3}
+      poids: 0.5
+      suivreLaPente: 0
+      enfoncement: 0
+    densite: 0.03
+    espacement: 5
+    massifs: 0.3
+    tailleMin: 0.9
+    tailleMax: 1.1
+    penteMax: 25
+    altitudeMin: -1000
+    altitudeMax: 1000
+    eviterLesObjets: 1

@@ -23,6 +23,10 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
 - Gestion de projet : le [tableau GitHub Projects](https://github.com/orgs/froggy-with-the-sacred-cookie/projects/1),
   voir « Les tâches ».
 - Dépôt : https://github.com/froggy-with-the-sacred-cookie/croak-and-crumb
+- Habiller une arène : menu **Froggy ▸ Bâtisseur d'arène**, rangé en cinq étapes (① Terrain, ② Jeu, ③ Équilibre,
+  ④ Décor, ⑤ Tester) avec la jauge « Prête pour un test », et **F5** pour jouer au point visé ; mode d'emploi
+  `Docs/Outils/BATISSEUR.md` (commencer par « Premiers pas »). Toute nouvelle fonction de construction d'arène y
+  va, pas dans une fenêtre de plus.
 
 ## Les branches
 
