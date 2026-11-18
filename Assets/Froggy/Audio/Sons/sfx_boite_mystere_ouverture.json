@@ -1,0 +1,157 @@
+{
+  "generator": "sound-forge 0.6.0",
+  "preset": null,
+  "sound": {
+    "name": "Ouverture de la boîte mystère",
+    "layers": [
+      {
+        "name": "Fermoir",
+        "waveform": "white_noise",
+        "pitch": {
+          "start": 825.0,
+          "end": 825.0,
+          "time": 0.008
+        },
+        "envelope": {
+          "attack": 0.0012,
+          "decay": 0.008,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "low_pass",
+          "cutoff": {
+            "start": 5100.0,
+            "end": 5100.0,
+            "time": 0.008
+          },
+          "resonance": 0.2
+        },
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.67,
+        "start": 0.0,
+        "resonator": {
+          "material": "metal",
+          "decay": 0.2,
+          "brightness": 0.43,
+          "dry": 0.12
+        }
+      },
+      {
+        "name": "Couvercle qui se décolle",
+        "waveform": "white_noise",
+        "pitch": {
+          "start": 440.0,
+          "end": 440.0,
+          "time": 0.15
+        },
+        "envelope": {
+          "attack": 0.024,
+          "decay": 0.15,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "band_pass",
+          "cutoff": {
+            "start": 850.0,
+            "end": 2100.0,
+            "time": 0.15
+          },
+          "resonance": 0.2
+        },
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.42,
+        "start": 0.035,
+        "resonator": null
+      },
+      {
+        "name": "Butée en bois",
+        "waveform": "white_noise",
+        "pitch": {
+          "start": 358.0,
+          "end": 358.0,
+          "time": 0.008
+        },
+        "envelope": {
+          "attack": 0.0012,
+          "decay": 0.008,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "low_pass",
+          "cutoff": {
+            "start": 5100.0,
+            "end": 5100.0,
+            "time": 0.008
+          },
+          "resonance": 0.2
+        },
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.59,
+        "start": 0.132,
+        "resonator": {
+          "material": "wood",
+          "decay": 0.31,
+          "brightness": 0.35,
+          "dry": 0.12
+        }
+      },
+      {
+        "name": "Surprise",
+        "waveform": "triangle",
+        "pitch": {
+          "start": 895.0,
+          "end": 895.0,
+          "time": 0.15
+        },
+        "envelope": {
+          "attack": 0.008,
+          "decay": 0.15,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": null,
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.16,
+        "start": 0.147,
+        "resonator": null
+      }
+    ],
+    "effects": {
+      "drive": null,
+      "echo": null,
+      "reverb": null
+    },
+    "peak_db": -8.0
+  },
+  "variants": 3,
+  "amount": 0.3,
+  "seed": 62144,
+  "files": [
+    "sfx_boite_mystere_ouverture_01.wav",
+    "sfx_boite_mystere_ouverture_02.wav",
+    "sfx_boite_mystere_ouverture_03.wav"
+  ]
+}

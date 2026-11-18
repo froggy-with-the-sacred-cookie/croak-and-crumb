@@ -1,0 +1,148 @@
+{
+  "generator": "sound-forge 0.6.0",
+  "preset": null,
+  "sound": {
+    "name": "Torgnole · impact",
+    "layers": [
+      {
+        "name": "Claque sèche",
+        "waveform": "white_noise",
+        "pitch": {
+          "start": 440.0,
+          "end": 440.0,
+          "time": 0.048
+        },
+        "envelope": {
+          "attack": 0.0015,
+          "decay": 0.048,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "band_pass",
+          "cutoff": {
+            "start": 6200.0,
+            "end": 2600.0,
+            "time": 0.048
+          },
+          "resonance": 0.2
+        },
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.72,
+        "start": 0.0,
+        "resonator": null
+      },
+      {
+        "name": "Corps du coup",
+        "waveform": "sine",
+        "pitch": {
+          "start": 237.0,
+          "end": 71.0,
+          "time": 0.13
+        },
+        "envelope": {
+          "attack": 0.002,
+          "decay": 0.13,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": null,
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.94,
+        "start": 0.0,
+        "resonator": null
+      },
+      {
+        "name": "Paume souple",
+        "waveform": "triangle",
+        "pitch": {
+          "start": 420.0,
+          "end": 149.0,
+          "time": 0.06
+        },
+        "envelope": {
+          "attack": 0.002,
+          "decay": 0.06,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "low_pass",
+          "cutoff": {
+            "start": 1450.0,
+            "end": 1450.0,
+            "time": 0.06
+          },
+          "resonance": 0.2
+        },
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.43,
+        "start": 0.0,
+        "resonator": null
+      },
+      {
+        "name": "Rebond étouffé",
+        "waveform": "white_noise",
+        "pitch": {
+          "start": 440.0,
+          "end": 440.0,
+          "time": 0.061
+        },
+        "envelope": {
+          "attack": 0.004,
+          "decay": 0.061,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "band_pass",
+          "cutoff": {
+            "start": 1590.0,
+            "end": 830.0,
+            "time": 0.061
+          },
+          "resonance": 0.2
+        },
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.28,
+        "start": 0.035,
+        "resonator": null
+      }
+    ],
+    "effects": {
+      "drive": null,
+      "echo": null,
+      "reverb": null
+    },
+    "peak_db": -3.7
+  },
+  "variants": 4,
+  "amount": 0.31,
+  "seed": 61697,
+  "files": [
+    "sfx_torgnole_impact_01.wav",
+    "sfx_torgnole_impact_02.wav",
+    "sfx_torgnole_impact_03.wav",
+    "sfx_torgnole_impact_04.wav"
+  ]
+}

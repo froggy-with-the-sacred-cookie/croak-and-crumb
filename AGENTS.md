@@ -76,6 +76,17 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
   que la scène a, et éteint les affichages provisoires des postes (menu **Froggy ▸ HUD de partie** pour les
   retrouver). Un poste qui ajoute un affichage provisoire lui donne une propriété `AffichageProvisoire` et le branche
   dans `HudPartie.PrendreLaPlace` ; une nouvelle information de jeu s'ajoute au HUD, pas dans un `OnGUI` de plus.
+- Nage (`Assets/Froggy/Scripts/Deplacement/`) : une `ZoneEau` (boîte déclencheur dont le dessus est la surface) sur
+  chaque plan d'eau assez profond pour nager ; dedans, `DeplacementWow` passe la main à `NageFroggy` (flotte, nage à
+  60 % de la course, plonge avec C ou le bouton est, ressort en sautant). Réglages : `ReglagesNage`. L'éclaboussure et
+  le son écoutent `NageFroggy.Entree` et `Sortie`. Bassin d'essai : `Postes/1_MouvementCamera/BassinEssai.prefab`.
+- Bots (`Assets/Froggy/Scripts/Bots/`, hors réseau) : `ReglesBot` (les décisions, en C# pur), `CerveauBot` sur la
+  Froggy (il « appuie » sur les mêmes commandes qu'un humain : `DeplacementWow.Imposer`, `PartieTorgnoles.Frapper`,
+  `PartieObjets.Utiliser`) et `BotsPartie` dans la scène (réglage « nombre de bots » : il copie la Froggy du joueur,
+  construit la NavMesh au lancement et coupe les mannequins d'essai). Un repère « Apparition d'un joueur » par joueur,
+  bots compris. Réglages : `Postes/3_ReglesBots/ReglagesBot.asset`. Un nouvel objet marche chez les bots sans rien
+  changer : ils utilisent celui qu'ils portent quand un rival est proche. Un bot garde un `PlayerInput` **éteint**
+  (exigé par `FroggyApparence`) : le joueur de cette machine se reconnaît à un `PlayerInput` **allumé**.
 
 ## Les branches
 

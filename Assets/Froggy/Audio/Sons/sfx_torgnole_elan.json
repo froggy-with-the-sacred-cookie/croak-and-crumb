@@ -1,0 +1,90 @@
+{
+  "generator": "sound-forge 0.6.0",
+  "preset": null,
+  "sound": {
+    "name": "Torgnole · élan",
+    "layers": [
+      {
+        "name": "Bras qui fend l’air",
+        "waveform": "white_noise",
+        "pitch": {
+          "start": 440.0,
+          "end": 440.0,
+          "time": 0.129
+        },
+        "envelope": {
+          "attack": 0.017,
+          "decay": 0.129,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "band_pass",
+          "cutoff": {
+            "start": 700.0,
+            "end": 2690.0,
+            "time": 0.129
+          },
+          "resonance": 0.2
+        },
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.78,
+        "start": 0.0,
+        "resonator": null
+      },
+      {
+        "name": "Bord de paume",
+        "waveform": "white_noise",
+        "pitch": {
+          "start": 440.0,
+          "end": 440.0,
+          "time": 0.1
+        },
+        "envelope": {
+          "attack": 0.011,
+          "decay": 0.1,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "band_pass",
+          "cutoff": {
+            "start": 1450.0,
+            "end": 655.0,
+            "time": 0.1
+          },
+          "resonance": 0.2
+        },
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.45,
+        "start": 0.011,
+        "resonator": null
+      }
+    ],
+    "effects": {
+      "drive": null,
+      "echo": null,
+      "reverb": null
+    },
+    "peak_db": -10.0
+  },
+  "variants": 4,
+  "amount": 0.36,
+  "seed": 61548,
+  "files": [
+    "sfx_torgnole_elan_01.wav",
+    "sfx_torgnole_elan_02.wav",
+    "sfx_torgnole_elan_03.wav",
+    "sfx_torgnole_elan_04.wav"
+  ]
+}

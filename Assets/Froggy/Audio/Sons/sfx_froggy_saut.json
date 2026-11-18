@@ -1,0 +1,118 @@
+{
+  "generator": "sound-forge 0.6.0",
+  "preset": null,
+  "sound": {
+    "name": "Impulsion de saut",
+    "layers": [
+      {
+        "name": "Pattes qui poussent",
+        "waveform": "sine",
+        "pitch": {
+          "start": 205.0,
+          "end": 91.0,
+          "time": 0.071
+        },
+        "envelope": {
+          "attack": 0.002,
+          "decay": 0.071,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": null,
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.62,
+        "start": 0.0,
+        "resonator": null
+      },
+      {
+        "name": "Souffle montant",
+        "waveform": "white_noise",
+        "pitch": {
+          "start": 440.0,
+          "end": 440.0,
+          "time": 0.121
+        },
+        "envelope": {
+          "attack": 0.022,
+          "decay": 0.121,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "band_pass",
+          "cutoff": {
+            "start": 570.0,
+            "end": 2750.0,
+            "time": 0.121
+          },
+          "resonance": 0.2
+        },
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.43,
+        "start": 0.0,
+        "resonator": null
+      },
+      {
+        "name": "Petit effort de Froggy",
+        "waveform": "triangle",
+        "pitch": {
+          "start": 132.0,
+          "end": 234.0,
+          "time": 0.077
+        },
+        "envelope": {
+          "attack": 0.018,
+          "decay": 0.077,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "low_pass",
+          "cutoff": {
+            "start": 750.0,
+            "end": 750.0,
+            "time": 0.077
+          },
+          "resonance": 0.2
+        },
+        "vibrato": {
+          "rate_hz": 23.0,
+          "depth_semitones": 0.48
+        },
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.2,
+        "start": 0.021,
+        "resonator": null
+      }
+    ],
+    "effects": {
+      "drive": null,
+      "echo": null,
+      "reverb": null
+    },
+    "peak_db": -9.0
+  },
+  "variants": 4,
+  "amount": 0.32,
+  "seed": 60952,
+  "files": [
+    "sfx_froggy_saut_01.wav",
+    "sfx_froggy_saut_02.wav",
+    "sfx_froggy_saut_03.wav",
+    "sfx_froggy_saut_04.wav"
+  ]
+}

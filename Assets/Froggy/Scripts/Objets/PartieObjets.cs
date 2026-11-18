@@ -114,7 +114,9 @@ namespace Froggy.Objets
                 porteurs.Add(porteur);
                 porteur.Numeroter(porteurs.Count);
                 porteur.Vider();
-                if (local == null && froggy.GetComponent<PlayerInput>() != null) local = porteur;
+                // un PlayerInput allumé : les bots (P3-05) en gardent un éteint, exigé par FroggyApparence
+                var entree = froggy.GetComponent<PlayerInput>();
+                if (local == null && entree != null && entree.enabled) local = porteur;
             }
             if (local == null && porteurs.Count > 0) local = porteurs[0];
         }

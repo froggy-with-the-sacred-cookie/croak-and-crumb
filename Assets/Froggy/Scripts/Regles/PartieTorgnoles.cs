@@ -83,12 +83,18 @@ namespace Froggy.Regles
             Regles.Pas(dt);
         }
 
-        /// <summary>Le joueur de cette machine : le premier qui a un PlayerInput (en réseau, celui qu'on possède).</summary>
+        /// <summary>
+        /// Le joueur de cette machine : le premier qui a un PlayerInput allumé (en réseau, celui qu'on possède). Les bots
+        /// (P3-05) en gardent un éteint, exigé par FroggyApparence : sans « enabled », V faisait frapper un bot.
+        /// </summary>
         public PorteurCookies JoueurLocal()
         {
             if (partie == null) return null;
             foreach (var p in partie.Porteurs)
-                if (p != null && p.GetComponent<PlayerInput>() != null) return p;
+            {
+                var entree = p != null ? p.GetComponent<PlayerInput>() : null;
+                if (entree != null && entree.enabled) return p;
+            }
             return null;
         }
 
