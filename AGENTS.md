@@ -32,6 +32,12 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
   ④ Décor, ⑤ Tester) avec la jauge « Prête pour un test », et **F5** pour jouer au point visé ; mode d'emploi
   `Docs/Outils/BATISSEUR.md` (commencer par « Premiers pas »). Toute nouvelle fonction de construction d'arène y
   va, pas dans une fenêtre de plus.
+- Socle commun (`Assets/Froggy/Scripts/Socle/`) : `Modificateurs` (vitesse et saut de Froggy : chaque poste pose le
+  sien, ils se multiplient) et `EvenementsPartie` (cookie ramassé, lâché, objet utilisé, cookie sacré : un poste émet,
+  les autres écoutent). Passer par eux plutôt que d'appeler le code d'un autre poste.
+- Scènes de test : une par poste dans `Assets/Froggy/Postes/`, presque vide, qui charge le jardin par-dessus
+  (`DecorDeTest`). À deux sur le même poste : menu **Froggy ▸ Scènes de test ▸ Nouvelle scène perso** (ignorée par
+  Git). Ce qui se partage vit dans un préfabriqué, pas dans une scène.
 
 ## Les branches
 

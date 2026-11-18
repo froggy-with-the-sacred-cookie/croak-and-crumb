@@ -1,3 +1,4 @@
+using Froggy.Socle;
 using Froggy.Template;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -15,6 +16,7 @@ namespace Froggy.Deplacement
     /// Course, sprint, saut et tolérances (coyote time, tampon, saut variable) : les mêmes que TemplatePlayerController,
     /// avec les mêmes réglages ; seul le repère change. Le remplace tant qu'il est actif (CameraOrbitale l'active et le
     /// coupe avec elle). La logique tient dans Pas(), appelée au pas physique, pour que les tests la fassent tourner hors jeu.
+    /// Le composant Modificateurs de Froggy (socle commun, T-01 ; ajouté ici s'il manque) multiplie la vitesse et la hauteur du saut.
     /// </summary>
     [RequireComponent(typeof(Rigidbody), typeof(BoxCollider))]
     public class DeplacementWow : MonoBehaviour
@@ -31,6 +33,7 @@ namespace Froggy.Deplacement
         private Rigidbody corps;
         private BoxCollider boite;
         private TemplatePlayerController ancien;
+        private Modificateurs modificateurs;
         private InputAction moveAction, jumpAction, sprintAction, pasDeCote, courseAuto;
         private bool pret;
 
@@ -50,6 +53,9 @@ namespace Froggy.Deplacement
             corps = GetComponent<Rigidbody>();
             boite = GetComponent<BoxCollider>();
             ancien = GetComponent<TemplatePlayerController>();
+            // chaque Froggy en a un, pour que les autres postes le trouvent sans toucher au préfabriqué
+            modificateurs = GetComponent<Modificateurs>();
+            if (modificateurs == null) modificateurs = gameObject.AddComponent<Modificateurs>();
             if (visuel == null) visuel = transform.Find("Visual");
             var entree = GetComponent<PlayerInput>();
             if (entree != null)
@@ -128,14 +134,17 @@ namespace Froggy.Deplacement
             tampon -= dt;
             if (AuSol) montee = false;
 
-            Vector3 voulue = Vitesse(entrees.deplacement, corps.rotation.eulerAngles.y, entrees.sprint, reglages, reglagesWow);
+            // météo, objets, cookies portés : lus au pas physique, sans savoir qui les a posés
+            float facteurVitesse = modificateurs.Vitesse, facteurSaut = modificateurs.Saut;
+
+            Vector3 voulue = Vitesse(entrees.deplacement, corps.rotation.eulerAngles.y, entrees.sprint, reglages, reglagesWow) * facteurVitesse;
             float acceleration = AuSol ? reglages.groundAcceleration : reglagesWow.elanFigeEnLair ? 0f : reglages.airAcceleration;
             Vector3 horizontal = Vector3.MoveTowards(new Vector3(v.x, 0f, v.z), voulue, acceleration * dt);
 
             // la hauteur se donne, la vitesse se dérive
             if (tampon > 0f && coyote > 0f)
             {
-                v.y = Mathf.Sqrt(2f * -Physics.gravity.y * reglages.jumpHeight);
+                v.y = Mathf.Sqrt(2f * -Physics.gravity.y * reglages.jumpHeight * facteurSaut);
                 tampon = coyote = 0f;
                 montee = true;
                 AuSol = false;
