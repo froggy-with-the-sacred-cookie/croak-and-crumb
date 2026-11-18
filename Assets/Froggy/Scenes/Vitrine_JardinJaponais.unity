@@ -4292,8 +4292,9 @@ MonoBehaviour:
   - {fileID: 487286403}
   - {fileID: 487286402}
   hauteur: 1
-  modeleDeDepart: -1
+  modeleDeDepart: 2
   raccourcis: 0
+  volPourAtterrir: 0.25
 --- !u!114 &981511669
 MonoBehaviour:
   m_ObjectHideFlags: 0

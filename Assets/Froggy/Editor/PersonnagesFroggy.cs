@@ -12,8 +12,9 @@ namespace Froggy.Outils
 {
     /// <summary>
     /// Construit, pour chaque dossier de Assets/Froggy/Personnages, un Animator Controller (Repos / Marche / Course par
-    /// la vitesse, Saut, Victoire), puis la scène Test_Personnages : une copie de la scène Template dont le joueur porte
-    /// FroggyApparence avec tous les modèles. Relançable : les contrôleurs sont refaits, la scène recâblée.
+    /// la vitesse, Saut, Victoire, puis un état par autre geste du modèle : torgnole, croassement, nage…), puis la scène
+    /// Test_Personnages : une copie de la scène Template dont le joueur porte FroggyApparence avec tous les modèles.
+    /// Relançable : les contrôleurs sont refaits, la scène recâblée.
     /// </summary>
     public static class PersonnagesFroggy
     {
@@ -23,6 +24,9 @@ namespace Froggy.Outils
         // Seuils du mélange, en m/s. PROVISOIRES : à régler en jeu avec les vraies vitesses de Froggy.
         private const float SeuilMarche = 2.5f;
         private const float SeuilCourse = 7f;
+
+        /// <summary>Les clips qui ont leur place à part (mélange du déplacement, saut et victoire par paramètres).</summary>
+        public static readonly string[] EtatsFixes = { "Repos", "Marche", "Course", "Saut", "Victoire" };
 
         [MenuItem("Froggy/Personnages/Construire la scène de test")]
         public static string Construire()
@@ -151,6 +155,28 @@ namespace Froggy.Outils
                 var fin = etat.AddTransition(deplacement); fin.hasExitTime = true; fin.exitTime = 1f; fin.duration = 0.25f;
                 var interrompue = etat.AddTransition(deplacement);  // bouger interrompt la célébration
                 interrompue.AddCondition(AnimatorConditionMode.Greater, 0.5f, "Vitesse"); interrompue.duration = 0.2f;
+            }
+
+            // Les autres gestes (torgnole, croassement, nage…) : un état chacun, du nom du clip, lancé par ce nom
+            // (FroggyApparence.Jouer, menu de debug). Une boucle (nage, porter) tourne jusqu'à l'ordre suivant ; un geste
+            // unique revient au déplacement à sa fin.
+            int rang = 0;
+            foreach (var paire in clips.OrderBy(p => p.Key))
+            {
+                if (EtatsFixes.Contains(paire.Key)) continue;
+                var etat = sm.AddState(paire.Key, new Vector3(520f + 220f * (rang % 3), 60f * (rang / 3), 0f));
+                etat.motion = paire.Value;
+                rang++;
+                if (paire.Value.isLooping) continue;
+                var fin = etat.AddTransition(deplacement); fin.hasExitTime = true; fin.exitTime = 1f; fin.duration = 0.2f;
+                if (paire.Key == "Atterrissage")
+                {
+                    // joué au retour au sol (FroggyApparence) : en courant, l'écrasement se voit (il culmine à 0,17 s),
+                    // puis la course reprend, sinon les pieds glisseraient
+                    var reprise = etat.AddTransition(deplacement);
+                    reprise.AddCondition(AnimatorConditionMode.Greater, 1f, "Vitesse");
+                    reprise.hasExitTime = true; reprise.exitTime = 0.35f; reprise.duration = 0.15f;
+                }
             }
             EditorUtility.SetDirty(ac);
             AssetDatabase.SaveAssets();

@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbc653a7ec2141fea7cb0ecdc645432d, type: 3}
+  m_Name: ReglagesObjets
+  m_EditorClassIdentifier: Assembly-CSharp::Froggy.Objets.ReglagesObjets
+  delaiReapparition: 10
+  hauteur: 0.6
+  rayonRamassage: 1.2
+  objets:
+  - {fileID: 11400000, guid: e7c8143c3cd24f619535fb702837e2ef, type: 2}
+  - {fileID: 11400000, guid: bc2f46b4a03e4c42b98ec7f64ac07df1, type: 2}
+  - {fileID: 11400000, guid: 051e2819d626442cbeb58fe6be8b7b81, type: 2}
+  graine: 0

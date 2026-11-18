@@ -1,6 +1,6 @@
 ---
 name: reseau-fishnet
-description: API et pièges de FishNet 4.7.4 tel qu'installé dans Froggy (version épinglée, prédiction Replicate/Reconcile, PredictionRigidbody, NetworkTickSmoother, simulateur de latence, ping, connexions, transport Tugboat, port, NetworkManager d'une scène). À charger AVANT d'écrire ou de modifier un script qui utilise FishNet, un prefab réseau, un NetworkManager, ou de toucher à la version du paquet. Aussi quand « le port est déjà pris », « Server failed to start », « SpawnablePrefabs is null », que les boutons Server / Client ne répondent pas, qu'un joueur compte double, ou que le ping semble faux.
+description: API et pièges de FishNet 4.7.4 tel qu'installé dans Froggy (version épinglée, prédiction Replicate/Reconcile, PredictionRigidbody, NetworkTickSmoother, simulateur de latence, ping, connexions, transport Tugboat, port, NetworkManager d'une scène, salon, SyncVar/SyncList, ServerRpc, authentification, chargement de scènes, objets globaux). À charger AVANT d'écrire ou de modifier un script qui utilise FishNet, un prefab réseau, un NetworkManager, ou de toucher à la version du paquet. Aussi quand « le port est déjà pris », « Server failed to start », « SpawnablePrefabs is null », que les boutons Server / Client ne répondent pas, qu'un joueur compte double, ou que le ping semble faux.
 ---
 
 # FishNet dans Froggy
@@ -96,3 +96,53 @@ Le plus simple : le prefab `Assets/Froggy/Prefabs/Reseau/TestReseau.prefab` (P2-
   quelques secondes.
 - `Tugboat.SetPort` et `SetClientAddress` sont lus au démarrage : les régler **avant** `StartConnection`. Sur un client
   qui tourne, `GetPort()` rend son port de sortie, pas celui de l'hôte.
+  `ClientManager.StartConnection(string adresse, ushort port)` fait les deux d'un coup.
+
+## 8. Salon, scènes, état partagé (P2-03)
+
+Exemple complet : `Assets/Froggy/Scripts/Reseau/Salon/` (prefab `Prefabs/Reseau/Salon.prefab`).
+
+- **Ce qui n'existe pas** dans FishNet 4.7.4 : découverte réseau, salon, matchmaking, relais. Le `NetManager`
+  LiteNetLib de Tugboat est `internal` : la recherche d'un salon par code passe par un `UdpClient` .NET à part
+  (`RechercheSalon`, port 7790).
+- **État synchronisé** : champs **`readonly`** `SyncVar<T>` (`.Value`, `OnChange(prev, next, asServer)`) et
+  `SyncList<T>` (`OnChange(op, index, ancien, nouveau, asServer)`). `[SyncVar]` / `[SyncObject]` sont obsolètes. Une
+  struct à champs publics se sérialise seule.
+- **Demande d'un client** : `[ServerRpc(RequireOwnership = false)]` avec `NetworkConnection appelant = null` en
+  **dernier** paramètre : FishNet le remplit côté serveur.
+- **Objet qui survit au changement de scène** : prefab apparu avec `_isGlobal` coché sur son `NetworkObject` (refusé
+  sur un objet posé dans une scène). `ServerManager.Spawn(objet, proprietaire)`.
+- **Authentification** : hériter de `FishNet.Authenticating.Authenticator` (`HostAuthenticator` et
+  `PasswordAuthenticator` sont dans `Demos/`, pas dans le runtime). Posé sur le NetworkManager, FishNet le trouve
+  seul. Enregistrer le message d'entrée avec `RegisterBroadcast<T>(h, false)` (pas encore authentifié), répondre avec
+  `ServerManager.Broadcast(conn, msg, false)` **avant** `OnAuthenticationResult(conn, false)`, qui coupe.
+  Reconnaître le client de l'hôte : un jeton connu de son seul processus (`conn.IsLocalClient` n'est pas sûr à ce
+  moment-là).
+- **Scènes** : `SceneManager.LoadGlobalScenes(new SceneLoadData(nom) { ReplaceScenes = ReplaceOption.None })` et
+  `UnloadGlobalScenes(new SceneUnloadData(nom))` ; scènes **dans les Build Settings**. Un client authentifié plus tard
+  **reçoit les scènes globales déjà chargées** : refuser l'entrée pendant une partie. Recharger la scène du
+  NetworkManager en crée un second : charger la partie en additif. Faire apparaître le joueur quand **lui** a fini de
+  charger : `SceneManager.OnClientPresenceChangeEnd` (`Scene`, `Connection`, `Added`).
+- `NetworkConnection.CustomData` (`object`) : donnée locale au serveur par connexion, non synchronisée ; la remettre
+  à `null` à l'entrée (les connexions sont réutilisées).
+- Testé le 18/11/2026 à 2 fenêtres : créer, rejoindre, mauvais code, partie en cours, lancer, revenir, deux Play de
+  suite.
+
+## 9. Règles décidées par l'hôte (P2-04)
+
+Exemple : `Assets/Froggy/Scripts/Reseau/Partie/PartieReseau.cs`.
+
+- **Réutiliser les règles locales** : l'hôte fait tourner les MonoBehaviours du poste 3 tels quels ; chez les autres,
+  un drapeau `Miroir` coupe toute décision (dans `Pas` lui-même, pas seulement dans `FixedUpdate`) et `Refleter(...)`
+  montre l'état reçu.
+- **Publier les différences** : l'hôte compare et n'écrit dans `SyncList` / `SyncVar` que ce qui a changé (LateUpdate).
+  Défaut des types synchronisés : canal **fiable**, envoi toutes les **0,1 s**. Ne pas passer `SyncTypeSettings(0f)`
+  pour « envoyer tout de suite » : une valeur nulle ressemble au réglage par défaut.
+- **Événements** : `[ObserversRpc(ExcludeServer = true)]` (le client de l'hôte a déjà émis les siens). Un RPC part
+  **tout de suite**, l'état synchronisé au plus 0,1 s après : un client qui réagit au RPC lit l'ancien état. Mettre
+  dans le message ce qu'il faut (nouveau score, gagnant) et le garder jusqu'à ce que l'état synchronisé le rattrape.
+- **Numéroter par le salon**, pas par la position ; chercher un joueur par son numéro (trous possibles : 1 et 3).
+- **`Start()` qui remet à zéro** : un objet apparu puis réglé dans la même image est remis à zéro par son `Start()` à
+  l'image suivante ; attendre une image (coroutine) avant de commencer.
+- Vérifier « en même temps » sans dépendre du réseau : poser les deux joueurs sur le cookie **pendant le compte à
+  rebours** (règles en pause), la décision se fait au premier pas de jeu.

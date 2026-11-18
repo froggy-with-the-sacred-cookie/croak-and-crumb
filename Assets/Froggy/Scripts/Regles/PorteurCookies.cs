@@ -18,6 +18,12 @@ namespace Froggy.Regles
         /// <summary>Le nombre de cookies portés : le score.</summary>
         public int Nombre { get; private set; }
 
+        /// <summary>
+        /// Vrai quand on ne peut pas frapper ce joueur : tombé hors de l'arène ou tout juste réapparu (ApparitionJoueurs,
+        /// P3-04). FaireLacher le refuse ; un coup (P4-10) le lit aussi.
+        /// </summary>
+        public bool Intouchable { get; set; }
+
         /// <summary>Appelé quand le nombre de cookies portés change.</summary>
         public event Action Change;
 

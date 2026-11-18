@@ -9,10 +9,13 @@ d63b6b90-…png.webp. Mesures prises sur l'image (1014 × 1522) : 1 m = 928 px, 
    pesés comme la peau la plus proche, contour noir en coque retournée (le trait du dessin) ;
 4. cinq clips sur place, à 30 i/s : Repos, Marche, Course (boucles), Saut, Victoire ; pieds tenus par IK, cuits à
    l'export. Pas d'échelle d'os : l'humanoïde de Unity l'ignorerait ;
-5. un FBX par clip (Froggy_P_<Clip>.fbx), le .blend, et des rendus de contrôle (superposition à l'image, quatre vues,
-   un GIF par clip).
+5. les clips de jeu de la V1 (atterrissage, torgnole, touché, croassement, nage…), sac vocal et formes des yeux en
+   formes (blendshapes) : Tools/blender/froggy_p_animations.py ;
+6. un FBX par clip (Froggy_P_<Clip>.fbx), le .blend, et des rendus de contrôle (superposition à l'image, quatre vues,
+   un GIF par clip, et avec --planches trois vues de huit poses par clip de jeu).
 
-FROGGY_ROOT=<dépôt> blender -b --factory-startup --python Tools/blender/froggy_p.py -- <dossier de sortie> [--sans-rendus]
+FROGGY_ROOT=<dépôt> blender -b --factory-startup --python Tools/blender/froggy_p.py -- <dossier de sortie>
+    [--sans-rendus] [--planches] [--seulement Clip1,Clip2]
 """
 import bpy, bmesh, math, sys, os, json, subprocess, shutil
 import numpy as np
@@ -23,6 +26,8 @@ from mathutils.bvhtree import BVHTree
 args = sys.argv[sys.argv.index("--") + 1:]
 SORTIE = Path(args[0]).resolve(); SORTIE.mkdir(parents=True, exist_ok=True)
 RENDUS = "--sans-rendus" not in args
+PLANCHES = "--planches" in args
+SEULEMENT = set(args[args.index("--seulement") + 1].split(",")) if "--seulement" in args else None
 RACINE = Path(os.environ.get("FROGGY_ROOT", os.getcwd()))
 REFERENCE = RACINE / "d63b6b90-cbbb-418b-87d0-492cdd0b6408.png.webp"
 PX, SOL, AXE = 928, 1248, 507          # échelle de l'image : px par mètre, ligne du sol, axe de symétrie
@@ -191,13 +196,17 @@ def decalques(corps, mats):
     bvh = bvh_de(corps)
     bm = bmesh.new()
     i = {m: k for k, m in enumerate(mats)}
+    yeux = []                                  # sommets de chaque œil, pour ses formes (fermé, heureux, plissé)
     for s in (-1, 1):
         ellipse(bm, bvh, s * .271, .697, .087, .079, .0025, i["Joue"])
         ellipse(bm, bvh, s * .29, .735, .016, .013, .0045, i["Blanc"], anneaux=2, secteurs=16)
+        debut = len(bm.verts)
         ellipse(bm, bvh, s * .209, .831, .059, .072, .003, i["Noir"])
+        yeux.append((debut, len(bm.verts), s * .209, .831, .059, .072, 8, 40, .003))
     bouche(bm, bvh, i["Noir"])
     me = bpy.data.meshes.new("Decalques"); bm.to_mesh(me); bm.free()
     ob = lier(bpy.data.objects.new("Decalques", me))
+    cles_yeux(ob, bvh, yeux)
     return ob
 
 
@@ -295,8 +304,11 @@ def peser(arm, corps, deco):
     for f in bm.faces: f.material_index = MATS.index("Contour")
     bm.to_mesh(contour.data); bm.free()
     deco.parent = arm
+    sac = sac_vocal(MATS)                      # bulle du croassement, repliée dans le corps au repos
+    for m in mats: sac.data.materials.append(m)
+    for o in (corps, contour): o.shape_key_add(name="Basis", from_mix=False)   # les formes se rejoignent par nom
     bpy.ops.object.select_all(action="DESELECT")
-    for o in (corps, deco, contour): o.select_set(True)
+    for o in (corps, deco, contour, sac): o.select_set(True)
     bpy.context.view_layer.objects.active = corps; bpy.ops.object.join()
     corps.modifiers[0].object = arm
     return len(vides)
@@ -329,6 +341,10 @@ def poser(arm, cibles, pose, f):
         if cible.rotation_quaternion.dot(q) < 0: q.negate()
         cible.rotation_quaternion = q
         cible.keyframe_insert("location", frame=f); cible.keyframe_insert("rotation_quaternion", frame=f)
+    cle = corps.data.shape_keys                # chaque clip pose toutes les formes (0 sauf « _formes ») : rien ne traîne
+    if cle is not None:
+        for kb in cle.key_blocks[1:]:
+            kb.value = pose.get("_formes", {}).get(kb.name, 0.0); kb.keyframe_insert("value", frame=f)
 
 
 def bras(p, ax=0., ay=0., fx=0., cote=None):
@@ -370,7 +386,8 @@ def repos(t, T=3.0):
     s = .5 - .5 * math.cos(2 * pi * t / T)                       # souffle
     p = {"_bassin": (0, 0, -.008 - .006 * s),
          "Spine": [("X", 1.5 * s)], "Spine1": [("X", 1.0 * s)],
-         "Head": [("X", -2 * s), ("Y", 3 * math.sin(2 * pi * t / T))]}
+         "Head": [("X", -2 * s), ("Y", 3 * math.sin(2 * pi * t / T))],
+         "_formes": {"Yeux_Fermes": math.sin(pi * (t - 1.95) / .16) if 1.95 <= t <= 2.11 else 0.0}}   # un clignement
     bras(p, -2 * s, 3 + 4 * s, -6)
     return p
 
@@ -446,6 +463,9 @@ def cibles_ik(arm):
 def animer(arm, cibles, nom, duree, fonction):
     for o in [arm, *cibles.values()]:
         o.animation_data_create(); o.animation_data.action = bpy.data.actions.new(nom if o is arm else f"{nom}_{o.name}")
+    if corps.data.shape_keys is not None:
+        cle = corps.data.shape_keys; cle.animation_data_create()
+        cle.animation_data.action = bpy.data.actions.new(f"{nom}_Formes")
     n = round(duree * FPS)
     for f in range(n + 1): poser(arm, cibles, fonction(f / FPS), f + 1)
     sc = bpy.context.scene; sc.frame_start, sc.frame_end = 1, n + 1
@@ -533,21 +553,25 @@ def quatre_vues(cam):
     ecrire_png(np.concatenate(vues, 1), SORTIE / "controle" / "vues.png")
 
 
-def apercu_clip(cam, nom, n):
-    dossier = SORTIE / "controle" / nom; dossier.mkdir(parents=True, exist_ok=True)
-    viser(cam, -58, 12, (0, 0, .52), ortho=1.45)
-    sc = bpy.context.scene; sc.render.resolution_x = sc.render.resolution_y = 420
+def apercu_clip(cam, nom, n, az=-58, el=12, suffixe="", taille=420, ortho=1.45):
+    dossier = SORTIE / "controle" / (nom + suffixe); dossier.mkdir(parents=True, exist_ok=True)
+    viser(cam, az, el, (0, 0, .52), ortho=ortho)
+    sc = bpy.context.scene; sc.render.resolution_x = sc.render.resolution_y = taille
     sc.render.filepath = str(dossier / "#####"); sc.frame_start, sc.frame_end = 1, n
     bpy.ops.render.render(animation=True)
     ffmpeg = shutil.which("ffmpeg") or "/opt/homebrew/bin/ffmpeg"
-    gif = SORTIE / "controle" / f"Froggy_P_{nom}.gif"
+    gif = SORTIE / "controle" / f"Froggy_P_{nom}{suffixe}.gif"
     subprocess.run([ffmpeg, "-hide_banner", "-loglevel", "error", "-y", "-framerate", str(FPS), "-start_number", "1",
                     "-i", str(dossier / "%05d.png"), "-vf", "split[a][b];[a]palettegen=max_colors=96[p];[b][p]paletteuse",
                     "-loop", "0", str(gif)], check=True)
     # planche de 8 poses
     ims = [pixels(dossier / f"{round(1 + (n - 1) * k / 7):05d}.png") for k in range(8)]
-    ecrire_png(np.concatenate(ims, 1), SORTIE / "controle" / f"poses_{nom}.png")
+    ecrire_png(np.concatenate(ims, 1), SORTIE / "controle" / f"poses_{nom}{suffixe}.png")
     return gif
+
+
+# ---------------------------------------------------------------- clips de jeu (sac vocal, yeux, poses par canal)
+exec(open(RACINE / "Tools" / "blender" / "froggy_p_animations.py", encoding="utf-8").read())
 
 
 # ---------------------------------------------------------------- déroulé
@@ -581,10 +605,31 @@ if RENDUS:
     quatre_vues(cam)
 
 for nom, duree, boucle, fonction in CLIPS:
+    if SEULEMENT and nom not in SEULEMENT: continue
     n = animer(arm, cibles, nom, duree, fonction)
     chemin = exporter(arm, corps, nom)
     info = {"clip": nom, "images": n, "secondes": duree, "boucle": boucle, "fbx": str(chemin)}
     if RENDUS: info["gif"] = str(apercu_clip(cam, nom, n))
+    rapport["clips"].append(info)
+    print("CLIP", nom, n, flush=True)
+
+objets_demo = accessoires(arm) if RENDUS else {}
+for clip in CLIPS_JEU:
+    nom = clip["nom"]
+    if SEULEMENT and nom not in SEULEMENT: continue
+    n = animer2(arm, cibles, corps, clip)
+    chemin = exporter(arm, corps, nom)
+    info = {"clip": nom, "images": n, "secondes": clip["duree"], "boucle": clip["boucle"], "fbx": str(chemin)}
+    if RENDUS:
+        for cle_demo, ob in objets_demo.items(): ob.hide_render = cle_demo != clip.get("accessoire")
+        sol.hide_render = bool(clip.get("eau"))
+        cadre = max(1.45, clip.get("ortho", 1.45))
+        info["gif"] = str(apercu_clip(cam, nom, n, ortho=cadre))
+        if PLANCHES:                           # et vu de dos, comme le joueur voit son Froggy
+            info["gif_dos"] = str(apercu_clip(cam, nom, n, az=90, el=24, suffixe="_dos", taille=320, ortho=cadre))
+        sol.hide_render = False
+        if PLANCHES: planche_clip(cam, sol, clip, n)
+        for ob in objets_demo.values(): ob.hide_render = True
     rapport["clips"].append(info)
     print("CLIP", nom, n, flush=True)
 

@@ -91,6 +91,12 @@ Pièges :
   dans le projet, et un chemin relatif `Temp/x.png` atterrit dans **`Assets/Temp/`** (importé, et partagé avec les
   fenêtres Multiplayer Play Mode) : déplacer l'image hors du projet, puis `AssetDatabase.DeleteAsset("Assets/Temp")`
   pour ne pas laisser de `Assets/Temp.meta` dans `git status`.
+- **Poser un clip humanoïde sans jouer** (Froggy, 18 novembre 2026, gestes de Froggy P) : en mode édition,
+  `AnimationClip.SampleAnimation` et un `PlayableGraph` évalué laissent le modèle au repos (os et formes immobiles).
+  Seul `AnimationMode.StartAnimationMode()` puis `BeginSampling` / `SampleAnimationClip` / `EndSampling` pose la pose,
+  formes comprises ; `StopAnimationMode()` dans un `finally`. Et un `cam.Render()` dans le même appel montre encore
+  l'ancien skinning : cuire la pose (`smr.BakeMesh(m, false)`, l'objet du FBX porte une échelle de 100) dans un
+  maillage fixe et photographier celui-là. Une capture qui montre le repos ne prouve rien : mesurer d'abord un os.
 - **Simuler des appuis par le MCP ne marche pas** (Froggy, 28 octobre 2026, MCP officiel de Unity, `Unity_RunCommand`) :
   `InputSystem.QueueStateEvent` sur un clavier ou une manette virtuelle, puis `Step()` ou `InputSystem.Update()`, ne
   change pas l'état de l'appareil (éditeur sans focus), même en passant `backgroundBehavior` à `IgnoreFocus`. Et ce
@@ -173,3 +179,11 @@ Pièges :
   `GrabPixels(RenderTexture, Rect)` du `HostView` (champ `m_Parent` de l'`EditorWindow`, par réflexion), le rectangle en
   **pixels** (taille × `EditorGUIUtility.pixelsPerPoint`). L'image sort **à l'envers** : retourner les lignes avant
   d'enregistrer. Marche aussi pour la vue Scène, avec les poignées et les panneaux dessinés par les outils.
+- **Rejouer un clip hors du mode Play (`PlayableGraph.Evaluate`) : régler l'Animator sur `AlwaysAnimate`** (Froggy,
+  18 novembre 2026, kappa). Un modèle importé a souvent `CullUpdateTransforms` : sans caméra qui le voit, les os ne
+  bougent pas, et mesurer `localEulerAngles` juste après `Evaluate` donne la pose de repos pour tous les clips (on a cru
+  les clips cassés). Et toujours créer l'objet dans un appel, l'évaluer dans le suivant.
+- **Ouvrir une scène peut décharger un `ScriptableObject` tout juste créé** (Froggy, 18 novembre 2026, outil du
+  gobelin) : `CreateInstance` puis `AssetDatabase.CreateAsset`, puis `EditorSceneManager.NewScene` en mode `Single`, et
+  la référence gardée en mémoire ne pointait plus sur rien : la scène s'est enregistrée avec ces champs vides, sans
+  erreur. Relire l'asset par `AssetDatabase.LoadAssetAtPath` après l'ouverture de la scène, et contrôler les champs.

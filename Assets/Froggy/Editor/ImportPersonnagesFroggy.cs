@@ -12,7 +12,7 @@ namespace Froggy.Outils
     public class ImportPersonnagesFroggy : AssetPostprocessor
     {
         public const string Dossier = "Assets/Froggy/Personnages/";
-        private static readonly string[] Boucles = { "Repos", "Marche", "Course" };
+        public static readonly string[] Boucles = { "Repos", "Marche", "Course", "Nage", "Porter", "PorterBras" };
 
         private bool Concerne => assetPath.StartsWith(Dossier) && assetPath.ToLowerInvariant().EndsWith(".fbx");
 
@@ -41,10 +41,14 @@ namespace Froggy.Outils
                 c.name = clip;
                 c.loopTime = boucle;
                 c.loopPose = boucle;
-                // Tout est « cuit dans la pose » : orientation, hauteur (d'après les pieds) et avancée restent dans le clip.
+                // Tout est « cuit dans la pose » : orientation, hauteur et avancée restent dans le clip. La hauteur est
+                // celle du fichier (« Original », la valeur par défaut, écrite ici pour qu'on la sache) : caler les pieds
+                // au départ enfoncerait dans le sol un clip qui part en l'air ou dans l'eau (l'atterrissage part pieds
+                // repliés, à 9 cm du sol ; vérifié par GestesFroggyPTests).
                 c.lockRootRotation = true;
                 c.keepOriginalOrientation = true;
                 c.lockRootHeightY = true;
+                c.keepOriginalPositionY = true;
                 c.heightFromFeet = true;
                 c.lockRootPositionXZ = true;
                 c.keepOriginalPositionXZ = true;

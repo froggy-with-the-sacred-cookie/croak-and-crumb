@@ -21,14 +21,38 @@ namespace Froggy.Reseau
 
         private InputAction actionDeplacement;
 
+        public override void OnStartServer()
+        {
+            base.OnStartServer();
+            Numeroter();
+        }
+
+        /// <summary>
+        /// Dans un salon (P2-04) : la capsule porte les cookies, sous le numéro du joueur dans le salon (le même sur
+        /// toutes les machines).
+        /// </summary>
+        private void Numeroter()
+        {
+            if (Salon.Local == null || !Salon.Local.NumeroDe(OwnerId, out int numero)) return;
+            var porteur = GetComponent<Froggy.Regles.PorteurCookies>();
+            if (porteur == null) porteur = gameObject.AddComponent<Froggy.Regles.PorteurCookies>();
+            porteur.Numeroter(numero);
+        }
+
         public override void OnStartClient()
         {
             base.OnStartClient();
+            Numeroter();
 
             // Dans Awake et Start, le propriétaire n'est pas encore connu : on décide ici.
             var rendu = GetComponentInChildren<Renderer>();
             if (rendu != null)
-                rendu.material.color = IsOwner ? couleurLocale : couleurAutres;
+            {
+                // Dans un salon (P2-03) : la couleur choisie par le joueur ; sinon vert = la mienne, rouge = les autres.
+                rendu.material.color = Salon.Local != null && Salon.Local.CouleurDe(OwnerId, out Color choisie)
+                    ? choisie
+                    : IsOwner ? couleurLocale : couleurAutres;
+            }
 
             if (IsOwner)
             {

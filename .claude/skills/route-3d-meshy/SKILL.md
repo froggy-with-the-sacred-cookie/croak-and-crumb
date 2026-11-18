@@ -15,6 +15,11 @@ Pilotes d'Eku (18-19 octobre 2026), de Lovecraft (arbres, maisons, personnage au
   **de face, de profil et de dos** (4 vues pour un objet), mêmes proportions, fond uni, sans perspective, puis
   `meshy_multi_image_to_3d` avec ces vues (élément 0 = la face). Eku, deuxième essai : la planche multi-vues a réglé les
   proportions du premier coup.
+- **Meshy ne rend pas plus riche que l'image qu'on lui donne.** Froggy, 18 novembre 2026 : la lanterne *kasuga* du kit
+  (script Blender), photographiée sous 4 angles sans contour (`Tools/blender/vues_pour_meshy.py`), puis meshy-7.1 +
+  texture meshy-7, 30 crédits : la même lanterne, sans contour, texture d'un gris presque uniforme (`remove_lighting`
+  efface aussi la lumière peinte sur les facettes), arêtes un peu fondues, un panneau de la boîte à lumière perdu. Moins
+  bien que l'original. Pour « plus beau », enrichir d'abord l'image (concept Gemini), puis la planche, puis Meshy.
 - **Gemini dessine mal trois vues cohérentes d'un seul jet** (profil tourné du mauvais côté, queue absente de dos,
   bouche ouverte de face et fermée de profil). Méthode qui corrige : garder la meilleure vue comme **ancre** dans une
   **planche-guide** (l'ancre à gauche, deux cases vides, des lignes horizontales aux repères : haut de tête, yeux,
@@ -29,6 +34,12 @@ Pilotes d'Eku (18-19 octobre 2026), de Lovecraft (arbres, maisons, personnage au
   des **gestes humains**. Pour une démarche ou un saut de grenouille, `meshy_text_to_motion` (décrire la posture :
   accroupi, cuisses repliées, poussée des pattes arrière) avant `meshy_animate`. Une grenouille *humanoïde* (Notion)
   passe mieux par le rig humanoïde, mais ses proportions (grosse tête, jambes repliées) se vérifient au rendu.
+- **Un mouvement humain ne se voit pas sur un corps chibi.** Froggy P, 18 novembre 2026 : les 11 clips
+  `text_to_motion`, rejoués sur P par le retargeting de Unity, bougeaient le corps d'un bloc et presque pas les bras
+  (23 cm, sous une tête de 84 cm de large qui les cache vus de dos) : « le modèle semble ne pas être riggé ». Il
+  l'était. Pour un personnage à grosse tête et petits membres, animer à la main par script Blender
+  (`Tools/blender/froggy_p_animations.py` : le corps et la tête portent le geste, le visage l'émotion), et juger sur
+  une planche à trois vues dont **la vue de dos de la caméra**, pas seulement de face.
 
 ## 2. Coûts et chaîne (à annoncer en une fois)
 
@@ -47,6 +58,20 @@ Coûts payés en octobre 2026, à revérifier avant de les annoncer (`meshy_chec
 pour un modèle à armer. Budget de faces : ~6 000 pour un objet, ~30 000 pour un personnage.
 
 ## 3. Ce que livre Meshy (pièges)
+
+- **Avec le MCP de Meshy, un squelette (`meshy_rig`) et une animation (`meshy_animate`) ne se téléchargent pas** : l'outil
+  ne rend que des liens signés, qui arrivent masqués à l'IA (Froggy, 18 novembre 2026 : squelette 5 + torgnole de la
+  bibliothèque 3 crédits, fichiers inaccessibles ; liens valables 3 jours). Les modèles (`image_to_3d`,
+  `multi_image_to_3d`) et les mouvements `text_to_motion` en qualité prime, eux, s'enregistrent sur le disque. Pour
+  animer : `text_to_motion` (10 crédits), puis `Tools/blender/mouvement_meshy_pour_unity.py`.
+- **Le mouvement `text_to_motion` prime arrive sur un squelette SMPL-H** (52 os : Pelvis, L_Hip, L_Collar,
+  L_Shoulder…) avec un mannequin de 16 Mo. Unity l'importe directement en humanoïde, avec la bonne correspondance
+  (L_Collar = épaule, L_Shoulder = haut du bras), et le rejoue sur Froggy B, kawaii et P (vérifié le 18/11/2026 par des
+  rendus de profil). Le script retire le mannequin et exporte la plage exacte de l'action : un clip de 2,5 s sortait de
+  Blender à 8,3 s. Le mouvement avance le corps : en jeu, jouer sur place et couper au besoin (l'atterrissage commence
+  par le saut, le contact au sol arrive vers 0,8 s).
+- Un modèle Meshy de plus de quelques semaines peut ne plus être retrouvé par l'API (le squelette de Froggy B, fait
+  par Codex le 28 octobre, était introuvable le 18 novembre) : garder les GLB et FBX d'origine à l'abri, hors du dépôt.
 
 - Le GLB armé porte une **sphère d'aide** (« Icosphere », sans parent) : à exclure des mesures et du rendu.
 - Le squelette est à l'**échelle 0,01** : une épaisseur donnée dans l'espace de l'objet se divise par l'échelle.
@@ -70,11 +95,19 @@ pour un modèle à armer. Budget de faces : ~6 000 pour un objet, ~30 000 pour u
 - **Yeux bavés** : quand le profil de la planche montre l'œil, Meshy mélange l'œil de face et celui de profil, et le
   noir déborde sur les côtés de la tête (Froggy kawaii, 28 octobre 2026 ; parfait de face, taches de trois quarts).
   Réparation gratuite, `Tools/blender/froggy_kawaii_corriger.py` : situer chaque texel en 3D, repeindre les yeux par
-  diffusion de la peau voisine, poser de vrais yeux (ellipsoïdes mesurés sur les texels vus de face) attachés à l'os
-  `Head`. Plutôt que de régénérer la texture (10 crédits, sans garantie).
+  diffusion de la peau voisine, poser de vrais yeux (ellipsoïdes mesurés sur les texels vus de face). Plutôt que de
+  régénérer la texture (10 crédits, sans garantie). **Ne pas accrocher ces yeux à l'os `Head`** : Meshy a pesé la grosse
+  tête du kawaii surtout sur le cou, et dès qu'un clip tourne la tête (les `text_to_motion`), les yeux partaient seuls
+  (18 novembre 2026). Les yeux prennent les poids de la peau juste en dessous : `Tools/blender/froggy_kawaii_yeux_peau.py`
+  (contrôle : l'écart œil-peau reste de 2,0 cm tête tournée de 25°). Après remplacement des FBX, vider
+  `humanDescription` (§ 4), sinon plus d'avatar ni de clip.
 
 ## 4. Dans Unity
 
+- **Un personnage animé seulement par ses propres clips s'importe en `Generic`** (Froggy, 18 novembre 2026, le kappa :
+  modèle Meshy, squelette et clips faits par script Blender). En humanoïde, Unity écrasait ses postures tenues (penché
+  en avant, cookie serré, bras croisés) : le clip rejouait presque la pose A ; en générique, il rend exactement Blender
+  (vérifié de face et de profil). L'humanoïde ne sert que pour partager des clips entre squelettes (les Froggy).
 - **Personnage** : type humanoïde, avatar créé depuis le modèle avec la correspondance automatique. Si on remplace le
   FBX, **vider `humanDescription`**, sinon l'avatar n'est plus humain. **Ne pas forcer la pose T** dans
   `humanDescription.skeleton` : la configuration automatique le fait (Lovecraft : l'écraser a penché le corps de 29°).

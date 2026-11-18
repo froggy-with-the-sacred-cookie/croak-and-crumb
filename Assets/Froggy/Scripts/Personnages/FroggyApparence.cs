@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Froggy.Template;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -7,9 +8,10 @@ namespace Froggy.Personnages
 {
     /// <summary>
     /// Outil de test : choisit le modèle de Froggy affiché (actions Previous / Next) et l'anime d'après le Rigidbody
-    /// (Repos, Marche, Course, Saut) ; Interact lance la Victoire. Seul l'habillage change : déplacement, collider et
+    /// (Repos, Marche, Course, Saut, et Atterrissage au retour au sol si le modèle l'a) ; Interact lance la Victoire. Seul l'habillage change : déplacement, collider et
     /// physique restent ceux du joueur. Le choix n'est pas sauvegardé. Sans raccourcis (vitrines du jardin, où E est le pas
-    /// de côté), le menu de debug choisit le modèle et lance la Victoire. L'index -1 garde la forme provisoire du template.
+    /// de côté), le menu de debug choisit le modèle et joue ses gestes (Jouer). L'index -1 garde la forme provisoire du
+    /// template.
     /// </summary>
     [RequireComponent(typeof(Rigidbody), typeof(PlayerInput))]
     public class FroggyApparence : MonoBehaviour
@@ -42,6 +44,9 @@ namespace Froggy.Personnages
         [Tooltip("Previous / Next changent de modèle, Interact lance la Victoire, et l'aide s'affiche. Sans : le menu de debug.")]
         [SerializeField] private bool raccourcis = true;
 
+        [Tooltip("Durée de vol au-delà de laquelle Froggy joue son atterrissage en touchant le sol (s'il en a un), en s. PROVISOIRE.")]
+        [SerializeField] private float volPourAtterrir = 0.25f;
+
         private static readonly int Vitesse = Animator.StringToHash("Vitesse");
         private static readonly int AuSol = Animator.StringToHash("AuSol");
         private static readonly int Saut = Animator.StringToHash("Saut");
@@ -64,12 +69,31 @@ namespace Froggy.Personnages
         private GameObject instance;
         private Animator animator;
         private bool etaitAuSol = true;
+        private float enLAir;                 // durée du vol en cours, en s
+        private bool aUnAtterrissage;         // le modèle affiché a son clip « Atterrissage »
+
+        // les clips du déplacement, joués par la vitesse : tous les autres sont des gestes qu'on lance par leur nom
+        private static readonly string[] Deplacement = { "Repos", "Marche", "Course" };
+        private string[] gestes = new string[0];
 
         public string NomCourant => courant >= 0 ? modeles[courant].nom : "";
         public int Courant => courant;
         public Animator Animateur => animator;
         public int Nombre => modeles.Count;
         public string Nom(int index) => modeles[index].nom;
+
+        /// <summary>Les gestes du modèle affiché (Saut, Victoire, Torgnole, Croassement…), dans l'ordre alphabétique.</summary>
+        public IReadOnlyList<string> Gestes => gestes;
+
+        /// <summary>
+        /// Joue un geste du modèle affiché : l'état du même nom dans son contrôleur (« Deplacement » ramène au
+        /// déplacement, utile après une boucle comme la nage).
+        /// </summary>
+        public void Jouer(string geste)
+        {
+            if (animator != null && animator.runtimeAnimatorController != null)
+                animator.CrossFadeInFixedTime(geste, 0.1f);
+        }
 
         private void Awake()
         {
@@ -105,6 +129,15 @@ namespace Froggy.Personnages
             animator.SetBool(AuSol, auSol);
             if (etaitAuSol && !auSol && v.y > 0.5f)
                 animator.SetTrigger(Saut);
+            if (!auSol)
+                enLAir += Time.deltaTime;
+            else
+            {
+                // retour au sol après un vrai vol (pas une marche qu'on descend) : l'atterrissage, s'il existe
+                if (!etaitAuSol && aUnAtterrissage && enLAir > volPourAtterrir)
+                    animator.CrossFadeInFixedTime("Atterrissage", 0.05f);
+                enLAir = 0f;
+            }
             etaitAuSol = auSol;
             if (raccourcis && victoire.WasPressedThisFrame())
                 animator.SetTrigger(Victoire);
@@ -131,6 +164,8 @@ namespace Froggy.Personnages
                 courant = -1;
                 foreach (var r in aCacher)
                     if (r != null) r.enabled = true;
+                gestes = new string[0];
+                aUnAtterrissage = false;
                 return;
             }
             if (index == courant || index < 0 || index >= modeles.Count || modeles[index].prefab == null)
@@ -162,6 +197,11 @@ namespace Froggy.Personnages
             animator.applyRootMotion = false;
             animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
             etaitAuSol = true;
+            gestes = m.animateur != null
+                ? m.animateur.animationClips.Select(c => c.name).Where(n => !Deplacement.Contains(n)).Distinct().OrderBy(n => n).ToArray()
+                : new string[0];
+            aUnAtterrissage = gestes.Contains("Atterrissage");
+            enLAir = 0f;
 
             foreach (var r in aCacher)
                 if (r != null) r.enabled = false;

@@ -47,7 +47,14 @@ scripts qui les produisent, dans le dépôt.
 **Qui fait quoi** (choix de Florent sur Eku, 20 octobre) : Gemini est le meilleur pour le **design** et les images de
 référence ; GPT dans Codex est meilleur pour **reproduire et animer** en 2D, et pour les monstres de bout en bout ;
 Meshy « modélise mieux que Claude ou Codex » en 3D ; Claude intègre, mesure et vérifie. Glouton, 27 octobre : **jamais
-Meshy pour les images** (texte vers image) : ses crédits sont limités, Gemini est déjà payé.
+Meshy pour les images** (texte vers image) : ses crédits sont limités, Gemini est déjà payé. **Changé pour Froggy le
+18 novembre 2026** (Florent : « tu peux utiliser les crédits Meshy pour utiliser Gemini ») : Meshy donne les modèles
+d'image de Google (`nano-banana`, 3 à 9 crédits l'image) et l'IA peut tirer elle-même ses concepts par
+`meshy_image_to_image`, sans passer par le copier-coller dans l'abonnement Gemini. Coût annoncé avant chaque tirage.
+**Sauf pour les objets du kit de Froggy** (18 novembre 2026, sonde sur la lanterne du jardin) : « le résultat de Meshy
+[est] de moins bonne qualité. Le résultat du script Blender est très propre. » Un objet taillé à facettes, peint aux
+sommets et cerné d'un contour se fait par script (skill `modele-3d-blender`) ; Meshy reste pour l'organique complexe
+(personnages, créatures).
 
 ## 3. Bien utiliser Gemini
 
