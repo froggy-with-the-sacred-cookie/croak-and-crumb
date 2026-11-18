@@ -63,6 +63,7 @@ namespace Froggy.Reseau
         {
             cookies = GetComponent<PartieCookies>();
             deroulement = GetComponent<DeroulementPartie>();
+            deroulement.RejouerPermis = false;   // en réseau, c'est le salon qui relance une partie
             scores.OnChange += (_, _, _, _, _) => aRefleter = true;
             presents.OnChange += (_, _, _, _, _) => aRefleter = true;
             auSol.OnChange += (_, _, _, _, _) => aRefleter = true;

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Froggy.Socle;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Froggy.Regles
 {
@@ -11,8 +12,10 @@ namespace Froggy.Regles
     /// la fin, et émet « partie commencée » et « partie finie ».
     /// Le cookie sacré n'existe pas encore (P5-08) : celui qui le portera se donne par PorteurCookieSacre.
     /// À la fin, l'événement « partie finie » part ; en réseau, le salon (P2-03) ramène alors tout le monde.
-    /// L'affichage (temps, gagnant) est provisoire, en attendant le HUD (P6-02).
-    /// En réseau (P2-04, PartieReseau) : l'hôte le fait tourner ; chez les autres il est en « Miroir » (Refleter).
+    /// L'affichage (temps, gagnant) est provisoire, en attendant le HUD (P6-02). Hors réseau, à la fin, « Rejouer »
+    /// (bouton ou touche R) relance une partie dans la même scène : provisoire aussi, pour les essais.
+    /// En réseau (P2-04, PartieReseau) : l'hôte le fait tourner ; chez les autres il est en « Miroir » (Refleter) ;
+    /// « Rejouer » est coupé (RejouerPermis), c'est le salon qui relance.
     /// </summary>
     public class DeroulementPartie : MonoBehaviour
     {
@@ -25,7 +28,8 @@ namespace Froggy.Regles
 
         private readonly List<(int, int)> scores = new List<(int, int)>();
         private readonly List<Modificateurs> retenus = new List<Modificateurs>();
-        private GUIStyle petit, grand;
+        private GUIStyle petit, grand, bouton;
+        private ApparitionJoueurs apparition;
 
         public ReglesPartie Regles { get; private set; }
 
@@ -36,10 +40,11 @@ namespace Froggy.Regles
         public PorteurCookies Gagnant { get; private set; }
 
         /// <summary>Pour un test : des réglages et une partie de cookies à soi.</summary>
-        public void Regler(ReglagesPartie r, PartieCookies c)
+        public void Regler(ReglagesPartie r, PartieCookies c, ApparitionJoueurs a = null)
         {
             reglages = r;
             cookies = c;
+            apparition = a;
         }
 
         private void Start()
@@ -77,6 +82,28 @@ namespace Froggy.Regles
             if (phase == Phase.Finie && cookies != null)
                 foreach (var p in cookies.Porteurs)
                     if (p != null && p.Joueur == gagnant) Gagnant = p;
+        }
+
+        /// <summary>« Rejouer » permis (vrai hors réseau). En réseau (P2-04), c'est le salon qui relance une partie.</summary>
+        public bool RejouerPermis { get; set; } = true;
+
+        /// <summary>Relance une partie dans la même scène : cookies remis à zéro, joueurs reposés sur leur apparition, compte à rebours.</summary>
+        public void Rejouer()
+        {
+            if (!RejouerPermis) return;
+            PorteurCookieSacre = null;
+            if (cookies != null) cookies.Recommencer();
+            if (apparition == null) apparition = FindAnyObjectByType<ApparitionJoueurs>();
+            if (apparition != null) apparition.Recommencer();   // après les cookies : ils numérotent les joueurs
+            Preparer();
+            Lancer();
+        }
+
+        private void Update()
+        {
+            var clavier = Keyboard.current;
+            if (affichageProvisoire && Regles != null && Regles.Phase == Phase.Finie && clavier != null && clavier[Key.R].wasPressedThisFrame)
+                Rejouer();
         }
 
         private void FixedUpdate() => Pas(Time.fixedDeltaTime);
@@ -144,6 +171,7 @@ namespace Froggy.Regles
                 petit = new GUIStyle(GUI.skin.label) { fontSize = 26, fontStyle = FontStyle.Bold, alignment = TextAnchor.UpperCenter };
                 grand = new GUIStyle(petit) { fontSize = 72, alignment = TextAnchor.MiddleCenter };
             }
+            if (bouton == null) bouton = new GUIStyle(GUI.skin.button) { fontSize = 24, fontStyle = FontStyle.Bold };
             switch (Regles.Phase)
             {
                 case Phase.Decompte:
@@ -158,6 +186,17 @@ namespace Froggy.Regles
                 case Phase.Finie:
                     Ecrire(new Rect(0f, 0f, Screen.width, Screen.height),
                         Gagnant != null ? $"Joueur {Gagnant.Joueur} gagne" : "Partie finie", grand);
+                    if (!RejouerPermis) break;   // en réseau : le salon relance (P2-04)
+                    // dès l'appui : au clic gauche, la caméra capture la souris et le relâchement n'arrive jamais au bouton
+                    var zoneBouton = new Rect(Screen.width * 0.5f - 110f, Screen.height * 0.5f + 70f, 220f, 48f);
+                    var evenement = Event.current;
+                    if (evenement.type == EventType.MouseDown && evenement.button == 0 && zoneBouton.Contains(evenement.mousePosition))
+                    {
+                        evenement.Use();
+                        Rejouer();
+                        break;
+                    }
+                    GUI.Button(zoneBouton, "Rejouer (R)", bouton);
                     break;
             }
         }

@@ -78,11 +78,20 @@ namespace Froggy.Regles
             Demarrer(reperes, froggys);
         }
 
+        private List<RepereArene> derniersReperes = new List<RepereArene>();
+        private List<GameObject> dernieresFroggys = new List<GameObject>();
+
+        /// <summary>Remet la partie à zéro avec les mêmes repères et les mêmes Froggy (« Rejouer »).</summary>
+        public void Recommencer() => Demarrer(derniersReperes, dernieresFroggys);
+
         /// <summary>(Re)lance la partie avec ces repères et ces Froggy (un test donne les siens).</summary>
         public void Demarrer(IEnumerable<RepereArene> reperes, IEnumerable<GameObject> froggys)
         {
-            Reinitialiser(reperes);
-            foreach (var froggy in froggys.OrderBy(f => f.transform.position.x).ThenBy(f => f.transform.position.z))
+            // copiés d'abord : Recommencer() repasse ces listes-là
+            derniersReperes = reperes.Where(r => r != null).ToList();
+            dernieresFroggys = froggys.Where(f => f != null).ToList();
+            Reinitialiser(derniersReperes);
+            foreach (var froggy in dernieresFroggys.OrderBy(f => f.transform.position.x).ThenBy(f => f.transform.position.z))
             {
                 var porteur = froggy.GetComponent<PorteurCookies>();
                 if (porteur == null) porteur = froggy.AddComponent<PorteurCookies>();
@@ -201,11 +210,12 @@ namespace Froggy.Regles
         /// <summary>
         /// Fait lâcher un cookie à un joueur (P3-02). Le cookie tombe au sol à « distanceLacher » dans la direction donnée
         /// (celle du coup ; nulle : derrière lui), sans traverser un mur, et va au premier qui le ramasse.
-        /// Rend false si le joueur ne porte rien ou n'est pas de la partie.
+        /// Rend false si le joueur ne porte rien, n'est pas de la partie ou est intouchable (il vient de réapparaître, P3-04).
         /// </summary>
         public bool FaireLacher(PorteurCookies porteur, Vector3 direction)
         {
-            if (Regles == null || porteur == null || !porteurs.Contains(porteur)) return false;
+            // en Miroir (réseau, P2-04) : seul l'hôte fait lâcher un cookie
+            if (Regles == null || Miroir || porteur == null || !porteurs.Contains(porteur) || porteur.Intouchable) return false;
             Vector3 chute = PointDeChute(porteur.transform, direction);
             int numero = Regles.Lacher(porteur.Joueur, chute);
             if (numero < 0) return false;
@@ -277,12 +287,13 @@ namespace Froggy.Regles
         private void OnGUI()
         {
             if (!scoreProvisoire || Regles == null) return;
-            if (style == null) style = new GUIStyle(GUI.skin.label) { fontSize = 22, fontStyle = FontStyle.Bold };
+            // en haut à droite : le menu de debug s'ouvre à gauche
+            if (style == null) style = new GUIStyle(GUI.skin.label) { fontSize = 22, fontStyle = FontStyle.Bold, alignment = TextAnchor.UpperRight };
             float y = 12f;
             foreach (var p in porteurs)
             {
                 if (p == null) continue;
-                var zone = new Rect(14f, y, 420f, 30f);
+                var zone = new Rect(Screen.width - 434f, y, 420f, 30f);
                 string texte = $"Joueur {p.Joueur} : {p.Nombre} cookie{(p.Nombre > 1 ? "s" : "")}";
                 style.normal.textColor = Color.black;   // contour sombre : lisible sur le ciel comme sur l'herbe
                 GUI.Label(new Rect(zone.x + 2f, zone.y + 2f, zone.width, zone.height), texte, style);
