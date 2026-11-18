@@ -57,6 +57,12 @@ git switch -c feature/<sujet>      # ou fix/<sujet>, art/<sujet>
 
 1. Récupérer `develop` : `git fetch origin`, puis `git merge origin/develop` si elle a bougé. Pas de rebase ni de
    force-push sur une branche déjà poussée : d'autres l'ont peut-être tirée.
+   - **Conflit dans une scène ou un préfabriqué** (Froggy, 18 novembre 2026, PR #124 : camouflage et gel éclair
+     ajoutaient chacun un objet au même endroit de la scène de test du poste 4). Pas de fusion « union »
+     (`git merge-file --union`) : les blocs YAML se ressemblent, git les entrelace ligne à ligne et fabrique un objet
+     hybride (sans nom, scripts croisés) qui passe les contrôles d'identifiants uniques et de références. Garder le
+     fichier d'un côté, y recopier **en entier** les documents `--- !u!` neufs de l'autre et leurs racines
+     (`SceneRoots`), puis ouvrir la scène dans Unity et lire chaque racine et ses composants : aucun script manquant.
 2. Pousser, sur demande : `git push -u origin <branche>`.
 3. Ouvrir la pull request vers `develop`, sur demande : `gh pr create --base develop --draft`. Elle suit le
    [modèle](../../../.github/pull_request_template.md) : `Closes #n` en première ligne si elle termine l'issue (l'issue
