@@ -547,7 +547,9 @@ namespace Froggy.Outils
                 var modeles = PersonnagesFroggy.Modeles();
                 var so = new SerializedObject(PersonnagesFroggy.Brancher(joueur, modeles));
                 so.FindProperty("raccourcis").boolValue = false;   // E est le pas de côté de la caméra WoW, 1 / 2 restent libres
-                so.FindProperty("modeleDeDepart").intValue = -1;   // la forme provisoire, comme avant ; le menu change de Froggy
+                // Froggy P d'emblée (Florent, 18 novembre 2026 : « le plus proche de ce qu'on veut ») ; sans lui, la forme
+                // provisoire (-1). Le menu change de Froggy.
+                so.FindProperty("modeleDeDepart").intValue = modeles.FindIndex(m => m.nom == "FroggyP");
                 so.ApplyModifiedPropertiesWithoutUndo();
                 EditorSceneManager.MarkSceneDirty(scene);
                 EditorSceneManager.SaveScene(scene);
