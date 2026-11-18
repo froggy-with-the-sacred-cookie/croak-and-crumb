@@ -82,6 +82,12 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
   bots compris. Réglages : `Postes/3_ReglesBots/ReglagesBot.asset`. Un nouvel objet marche chez les bots sans rien
   changer : ils utilisent celui qu'ils portent quand un rival est proche. Un bot garde un `PlayerInput` **éteint**
   (exigé par `FroggyApparence`) : le joueur de cette machine se reconnaît à un `PlayerInput` **allumé**.
+- Menus (`Assets/Froggy/Scripts/Interface/`) : la scène `Assets/Froggy/Scenes/Menu.unity`, première du build, porte le
+  salon (P2-03) ; `MenuPrincipal` s'y installe seul et montre un écran à la fois (accueil de Julien, Paramètres,
+  Rejoindre un salon, Salle d'attente), à la souris comme à la manette. La partie se charge par-dessus et le menu se
+  cache jusqu'au retour. Les écrans ne passent que par `Salon.Local` ; leurs textes sont dans `ContenuSalle` (C# pur).
+  Les réglages du joueur (volumes, secousses, flashs, vibrations, de 0 à 1) : `ReglagesJoueur.Actuels`, à lire au
+  moment où l'effet part ; les tests écrivent dans un fichier de test, jamais dans le vrai.
 
 ## Les branches
 
