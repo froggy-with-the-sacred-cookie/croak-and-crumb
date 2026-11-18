@@ -131,6 +131,13 @@ Pièges :
   - `unity open <projet>` puis `unity status --until-ready --project-path <projet> --timeout 600` pour attendre
     l'éditeur ; `unity close <projet>` **quitte sans enregistrer** : vérifier d'abord `scene.isDirty` de chaque scène
     ouverte. Fermer puis rouvrir libère un port réseau resté pris.
+  - Pour tout ce qui demande d'être **connecté à Unity** (Project Settings ▸ Services, Unity Cloud) : faire ouvrir le
+    projet **depuis le Unity Hub**. Même ainsi, avec le Hub du Microsoft Store, la page peut rester « signed out » et
+    proposer d'installer le Hub : voir skill `reseau-fishnet` § 10 pour relier le projet sans cette page.
+  - **Les « AssetImportWorker »** (≈ 1,3 Go chacun, 3 relancés à chaque ouverture ou recompilation) : les arrêter avant
+    un test à plusieurs fenêtres sur un poste à 16 Go (Unity les relance au besoin).
+  - **Voir ce que voit la personne** (fenêtres de l'éditeur, que `capture` ne prend pas) : capture de l'écran entier
+    par PowerShell (`System.Drawing`, `CopyFromScreen`), **seulement avec son accord** (tout l'écran est pris).
   - Viser une fenêtre Multiplayer Play Mode : `--project-path <projet>/Library/VP/<vpId>` (skill
     `test-multijoueur-local`).
   - Un menu se teste par script : `EditorApplication.ExecuteMenuItem("Froggy/…")` rend vrai s'il existe ; la liste

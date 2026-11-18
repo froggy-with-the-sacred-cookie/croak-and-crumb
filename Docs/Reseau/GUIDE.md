@@ -11,6 +11,9 @@ Pour tous les postes : gameplay, caméra, effets, son, UI. Froggy se joue **uniq
   [#1110](https://github.com/FirstGearGames/FishNet/issues/1110)). On repassera sur un tag quand FishNet en publiera un
   sain.
 - **Multiplayer Play Mode 3.0.0**, livré avec Unity 6000.6.7f1, pour jouer à plusieurs sur une seule machine.
+- **Unity Multiplayer Services 2.4.1** (Unity Relay, jouer par internet) et **FishyUnityTransport 2.0.0-pre.2**, copié
+  et corrigé dans `Packages/` (voir « Jouer par internet : ce qu'il y a derrière »). Dans Unity 6.6,
+  `com.unity.transport` est le paquet du moteur (6.6.0).
 - Mettre FishNet à jour se décide en équipe, par une pull request, comme la version de Unity.
 
 ## Tester à 2, 3 ou 4 sur une machine (5 minutes)
@@ -60,10 +63,15 @@ Le code : `Assets/Froggy/Scripts/Reseau/TestReseau.cs` (démarrage), `PanneauTes
 
 ## Jouer par code (salon)
 
-Le salon (P2-03) : un joueur crée une partie et reçoit un **code de 4 lettres** (par exemple `KRBF`, jamais de O ni
-de I). Les autres tapent ce code pour le rejoindre, se disent prêts, puis l'hôte lance. Pour l'instant, le code se
-trouve **sur le même réseau local** (même machine ou même wifi) ; jouer depuis deux maisons viendra avec le relais
-(P2-05).
+Le salon (P2-03) : un joueur crée une partie et reçoit un **code**. Les autres tapent ce code pour le rejoindre, se
+disent prêts, puis l'hôte lance. Deux façons (P2-05) :
+
+- **En ligne** (par défaut) : par **Unity Relay**, depuis n'importe quelle maison, sans ouvrir de ports. Le code est
+  donné par Unity : 6 lettres et chiffres (par exemple `TMQJWD`), valable tant que l'hôte est là.
+- **Réseau local** (case « Réseau local (sans internet) » cochée avant de créer ou de rejoindre) : même machine ou même
+  wifi, sans internet. Code de 4 lettres (par exemple `KRBF`, jamais de O ni de I).
+
+Les deux joueurs doivent être dans le même mode.
 
 1. **Ouvrir le salon de test** : menu **Froggy ▸ Réseau ▸ 4. Ouvrir le salon de test (jouer par code)**
    (`Assets/Froggy/Postes/2_Reseau/Salon_Reseau.unity`). Si Unity propose d'enregistrer, répondre « Save ».
@@ -80,8 +88,11 @@ trouve **sur le même réseau local** (même machine ou même wifi) ; jouer depu
 
 | Message | Ce qu'il veut dire |
 |---|---|
-| « Aucun salon KRBF trouvé sur ce réseau » | Mauvais code, salon pas encore créé, ou autre réseau (pas de relais pour l'instant) |
-| « Code inconnu de cet hôte » | L'hôte trouvé a un autre code (rare) |
+| « Code inconnu : salon fermé ou code mal tapé. » (en ligne) | Code faux, ou l'hôte est parti (le code meurt avec lui) |
+| « Connexion aux services de Unity impossible » (en ligne) | Pas d'internet, ou services de Unity indisponibles : réessayer, ou passer en réseau local |
+| « Le projet n'est pas relié à Unity Cloud » | Voir « Relier le projet à Unity Cloud » plus bas (une fois pour toute l'équipe) |
+| « Aucun salon KRBF trouvé sur ce réseau » (local) | Mauvais code, salon pas encore créé, ou pas le même réseau : passer en ligne |
+| « Code inconnu de cet hôte » (local) | L'hôte trouvé a un autre code (rare) |
 | « Salon plein (4 joueurs) » | Il y a déjà 4 joueurs |
 | « Partie en cours » | On ne rejoint pas une partie commencée : attendre le retour au salon |
 | « Déconnecté : l'hôte a fermé le salon… » | L'hôte est parti ; recréer ou rejoindre un autre salon |
@@ -102,6 +113,7 @@ Salon salon = Salon.Local;
 salon.Change += Rafraichir;          // joueurs, prêt, couleur, phase, connexion : tout changement
 salon.Erreur += AfficherMessage;     // texte prêt à afficher
 
+salon.EnLigne = true;                // en ligne (Unity Relay, par défaut) ou false : réseau local
 salon.Creer();                       // devenir l'hôte ; salon.Code donne le code
 salon.Rejoindre(texteTape);          // le code tel que tapé
 salon.SeDirePret(true);
@@ -116,8 +128,36 @@ salon.Quitter();
 
 Les règles (4 joueurs au plus, couleur unique, lancement quand tous les invités sont prêts) sont dans `EtatSalon.cs`
 et testées dans `Assets/Froggy/Editor/Tests/SalonTests.cs`. Le prefab `Assets/Froggy/Prefabs/Reseau/Salon.prefab`
-contient le NetworkManager, le salon, la recherche par code, le panneau, les 4 points d'apparition et la caméra ; la
-scène de partie est un champ de `Salon` (`Vitrine_JardinJaponais` pour l'instant).
+contient le NetworkManager, le salon, le relais (`RelaisSalon`), la recherche locale, le transport Unity
+(`UnityTransport`), le panneau, les 4 points d'apparition et la caméra ; la scène de partie est un champ de `Salon`
+(`Vitrine_JardinJaponais` pour l'instant).
+
+### Jouer par internet : ce qu'il y a derrière (P2-05)
+
+- **Unity Relay** (`com.unity.services.multiplayer` 2.4.1) : l'hôte réserve une place sur un serveur relais de Unity et
+  reçoit le code ; les autres le rejoignent par ce code. Personne n'ouvre de port. Gratuit jusqu'à 50 joueurs en
+  même temps en moyenne par mois, sans carte bancaire. Les joueurs n'ont aucun compte : chaque jeu se connecte
+  anonymement aux services de Unity.
+- **Transport** : FishNet parle à Unity Relay par FishyUnityTransport (communautaire), **copié dans
+  `Packages/com.alven.fishnet.unitytransport`** avec une correction d'une ligne (recherche « FROGGY » dans
+  `UnityTransport.cs`) : sans elle, un joueur avait une erreur rouge quand l'hôte fermait. À remplacer par la version
+  officielle quand elle sera corrigée. Le salon s'en sert aussi en réseau local (connexion directe) ; la scène de test
+  à plusieurs (P2-07) garde Tugboat.
+- Code : `Assets/Froggy/Scripts/Reseau/Salon/RelaisSalon.cs`.
+
+### Relier le projet à Unity Cloud (une fois, déjà fait le 18/11/2026)
+
+Le relais a besoin que le projet soit relié à un projet Unity Cloud. C'est fait : l'identifiant est dans
+`ProjectSettings/ProjectSettings.asset` (`cloudProjectId`), commité, et vaut pour toute l'équipe. À refaire seulement
+si on change de projet Unity Cloud :
+
+1. Sur **https://cloud.unity.com**, dans l'organisation de l'équipe : **Projects ▸ Create project**.
+2. Normalement : dans Unity, **Edit ▸ Project Settings ▸ Services**, choisir l'organisation puis le projet.
+3. Si cette page dit « You are signed out » et propose d'installer le Hub alors qu'il est installé (vu avec le Hub du
+   Microsoft Store) : copier le **Project ID** et l'**Organization ID** du site et les écrire dans
+   `ProjectSettings/ProjectSettings.asset` (`cloudProjectId`, `organizationId`, `projectName`). Le jeu lit
+   `Application.cloudProjectId`, ça suffit ; l'éditeur continue d'afficher « signed out », sans conséquence.
+4. Sur le site, vérifier que **Relay** est activé pour le projet (sinon : « le service Relay n'est pas activé »).
 
 ## Les règles de partie en réseau (P2-04)
 
@@ -227,6 +267,10 @@ avec P2-02 (#23).
 - **Un message (RPC) arrive avant l'état copié** : FishNet envoie l'état synchronisé toutes les 0,1 s, un message
   tout de suite. Un client qui réagit au message lirait l'ancien score : `PartieReseau` met donc le nouveau score (ou
   le gagnant) dans le message. Vu le 18/11/2026 (« partie finie » reçue, gagnant encore vide).
+- **Fermer un hôte dans le bon ordre** : arrêter le serveur **avant** le client de l'hôte (`ServerManager` puis
+  `ClientManager`). Dans l'autre ordre, le transport Unity écrit « stale connection » en rouge.
+- **Plusieurs fenêtres et Unity Relay** : chaque fenêtre de Multiplayer Play Mode doit avoir son propre profil des
+  services de Unity, sinon elles sont le même joueur pour Unity ; `RelaisSalon` le fait (nom du dossier `mppm…`).
 - **Unity qui plante à plusieurs fenêtres** (« d3d12: Device removed ») : machine à bout de mémoire. Après une
   réouverture ou une recompilation, Unity lance 3 « AssetImportWorker » (≈ 4 Go) ; les fermer avant le Play libère de
   la place (Unity les relance seul si besoin).
