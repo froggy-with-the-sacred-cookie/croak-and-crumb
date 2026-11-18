@@ -63,6 +63,10 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
   `GestionnaireMeteo` dans la scène, une fiche `ReglagesMeteo` par arène (événements et poids) et une
   `DefinitionEvenement` par événement (durée, vitesse, saut, posés par les `Modificateurs`). Le rendu et le son d'un
   événement écoutent `Annonce`, `Debut` et `Fin` du gestionnaire ; il démarre et s'arrête avec la partie.
+- Nage (`Assets/Froggy/Scripts/Deplacement/`) : une `ZoneEau` (boîte déclencheur dont le dessus est la surface) sur
+  chaque plan d'eau assez profond pour nager ; dedans, `DeplacementWow` passe la main à `NageFroggy` (flotte, nage à
+  60 % de la course, plonge avec C ou le bouton est, ressort en sautant). Réglages : `ReglagesNage`. L'éclaboussure et
+  le son écoutent `NageFroggy.Entree` et `Sortie`. Bassin d'essai : `Postes/1_MouvementCamera/BassinEssai.prefab`.
 
 ## Les branches
 
