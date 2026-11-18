@@ -43,6 +43,9 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
   ce que l'hôte fera tourner) ; `PartieCookies` les fait vivre dans une scène à partir des repères « Apparition de
   cookies » du Bâtisseur ; `PorteurCookies` donne le score d'une Froggy. Les valeurs sont dans `ReglagesCookies`.
   Faire lâcher un cookie à un joueur (un coup, un malus) : `PartieCookies.FaireLacher(porteur, direction)`.
+- Déroulement d'une partie (même dossier) : `ReglesPartie` (compte à rebours, durée, gagnant, prolongation, en C# pur)
+  et `DeroulementPartie` dans la scène. Le porteur du cookie sacré se donne par `PorteurCookieSacre` ; le début et la
+  fin partent en événements du socle (`PartieCommencee`, `PartieFinie`).
 
 ## Les branches
 

@@ -35,6 +35,9 @@ namespace Froggy.Regles
         private GUIStyle style;
 
         public ReglesCookies Regles { get; private set; }
+
+        /// <summary>En pause, rien ne se ramasse ni ne réapparaît (avant le départ, après la fin : DeroulementPartie).</summary>
+        public bool EnPause { get; set; }
         public IReadOnlyList<PorteurCookies> Porteurs => porteurs;
 
         /// <summary>Pour un test : des réglages à soi (une copie, jamais l'asset partagé).</summary>
@@ -90,7 +93,7 @@ namespace Froggy.Regles
         /// <summary>Un pas de la partie, au pas physique (un test l'appelle hors jeu).</summary>
         public void Pas(float dt)
         {
-            if (Regles == null) return;
+            if (Regles == null || EnPause) return;
             positions.Clear();
             foreach (var p in porteurs)
                 if (p != null && p.isActiveAndEnabled) positions.Add((p.Joueur, p.transform.position));
