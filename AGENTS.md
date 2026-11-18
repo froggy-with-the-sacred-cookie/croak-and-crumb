@@ -46,6 +46,12 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
 - Déroulement d'une partie (même dossier) : `ReglesPartie` (compte à rebours, durée, gagnant, prolongation, en C# pur)
   et `DeroulementPartie` dans la scène. Le porteur du cookie sacré se donne par `PorteurCookieSacre` ; le début et la
   fin partent en événements du socle (`PartieCommencee`, `PartieFinie`).
+- Menus (`Assets/Froggy/Scripts/Interface/`) : la scène `Assets/Froggy/Scenes/Menu.unity`, première du build, porte le
+  salon (P2-03) ; `MenuPrincipal` s'y installe seul et montre un écran à la fois (accueil de Julien, Paramètres,
+  Rejoindre un salon, Salle d'attente), à la souris comme à la manette. La partie se charge par-dessus et le menu se
+  cache jusqu'au retour. Les écrans ne passent que par `Salon.Local` ; leurs textes sont dans `ContenuSalle` (C# pur).
+  Les réglages du joueur (volumes, secousses, flashs, vibrations, de 0 à 1) : `ReglagesJoueur.Actuels`, à lire au
+  moment où l'effet part ; les tests écrivent dans un fichier de test, jamais dans le vrai.
 
 ## Les branches
 

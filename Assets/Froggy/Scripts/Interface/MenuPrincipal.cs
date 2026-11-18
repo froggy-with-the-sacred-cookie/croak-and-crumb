@@ -6,29 +6,39 @@ using UnityEngine.UI;
 
 namespace Froggy.Interface
 {
-    /// <summary>Point d’entrée du menu, de ses réglages et de ses transitions de scène.</summary>
+    /// <summary>
+    /// Point d’entrée du menu, de ses écrans et de ses transitions de scène. S'installe seul quand la scène Menu
+    /// s'ouvre. Écrans : l'accueil de Julien (l'étang), Paramètres, Rejoindre un salon, Salle d'attente ; un seul à la
+    /// fois, avec le focus posé pour la manette (Échap ou B : retour).
+    ///
+    /// La scène Menu porte le salon (P2-03) : la partie s'y charge par-dessus, en additif. Le menu se cache donc tant
+    /// qu'une autre scène est ouverte, et revient sur la salle d'attente au retour de la partie.
+    /// </summary>
     public sealed class MenuPrincipal : MonoBehaviour
     {
-        private const string SceneMenu = "Assets/Scenes/SampleScene.unity";
-        private const string SceneSalon = "Reseau_JardinJaponais";
+        /// <summary>La scène du menu et du salon, première du build.</summary>
+        public const string SceneMenu = "Assets/Froggy/Scenes/Menu.unity";
         private const string SceneSolo = "Vitrine_JardinJaponais";
         private const string PrefabEtang = "MenuEtang/Menu_Principal_Etang";
+        /// <summary>Volume de l'ambiance du menu quand le réglage « Ambiance » est à 100 % (choix de Julien).</summary>
+        private const float VolumeAmbiance = 0.12f;
 #if UNITY_EDITOR
         private static readonly Color EauCroquis = new Color32(43, 80, 121, 255);
 #endif
-        private static readonly Color Ivoire = new Color32(250, 239, 207, 255);
         private static bool instanceCreee;
 
         private AudioSource ambiance;
         private Canvas canvas;
         private GameObject systemeSaisie;
         private RectTransform menuPrincipal;
-        private RectTransform panneauReglages;
         private VueMenuEtang etang;
-        private Slider curseurVolume;
-        private Button retourReglages;
-        private Text valeurVolume;
-        private float volumeAmbiance = 0.12f;
+        private EcranParametres ecranParametres;
+        private EcranSalons ecranSalons;
+        private EcranSalleAttente ecranSalle;
+        private Ecran ecran = Ecran.Accueil;
+
+        /// <summary>L'écran affiché.</summary>
+        public Ecran EcranActuel => ecran;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void Reinitialiser() => instanceCreee = false;
@@ -49,26 +59,111 @@ namespace Froggy.Interface
             ambiance = gameObject.AddComponent<AudioSource>();
             ambiance.clip = Resources.Load<AudioClip>("Ambiance_Stream_Calm_Loop_Stereo");
             ambiance.loop = true;
-            ambiance.volume = volumeAmbiance;
             ambiance.spatialBlend = 0f;
+            AppliquerVolumes();
+            ReglagesJoueur.Change += AppliquerVolumes;
             if (ambiance.clip != null) ambiance.Play();
             ConstruireInterface();
-            SceneManager.sceneLoaded += QuandSceneChargee;
+            CacherPanneauProvisoire();
         }
 
-        private void OnDestroy() => SceneManager.sceneLoaded -= QuandSceneChargee;
+        private void OnDestroy() => ReglagesJoueur.Change -= AppliquerVolumes;
 
-        private void Start() => Selectionner(etang != null ? etang.Rejoindre : null);
+        private void Start() => Afficher(Ecran.Accueil);
 
-        private void QuandSceneChargee(Scene scene, LoadSceneMode mode)
+        /// <summary>
+        /// Le menu se montre seul dans sa scène : caché pendant une partie (chargée par-dessus par le salon) ou en solo
+        /// (scène remplacée). Dans un salon, on est dans la salle d'attente ; sorti du salon, on revient aux salons.
+        /// </summary>
+        private void Update()
         {
-            bool menuActif = scene.path == SceneMenu;
-            if (menuActif) AssurerEventSystem();
-            canvas.gameObject.SetActive(menuActif);
-            if (menuActif && etang != null)
-                Selectionner(panneauReglages.gameObject.activeSelf ? FocusReglages : etang.Rejoindre);
-            if (menuActif && ambiance.clip != null && !ambiance.isPlaying) ambiance.Play();
-            else if (!menuActif) ambiance.Stop();
+            bool visible = MenuVisible();
+            if (canvas.gameObject.activeSelf != visible)
+            {
+                canvas.gameObject.SetActive(visible);
+                if (visible)
+                {
+                    AssurerEventSystem();
+                    Afficher(ecran);
+                    if (ambiance.clip != null && !ambiance.isPlaying) ambiance.Play();
+                }
+                else ambiance.Stop();
+            }
+            if (!visible) return;
+
+            Reseau.Salon salon = Reseau.Salon.Local;
+            bool dansUnSalon = salon != null && salon.Connecte && salon.Moi.HasValue;
+            if (dansUnSalon && ecran != Ecran.SalleAttente) Afficher(Ecran.SalleAttente);
+            else if (!dansUnSalon && ecran == Ecran.SalleAttente) Afficher(Ecran.Salons);
+
+            if (RetourDemande()) Retour();
+        }
+
+        /// <summary>Vrai quand seule la scène Menu est ouverte.</summary>
+        public static bool MenuVisible() =>
+            SceneManager.sceneCount == 1 && SceneManager.GetActiveScene().path == SceneMenu;
+
+        /// <summary>Échap au clavier, B à la manette : l'action « Cancel » du module d'interface (réaffectable).</summary>
+        private static bool RetourDemande()
+        {
+            if (EventSystem.current == null) return false;
+            var module = EventSystem.current.currentInputModule as InputSystemUIInputModule;
+            var action = module != null && module.cancel != null ? module.cancel.action : null;
+            return action != null && action.WasPressedThisFrame();
+        }
+
+        private void Retour()
+        {
+            EcranMenu actuel = Actuel();
+            if (actuel != null) actuel.Retour();
+        }
+
+        /// <summary>Montre un écran (un seul à la fois) et donne le focus à son premier élément.</summary>
+        public void Afficher(Ecran cible)
+        {
+            if (cible == Ecran.Parametres && ecran != Ecran.Parametres && ecranParametres != null)
+                ecranParametres.Depuis(ecran);
+            ecran = cible;
+            if (menuPrincipal != null) menuPrincipal.gameObject.SetActive(cible == Ecran.Accueil);
+            if (ecranParametres != null) ecranParametres.gameObject.SetActive(cible == Ecran.Parametres);
+            if (ecranSalons != null) ecranSalons.gameObject.SetActive(cible == Ecran.Salons);
+            if (ecranSalle != null) ecranSalle.gameObject.SetActive(cible == Ecran.SalleAttente);
+
+            EcranMenu actuel = Actuel();
+            Selectionner(actuel != null ? actuel.PremierFocus : etang != null ? etang.Rejoindre : null);
+        }
+
+        private EcranMenu Actuel() => ecran switch
+        {
+            Ecran.Parametres => ecranParametres,
+            Ecran.Salons => ecranSalons,
+            Ecran.SalleAttente => ecranSalle,
+            _ => null
+        };
+
+        /// <summary>Le volume général règle tout le son ; « Ambiance » règle l'ambiance du menu.</summary>
+        private void AppliquerVolumes()
+        {
+            ReglagesJoueur r = ReglagesJoueur.Actuels;
+            AudioListener.volume = r.volumeGeneral;
+            if (ambiance != null) ambiance.volume = VolumeAmbiance * r.volumeAmbiance;
+        }
+
+        /// <summary>Le panneau de test du salon (P2-03, IMGUI) laisse la place aux vrais écrans.</summary>
+        private static void CacherPanneauProvisoire()
+        {
+            Reseau.Salon salon = Reseau.Salon.Local;
+            var panneau = salon != null ? salon.GetComponent<Reseau.PanneauSalon>() : null;
+            if (panneau != null) panneau.enabled = false;
+        }
+
+        /// <summary>Les écrans posés sur l'étang (ou sur l'eau du croquis), cachés jusqu'à leur tour.</summary>
+        private void ConstruireEcrans(Transform parent)
+        {
+            var fabrique = new FabriqueMenu(etang);
+            ecranParametres = EcranMenu.Creer<EcranParametres>("Écran - Paramètres", parent, this, fabrique);
+            ecranSalons = EcranMenu.Creer<EcranSalons>("Écran - Salons", parent, this, fabrique);
+            ecranSalle = EcranMenu.Creer<EcranSalleAttente>("Écran - Salle d'attente", parent, this, fabrique);
         }
 
         private void ConstruireInterface()
@@ -109,10 +204,10 @@ namespace Froggy.Interface
 
             etang = Instantiate(modele, parent, false);
             menuPrincipal = etang.Centre;
-            etang.Rejoindre.onClick.AddListener(() => SceneManager.LoadScene(SceneSalon));
-            etang.Parametres.onClick.AddListener(AfficherReglages);
+            etang.Rejoindre.onClick.AddListener(() => Afficher(Ecran.Salons));
+            etang.Parametres.onClick.AddListener(() => Afficher(Ecran.Parametres));
             etang.Solo.onClick.AddListener(() => SceneManager.LoadScene(SceneSolo));
-            ConstruirePanneauReglages(etang.transform);
+            ConstruireEcrans(etang.transform);
         }
 
 #if UNITY_EDITOR
@@ -148,15 +243,14 @@ namespace Froggy.Interface
             logo.preserveAspect = true;
 
             BoutonPeint("Rejoindre un salon", menuPrincipal, "Bouton_Rejoindre",
-                new Vector2(0.5f, 0.625f), new Vector2(800f, 170f),
-                () => SceneManager.LoadScene(SceneSalon));
+                new Vector2(0.5f, 0.625f), new Vector2(800f, 170f), () => Afficher(Ecran.Salons));
             BoutonPeint("Paramètres", menuPrincipal, "Bouton_Parametres",
-                new Vector2(0.5f, 0.415f), new Vector2(740f, 170f), AfficherReglages);
+                new Vector2(0.5f, 0.415f), new Vector2(740f, 170f), () => Afficher(Ecran.Parametres));
             BoutonPeint("Solo", menuPrincipal, "Bouton_Solo",
                 new Vector2(0.5f, 0.205f), new Vector2(710f, 179f),
                 () => SceneManager.LoadScene(SceneSolo));
 
-            ConstruirePanneauReglages(fond);
+            ConstruireEcrans(fond);
         }
 
         private void PoserNenu(string nom, Transform parent, string sprite, Vector2 ancre,
@@ -197,107 +291,6 @@ namespace Froggy.Interface
         }
 #endif
 
-        private void ConstruirePanneauReglages(Transform parent)
-        {
-            panneauReglages = Zone("Panneau des paramètres", parent, new Vector2(0.5f, 0.5f),
-                new Vector2(650f, 350f));
-            Image fond = panneauReglages.gameObject.AddComponent<Image>();
-            fond.color = new Color32(21, 58, 83, 246);
-            Texte("Paramètres", panneauReglages, 34, Ivoire, FontStyle.Bold,
-                new Vector2(0.5f, 0.80f), new Vector2(560f, 60f));
-            if (ambiance.clip != null) ConstruireReglageVolume();
-            else Texte("Ambiance indisponible", panneauReglages, 23, Ivoire, FontStyle.Normal,
-                new Vector2(0.50f, 0.48f), new Vector2(560f, 46f));
-
-            retourReglages = BoutonRetour(panneauReglages);
-            panneauReglages.gameObject.SetActive(false);
-        }
-
-        private void ConstruireReglageVolume()
-        {
-            Texte("Ambiance", panneauReglages, 23, Ivoire, FontStyle.Normal,
-                new Vector2(0.30f, 0.51f), new Vector2(170f, 46f));
-            valeurVolume = Texte("12 %", panneauReglages, 21, Ivoire, FontStyle.Bold,
-                new Vector2(0.81f, 0.51f), new Vector2(90f, 46f));
-            curseurVolume = CreerSlider(panneauReglages);
-            curseurVolume.value = volumeAmbiance / 0.25f;
-            curseurVolume.onValueChanged.AddListener(v =>
-            {
-                volumeAmbiance = Mathf.Lerp(0f, 0.25f, v);
-                ambiance.volume = volumeAmbiance;
-                valeurVolume.text = Mathf.RoundToInt(v * 25f) + " %";
-            });
-        }
-
-        private Button BoutonRetour(Transform parent)
-        {
-            GameObject objet = new GameObject("Bouton - Retour",
-                typeof(RectTransform), typeof(Image), typeof(Button));
-            objet.transform.SetParent(parent, false);
-            Placer(objet.GetComponent<RectTransform>(), new Vector2(0.5f, 0.17f),
-                Vector2.zero, new Vector2(260f, 60f));
-            Image image = objet.GetComponent<Image>();
-            Button bouton = objet.GetComponent<Button>();
-            bouton.targetGraphic = image;
-            if (etang != null)
-            {
-                image.sprite = etang.Parametres.image.sprite;
-                bouton.transition = Selectable.Transition.SpriteSwap;
-                bouton.spriteState = etang.Parametres.spriteState;
-            }
-            else image.color = new Color32(67, 151, 137, 255);
-            bouton.onClick.AddListener(CacherReglages);
-            Texte("Retour", objet.transform, 22, Ivoire, FontStyle.Bold,
-                new Vector2(0.5f, 0.5f), new Vector2(240f, 52f));
-            return bouton;
-        }
-
-        private static Slider CreerSlider(Transform parent)
-        {
-            RectTransform piste = Zone("Curseur du volume", parent,
-                new Vector2(0.56f, 0.37f), new Vector2(360f, 22f));
-            Image pisteImage = piste.gameObject.AddComponent<Image>();
-            pisteImage.color = new Color32(78, 111, 120, 255);
-            GameObject remplissage = new GameObject("Remplissage", typeof(RectTransform), typeof(Image));
-            remplissage.transform.SetParent(piste, false);
-            Image remplissageImage = remplissage.GetComponent<Image>();
-            remplissageImage.color = new Color32(173, 207, 108, 255);
-            RectTransform remplissageRect = remplissageImage.rectTransform;
-            remplissageRect.anchorMin = new Vector2(0f, 0.1f);
-            remplissageRect.anchorMax = new Vector2(1f, 0.9f);
-            remplissageRect.offsetMin = new Vector2(2f, 0f);
-            remplissageRect.offsetMax = new Vector2(-2f, 0f);
-            GameObject poignee = new GameObject("Poignée", typeof(RectTransform), typeof(Image));
-            poignee.transform.SetParent(piste, false);
-            Image poigneeImage = poignee.GetComponent<Image>();
-            poigneeImage.color = Ivoire;
-            Placer(poigneeImage.rectTransform, Vector2.zero, Vector2.zero, new Vector2(28f, 28f));
-            Slider slider = piste.gameObject.AddComponent<Slider>();
-            slider.fillRect = remplissageRect;
-            slider.handleRect = poigneeImage.rectTransform;
-            slider.targetGraphic = poigneeImage;
-            slider.direction = Slider.Direction.LeftToRight;
-            slider.minValue = 0f;
-            slider.maxValue = 1f;
-            return slider;
-        }
-
-        private void AfficherReglages()
-        {
-            menuPrincipal.gameObject.SetActive(false);
-            panneauReglages.gameObject.SetActive(true);
-            Selectionner(FocusReglages);
-        }
-
-        private Selectable FocusReglages => curseurVolume != null ? curseurVolume : retourReglages;
-
-        private void CacherReglages()
-        {
-            panneauReglages.gameObject.SetActive(false);
-            menuPrincipal.gameObject.SetActive(true);
-            Selectionner(etang != null ? etang.Parametres : null);
-        }
-
         private static void Selectionner(Selectable cible)
         {
             if (cible != null && EventSystem.current != null) cible.Select();
@@ -329,7 +322,6 @@ namespace Froggy.Interface
             return Sprite.Create(texture, new Rect(0f, 0f, texture.width, texture.height),
                 new Vector2(0.5f, 0.5f), 100f);
         }
-#endif
 
         private static RectTransform Zone(string nom, Transform parent, Vector2 ancre, Vector2 dimensions)
         {
@@ -344,7 +336,6 @@ namespace Froggy.Interface
             return rect;
         }
 
-#if UNITY_EDITOR
         private static void Etirer(RectTransform rect)
         {
             rect.anchorMin = Vector2.zero;
@@ -352,7 +343,6 @@ namespace Froggy.Interface
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
         }
-#endif
 
         private static void Placer(RectTransform rect, Vector2 ancre, Vector2 position, Vector2 dimensions)
         {
@@ -363,7 +353,6 @@ namespace Froggy.Interface
             rect.sizeDelta = dimensions;
         }
 
-#if UNITY_EDITOR
         private static Image ImageSprite(string nom, Transform parent, Sprite sprite)
         {
             GameObject objet = new GameObject(nom, typeof(RectTransform), typeof(Image));
@@ -374,24 +363,5 @@ namespace Froggy.Interface
             return image;
         }
 #endif
-
-        private Text Texte(string contenu, Transform parent, int taille, Color couleur,
-            FontStyle style, Vector2 ancre, Vector2 dimensions)
-        {
-            GameObject objet = new GameObject("Texte - " + contenu, typeof(RectTransform), typeof(Text));
-            objet.transform.SetParent(parent, false);
-            Text texte = objet.GetComponent<Text>();
-            texte.text = contenu;
-            texte.font = etang != null ? etang.Police : Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            texte.fontSize = taille;
-            texte.fontStyle = etang != null ? FontStyle.Normal : style;
-            texte.color = couleur;
-            texte.alignment = TextAnchor.MiddleCenter;
-            texte.horizontalOverflow = HorizontalWrapMode.Wrap;
-            texte.verticalOverflow = VerticalWrapMode.Overflow;
-            texte.raycastTarget = false;
-            Placer(texte.rectTransform, ancre, Vector2.zero, dimensions);
-            return texte;
-        }
     }
 }
