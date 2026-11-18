@@ -10,7 +10,7 @@ namespace Froggy.Regles
     /// règles sont dans ReglesPartie ; ce composant lit les scores de PartieCookies, retient les joueurs pendant le compte
     /// à rebours (par les Modificateurs du socle, sans toucher au contrôleur), arrête les cookies avant le départ et après
     /// la fin, et émet « partie commencée » et « partie finie ».
-    /// Le cookie sacré n'existe pas encore (P5-08) : celui qui le portera se donne par PorteurCookieSacre.
+    /// Le porteur du cookie sacré se donne par PorteurCookieSacre, que PartieCookieSacre (P5-08) tient à jour.
     /// Le retour au salon n'existe pas non plus (P2-03) : à la fin, la partie s'arrête et l'événement « partie finie » part.
     /// L'affichage (temps, gagnant) est provisoire, en attendant le HUD (P6-02). À la fin, « Rejouer » (bouton ou touche R)
     /// relance une partie dans la même scène : provisoire aussi, pour les essais, en attendant le salon (P2-03).
@@ -31,7 +31,7 @@ namespace Froggy.Regles
 
         public ReglesPartie Regles { get; private set; }
 
-        /// <summary>Celui qui porte le cookie sacré, ou vide. À tenir à jour par P5-08.</summary>
+        /// <summary>Celui qui porte le cookie sacré, ou vide. Tenu à jour par PartieCookieSacre (P5-08).</summary>
         public PorteurCookies PorteurCookieSacre { get; set; }
 
         /// <summary>Le gagnant, une fois la partie finie (vide si elle s'est finie sans joueur).</summary>
