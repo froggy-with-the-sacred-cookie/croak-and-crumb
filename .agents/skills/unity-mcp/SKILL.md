@@ -90,7 +90,10 @@ Pièges :
   l'interface IMGUI (`OnGUI`). `capture game_view --source screen --save_path <chemin>` la montre. Le chemin doit être
   dans le projet, et un chemin relatif `Temp/x.png` atterrit dans **`Assets/Temp/`** (importé, et partagé avec les
   fenêtres Multiplayer Play Mode) : déplacer l'image hors du projet, puis `AssetDatabase.DeleteAsset("Assets/Temp")`
-  pour ne pas laisser de `Assets/Temp.meta` dans `git status`.
+  pour ne pas laisser de `Assets/Temp.meta` dans `git status`. Sur macOS (18 novembre 2026, HUD P6-02), un chemin
+  **absolu** `<projet>/Captures/x.png` atterrit aussi dans `Assets/Captures/` : même remède.
+- **Un fond IMGUI semi-transparent paraît bien plus clair qu'attendu** (Froggy, 18 novembre 2026, HUD) : le projet
+  mélange en espace linéaire ; un fond sombre à 0,84 d'opacité semblait à moitié transparent. Monter vers 0,94.
 - **Poser un clip humanoïde sans jouer** (Froggy, 18 novembre 2026, gestes de Froggy P) : en mode édition,
   `AnimationClip.SampleAnimation` et un `PlayableGraph` évalué laissent le modèle au repos (os et formes immobiles).
   Seul `AnimationMode.StartAnimationMode()` puis `BeginSampling` / `SampleAnimationClip` / `EndSampling` pose la pose,
@@ -113,6 +116,10 @@ Pièges :
   Unity process »), comme `-batchmode`. Froggy, 28 octobre 2026 : on a exécuté les méthodes `[Test]` / `[TestCase]` par
   réflexion dans `unity command eval` (une `AssertionException` = un échec). Les tests dans `Assets/Froggy/Editor/`
   voient NUnit sans asmdef.
+- **Mieux : `unity command test run --mode EditMode [--filter <Ns.Classe>] --result-only`** (Froggy, 18 novembre
+  2026, macOS) lance le Test Runner **dans l'éditeur ouvert**, sans second éditeur, et rend le résumé et chaque
+  résultat en JSON (236 tests en quelques secondes). Mêmes règles que `run_tests` : hors mode Play, scène ouverte non
+  modifiée.
 
 ## 5. Build en ligne de commande
 

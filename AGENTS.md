@@ -71,6 +71,11 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
   passe par `PartieCookieSacre.FaireLacher(porteur, direction)`. Réglages :
   `Postes/5_MeteoEvenements/ReglagesCookieSacre.asset`. En réseau, il n'est pas encore dans `PartieReseau` ; chez un
   joueur qui n'est pas l'hôte (« Miroir »), il ne décide rien.
+- HUD de partie (`Assets/Froggy/Scripts/Interface/`) : `ContenuHud` écrit les textes (scores, minuteur, objet,
+  torgnole, cookie sacré, météo, fin, en C# pur) et `HudPartie` les dessine. Il s'installe seul en jeu, ne lit que ce
+  que la scène a, et éteint les affichages provisoires des postes (menu **Froggy ▸ HUD de partie** pour les
+  retrouver). Un poste qui ajoute un affichage provisoire lui donne une propriété `AffichageProvisoire` et le branche
+  dans `HudPartie.PrendreLaPlace` ; une nouvelle information de jeu s'ajoute au HUD, pas dans un `OnGUI` de plus.
 
 ## Les branches
 

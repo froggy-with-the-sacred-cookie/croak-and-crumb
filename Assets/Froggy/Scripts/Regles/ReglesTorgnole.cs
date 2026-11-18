@@ -26,6 +26,9 @@ namespace Froggy.Regles
             this.hauteur = Mathf.Max(0f, hauteur);
         }
 
+        /// <summary>La recharge entière après un coup, en s (la jauge du HUD, P6-02).</summary>
+        public float DureeRecharge => recharge;
+
         /// <summary>Le temps avant de pouvoir refrapper ; 0 : prête.</summary>
         public float Reste(int joueur) => restes.TryGetValue(joueur, out float r) ? Mathf.Max(0f, r) : 0f;
 

@@ -28,6 +28,12 @@ namespace Froggy.Regles
 
         public ReglesTorgnole Regles { get; private set; }
 
+        /// <summary>L'action « torgnole » : le HUD (P6-02) y lit la touche à afficher.</summary>
+        public InputAction ActionFrapper => frappe;
+
+        /// <summary>La recharge provisoire à l'écran : le HUD (P6-02) l'éteint quand il prend sa place.</summary>
+        public bool AffichageProvisoire { get => affichageProvisoire; set => affichageProvisoire = value; }
+
         /// <summary>Pour un test : des réglages et une partie de cookies à soi.</summary>
         public void Regler(ReglagesTorgnole r, PartieCookies p)
         {
