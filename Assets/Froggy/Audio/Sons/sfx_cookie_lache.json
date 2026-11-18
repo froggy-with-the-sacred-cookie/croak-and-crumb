@@ -1,0 +1,171 @@
+{
+  "generator": "sound-forge 0.6.0",
+  "preset": null,
+  "sound": {
+    "name": "Cookie lâché",
+    "layers": [
+      {
+        "name": "Le biscuit touche",
+        "waveform": "white_noise",
+        "pitch": {
+          "start": 485.0,
+          "end": 485.0,
+          "time": 0.008
+        },
+        "envelope": {
+          "attack": 0.0012,
+          "decay": 0.008,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "low_pass",
+          "cutoff": {
+            "start": 5100.0,
+            "end": 5100.0,
+            "time": 0.008
+          },
+          "resonance": 0.2
+        },
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.85,
+        "start": 0.0,
+        "resonator": {
+          "material": "wood",
+          "decay": 0.31,
+          "brightness": 0.32,
+          "dry": 0.12
+        }
+      },
+      {
+        "name": "Miettes au sol",
+        "waveform": "white_noise",
+        "pitch": {
+          "start": 440.0,
+          "end": 440.0,
+          "time": 0.11
+        },
+        "envelope": {
+          "attack": 0.004,
+          "decay": 0.11,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "band_pass",
+          "cutoff": {
+            "start": 3120.0,
+            "end": 1000.0,
+            "time": 0.11
+          },
+          "resonance": 0.2
+        },
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.48,
+        "start": 0.0,
+        "resonator": null
+      },
+      {
+        "name": "Premier rebond",
+        "waveform": "white_noise",
+        "pitch": {
+          "start": 608.0,
+          "end": 608.0,
+          "time": 0.008
+        },
+        "envelope": {
+          "attack": 0.0012,
+          "decay": 0.008,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "low_pass",
+          "cutoff": {
+            "start": 5100.0,
+            "end": 5100.0,
+            "time": 0.008
+          },
+          "resonance": 0.2
+        },
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.32,
+        "start": 0.064,
+        "resonator": {
+          "material": "wood",
+          "decay": 0.22,
+          "brightness": 0.39,
+          "dry": 0.12
+        }
+      },
+      {
+        "name": "Dernier rebond",
+        "waveform": "white_noise",
+        "pitch": {
+          "start": 580.0,
+          "end": 580.0,
+          "time": 0.008
+        },
+        "envelope": {
+          "attack": 0.0012,
+          "decay": 0.008,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "low_pass",
+          "cutoff": {
+            "start": 5100.0,
+            "end": 5100.0,
+            "time": 0.008
+          },
+          "resonance": 0.2
+        },
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.18,
+        "start": 0.118,
+        "resonator": {
+          "material": "wood",
+          "decay": 0.12,
+          "brightness": 0.4,
+          "dry": 0.12
+        }
+      }
+    ],
+    "effects": {
+      "drive": null,
+      "echo": null,
+      "reverb": null
+    },
+    "peak_db": -9.0
+  },
+  "variants": 4,
+  "amount": 0.31,
+  "seed": 61995,
+  "files": [
+    "sfx_cookie_lache_01.wav",
+    "sfx_cookie_lache_02.wav",
+    "sfx_cookie_lache_03.wav",
+    "sfx_cookie_lache_04.wav"
+  ]
+}

@@ -53,6 +53,9 @@ namespace Froggy.Deplacement
         /// </summary>
         public event System.Action<Collider> Atterrissage;
 
+        /// <summary>Une impulsion de saut a réellement été appliquée.</summary>
+        public event System.Action ImpulsionSaut;
+
         private void Initialiser()
         {
             if (pret) return;
@@ -152,7 +155,8 @@ namespace Froggy.Deplacement
             Vector3 horizontal = Vector3.MoveTowards(new Vector3(v.x, 0f, v.z), voulue, acceleration * dt);
 
             // la hauteur se donne, la vitesse se dérive
-            if (tampon > 0f && coyote > 0f)
+            bool saute = tampon > 0f && coyote > 0f;
+            if (saute)
             {
                 v.y = Mathf.Sqrt(2f * -Physics.gravity.y * reglages.jumpHeight * facteurSaut);
                 tampon = coyote = 0f;
@@ -168,6 +172,7 @@ namespace Froggy.Deplacement
             if (v.y <= 0f) montee = false;
 
             corps.linearVelocity = new Vector3(horizontal.x, v.y, horizontal.z);
+            if (saute) ImpulsionSaut?.Invoke();
         }
 
         /// <summary>La vitesse voulue au sol : x pas de côté, y avant / arrière, dans le repère du cap ; recul plus lent.</summary>

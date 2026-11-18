@@ -1,0 +1,126 @@
+{
+  "generator": "sound-forge 0.6.0",
+  "preset": null,
+  "sound": {
+    "name": "Pas sur le bois",
+    "layers": [
+      {
+        "name": "Planche",
+        "waveform": "white_noise",
+        "pitch": {
+          "start": 330.0,
+          "end": 330.0,
+          "time": 0.008
+        },
+        "envelope": {
+          "attack": 0.0012,
+          "decay": 0.008,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "low_pass",
+          "cutoff": {
+            "start": 5100.0,
+            "end": 5100.0,
+            "time": 0.008
+          },
+          "resonance": 0.2
+        },
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.84,
+        "start": 0.0,
+        "resonator": {
+          "material": "wood",
+          "decay": 0.31,
+          "brightness": 0.37,
+          "dry": 0.12
+        }
+      },
+      {
+        "name": "Poids du pied",
+        "waveform": "sine",
+        "pitch": {
+          "start": 179.0,
+          "end": 75.0,
+          "time": 0.081
+        },
+        "envelope": {
+          "attack": 0.004,
+          "decay": 0.081,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": null,
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.36,
+        "start": 0.0,
+        "resonator": null
+      },
+      {
+        "name": "Petite jointure",
+        "waveform": "white_noise",
+        "pitch": {
+          "start": 475.0,
+          "end": 475.0,
+          "time": 0.008
+        },
+        "envelope": {
+          "attack": 0.0012,
+          "decay": 0.008,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "low_pass",
+          "cutoff": {
+            "start": 5100.0,
+            "end": 5100.0,
+            "time": 0.008
+          },
+          "resonance": 0.2
+        },
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.32,
+        "start": 0.028,
+        "resonator": {
+          "material": "wood",
+          "decay": 0.22,
+          "brightness": 0.27,
+          "dry": 0.12
+        }
+      }
+    ],
+    "effects": {
+      "drive": null,
+      "echo": null,
+      "reverb": null
+    },
+    "peak_db": -12.0
+  },
+  "variants": 5,
+  "amount": 0.36,
+  "seed": 60654,
+  "files": [
+    "sfx_froggy_pas_bois_01.wav",
+    "sfx_froggy_pas_bois_02.wav",
+    "sfx_froggy_pas_bois_03.wav",
+    "sfx_froggy_pas_bois_04.wav",
+    "sfx_froggy_pas_bois_05.wav"
+  ]
+}

@@ -1,0 +1,243 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7bb47fe028294cc3a86da26a9a288d9, type: 3}
+  m_Name: Froggy_Sons
+  m_EditorClassIdentifier: Assembly-CSharp::Froggy.Audio.CatalogueSons
+  evenements:
+  - id: 0
+    variantes:
+    - {fileID: 8300000, guid: 108d41c6355764863ab8f76c25b1ce78, type: 3}
+    - {fileID: 8300000, guid: f5c5a9d33e2ab4678994daa4ea39af4e, type: 3}
+    - {fileID: 8300000, guid: 9870caa2969364497a7dc3904deced7b, type: 3}
+    - {fileID: 8300000, guid: 99a76fa258b404381abbcc58433a2971, type: 3}
+    - {fileID: 8300000, guid: 4835339c675ee49b8ba8aaf6d4326813, type: 3}
+    volume: 0.85
+    variationHauteur: 0.045
+    spatialisation: 1
+    priorite: 158
+    intervalleMinimal: 0
+    maxVoix: 4
+  - id: 1
+    variantes:
+    - {fileID: 8300000, guid: 48d361796e16c419ca062bc756fee165, type: 3}
+    - {fileID: 8300000, guid: 6280435b8cf624fa6bdd50adf5203097, type: 3}
+    - {fileID: 8300000, guid: 152a356cca1cc4431bd411dac38c30cd, type: 3}
+    - {fileID: 8300000, guid: 59b9e4327fc2f4468b4b9b740885a6eb, type: 3}
+    - {fileID: 8300000, guid: 3446b3eebb61b4b988737afb1b109ccc, type: 3}
+    volume: 0.85
+    variationHauteur: 0.045
+    spatialisation: 1
+    priorite: 158
+    intervalleMinimal: 0
+    maxVoix: 4
+  - id: 2
+    variantes:
+    - {fileID: 8300000, guid: 6a4e14ca3bf8b4909979da95df62dee3, type: 3}
+    - {fileID: 8300000, guid: 8d84101dd8ee345a9a5d09c3a6f1d2c0, type: 3}
+    - {fileID: 8300000, guid: ff5b9f8833df24f73a89378f3ed99aa6, type: 3}
+    - {fileID: 8300000, guid: e496a6bdb24664322a90ffa7c9a015ee, type: 3}
+    - {fileID: 8300000, guid: ae64d7a2ff85445bb9eed7211761d178, type: 3}
+    volume: 0.79
+    variationHauteur: 0.042
+    spatialisation: 1
+    priorite: 158
+    intervalleMinimal: 0
+    maxVoix: 4
+  - id: 3
+    variantes:
+    - {fileID: 8300000, guid: ee1042a52214f40c0b1500afadfcf346, type: 3}
+    - {fileID: 8300000, guid: 383f907b1a9f749e7827c97af7718ad4, type: 3}
+    - {fileID: 8300000, guid: ced601b9897904a6388541ac4988a558, type: 3}
+    - {fileID: 8300000, guid: 6da69a1233a5c430dbd91af24df62aff, type: 3}
+    - {fileID: 8300000, guid: ece7cf6759d654c398e3dc388999b505, type: 3}
+    volume: 0.84
+    variationHauteur: 0.042
+    spatialisation: 1
+    priorite: 158
+    intervalleMinimal: 0
+    maxVoix: 4
+  - id: 4
+    variantes:
+    - {fileID: 8300000, guid: ade2f3f2fa00c43879e6f135ffd99069, type: 3}
+    - {fileID: 8300000, guid: 681b5f6e63e9945839846a536dd6d2ff, type: 3}
+    - {fileID: 8300000, guid: 423f038847a1e41dcbf57f5ef7ac272b, type: 3}
+    - {fileID: 8300000, guid: 289a14ea795d8456eb2f6ea05a1b5ad5, type: 3}
+    - {fileID: 8300000, guid: 85abca81af2b44bb6a8328d7d0d2a374, type: 3}
+    volume: 0.88
+    variationHauteur: 0.043
+    spatialisation: 1
+    priorite: 158
+    intervalleMinimal: 0
+    maxVoix: 4
+  - id: 5
+    variantes:
+    - {fileID: 8300000, guid: fe6e61c10106c4cc0b3a13a02bbf48eb, type: 3}
+    - {fileID: 8300000, guid: c90b7ebd19513429e97a68a648fd9da5, type: 3}
+    - {fileID: 8300000, guid: a5fdb9dd3115c41afb9f7c98171aa691, type: 3}
+    - {fileID: 8300000, guid: 42d3ac130fa0648e083b361c1f5ddd69, type: 3}
+    volume: 0.89
+    variationHauteur: 0.038
+    spatialisation: 0.8
+    priorite: 116
+    intervalleMinimal: 0
+    maxVoix: 4
+  - id: 6
+    variantes:
+    - {fileID: 8300000, guid: 2bf1fd77032f74ac09c87ce5ee32bb63, type: 3}
+    - {fileID: 8300000, guid: a5ddec14b1c6040988e538a696506ad2, type: 3}
+    - {fileID: 8300000, guid: 06a6842a09af6452b8719921c7138d33, type: 3}
+    - {fileID: 8300000, guid: 13a3a5b32e3244ad7b5ac3d85c31d2cd, type: 3}
+    volume: 0.95
+    variationHauteur: 0.037
+    spatialisation: 0.85
+    priorite: 105
+    intervalleMinimal: 0
+    maxVoix: 4
+  - id: 7
+    variantes:
+    - {fileID: 8300000, guid: cc49923e9028247f99af233b0226c2f5, type: 3}
+    - {fileID: 8300000, guid: 134cc1e2ea52640cdb4260b34718eb82, type: 3}
+    - {fileID: 8300000, guid: 15b2b2dbaa06a4daf965c921b1f715a5, type: 3}
+    - {fileID: 8300000, guid: e2857d4b6e956402d937cefa1bf86642, type: 3}
+    volume: 0.9
+    variationHauteur: 0.03
+    spatialisation: 0.92
+    priorite: 91
+    intervalleMinimal: 0
+    maxVoix: 4
+  - id: 8
+    variantes:
+    - {fileID: 8300000, guid: c5d0a562cd63b44cea880de1fa822c95, type: 3}
+    - {fileID: 8300000, guid: 0615efcdbedd44f4bb80c56fa4403886, type: 3}
+    - {fileID: 8300000, guid: 2860efb910d4b4d469db92c3a34ee95e, type: 3}
+    - {fileID: 8300000, guid: e5b5c2a9bed3b4d50bc6d8fc11f43123, type: 3}
+    - {fileID: 8300000, guid: 20e2701d103e9427b8daf233481fd99c, type: 3}
+    volume: 0.85
+    variationHauteur: 0.042
+    spatialisation: 1
+    priorite: 155
+    intervalleMinimal: 0
+    maxVoix: 4
+  - id: 9
+    variantes:
+    - {fileID: 8300000, guid: 34b0757c0e56b4cf1a47e1f063173dd6, type: 3}
+    - {fileID: 8300000, guid: 22838fde28fea466aac45ef7d73d2e42, type: 3}
+    - {fileID: 8300000, guid: 5dc56d9af7b33487da5a86aba7e58232, type: 3}
+    - {fileID: 8300000, guid: d546f032062b44e438d59fc3ee04896c, type: 3}
+    volume: 0.79
+    variationHauteur: 0.05
+    spatialisation: 0.95
+    priorite: 94
+    intervalleMinimal: 0
+    maxVoix: 4
+  - id: 10
+    variantes:
+    - {fileID: 8300000, guid: c7fd4397dd6194ff88699b1ef9af386a, type: 3}
+    - {fileID: 8300000, guid: c22b2b4fd38c14e059555e9d1ed284be, type: 3}
+    - {fileID: 8300000, guid: 07816bb4dc9d148918d66c50f94d9666, type: 3}
+    - {fileID: 8300000, guid: eed37d8b47a5f4671a4db557c1e20718, type: 3}
+    volume: 0.88
+    variationHauteur: 0.031
+    spatialisation: 0.83
+    priorite: 56
+    intervalleMinimal: 0
+    maxVoix: 4
+  - id: 11
+    variantes:
+    - {fileID: 8300000, guid: 691a0d8a2e8cf40979c40068f2a16a2a, type: 3}
+    - {fileID: 8300000, guid: c76d25d0083524158b1a524a23b86c26, type: 3}
+    - {fileID: 8300000, guid: 7c8f8fbf3833249e39b04d99a1aacb56, type: 3}
+    - {fileID: 8300000, guid: 2cc98f7ec15f84d1584f650669c442bb, type: 3}
+    volume: 0.91
+    variationHauteur: 0.026
+    spatialisation: 0.78
+    priorite: 92
+    intervalleMinimal: 0
+    maxVoix: 4
+  - id: 12
+    variantes:
+    - {fileID: 8300000, guid: b0576d8afbffc465d94519b5fb3cf7ea, type: 3}
+    - {fileID: 8300000, guid: f735b8366ba9144988873df268e9fb85, type: 3}
+    - {fileID: 8300000, guid: b35e642dc179b409f8a924421054596a, type: 3}
+    - {fileID: 8300000, guid: 3164c2db883994b5aa120397ed144622, type: 3}
+    volume: 0.88
+    variationHauteur: 0.03
+    spatialisation: 0.9
+    priorite: 97
+    intervalleMinimal: 0
+    maxVoix: 4
+  - id: 13
+    variantes:
+    - {fileID: 8300000, guid: 75f7472703a464438ba3c826b7c140b1, type: 3}
+    - {fileID: 8300000, guid: a3afbf28d5c5b4bef88b2dde2745c347, type: 3}
+    - {fileID: 8300000, guid: e200edafa00ff42c4812635c05f38e33, type: 3}
+    volume: 0.91
+    variationHauteur: 0.03
+    spatialisation: 0.83
+    priorite: 92
+    intervalleMinimal: 0
+    maxVoix: 3
+  - id: 14
+    variantes:
+    - {fileID: 8300000, guid: 01df885141f3b4544a922f79f944abaa, type: 3}
+    - {fileID: 8300000, guid: e1e7cd393b0b542c59911c076f17869b, type: 3}
+    - {fileID: 8300000, guid: 8020134a9257b4a61b41d736308f3940, type: 3}
+    volume: 0.91
+    variationHauteur: 0.025
+    spatialisation: 0.84
+    priorite: 51
+    intervalleMinimal: 0
+    maxVoix: 3
+  - id: 15
+    variantes:
+    - {fileID: 8300000, guid: 1da4110215bd34336825950e807bbb46, type: 3}
+    - {fileID: 8300000, guid: 4b1793a73fc6d4d5fa402e40bed1062e, type: 3}
+    - {fileID: 8300000, guid: 110438b27e54542fcb7f2d48dd656342, type: 3}
+    volume: 0.89
+    variationHauteur: 0.026
+    spatialisation: 0.78
+    priorite: 49
+    intervalleMinimal: 0
+    maxVoix: 3
+  - id: 16
+    variantes:
+    - {fileID: 8300000, guid: 1a2c47b485cf34a9f92910a3ef90837e, type: 3}
+    - {fileID: 8300000, guid: e382a068634064d52a63b616f05b5878, type: 3}
+    - {fileID: 8300000, guid: bbd027e607dce45a28198563f6be1f06, type: 3}
+    volume: 0.89
+    variationHauteur: 0.025
+    spatialisation: 0.86
+    priorite: 56
+    intervalleMinimal: 0
+    maxVoix: 3
+  - id: 17
+    variantes:
+    - {fileID: 8300000, guid: 95a1635c02fcf4362bce138a3af7377d, type: 3}
+    - {fileID: 8300000, guid: 3b4a1ff5d11e741249319e9558fb1453, type: 3}
+    - {fileID: 8300000, guid: f87fff8d2b4914c3a8e5e5c94e614a7f, type: 3}
+    volume: 0.87
+    variationHauteur: 0.012
+    spatialisation: 0.4
+    priorite: 24
+    intervalleMinimal: 0.25
+    maxVoix: 1
+  - id: 18
+    variantes:
+    - {fileID: 8300000, guid: db388a1d01b514403b10d3210cddbf7a, type: 3}
+    - {fileID: 8300000, guid: a512596edef65436783b40c4ed38af51, type: 3}
+    - {fileID: 8300000, guid: b54d7650fa59943feaeb86ff16df1266, type: 3}
+    volume: 0.9
+    variationHauteur: 0.015
+    spatialisation: 0.51
+    priorite: 22
+    intervalleMinimal: 0
+    maxVoix: 2
