@@ -6,7 +6,7 @@ namespace Froggy.Deplacement
     [CreateAssetMenu(fileName = "ReglagesNage", menuName = "Froggy/Déplacement/Réglages de la nage")]
     public class ReglagesNage : ScriptableObject
     {
-        [Tooltip("Vitesse de nage, en part de la vitesse de course au sol (pas de sprint dans l'eau).")]
+        [Tooltip("Vitesse de nage, en part de la vitesse de course au sol (pas de dash dans l'eau).")]
         [Range(0.1f, 1.5f)] public float facteurVitesse = 0.6f;
 
         [Tooltip("Accélération horizontale dans l'eau, en m/s² : assez forte pour un demi-tour net (skill ressenti-mouvement).")]

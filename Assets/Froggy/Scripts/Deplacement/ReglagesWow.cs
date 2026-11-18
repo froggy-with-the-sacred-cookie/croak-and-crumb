@@ -3,7 +3,7 @@ using UnityEngine;
 namespace Froggy.Deplacement
 {
     /// <summary>
-    /// Réglages propres au déplacement à la World of Warcraft (DeplacementWow). La course, le sprint et le saut restent
+    /// Réglages propres au déplacement à la World of Warcraft (DeplacementWow). La course et le saut restent
     /// ceux de TemplateMovementSettings. Toutes PROVISOIRES.
     /// </summary>
     [CreateAssetMenu(fileName = "ReglagesWow", menuName = "Froggy/Vitrine/Réglages du déplacement à la WoW")]

@@ -246,6 +246,19 @@ namespace Froggy.Interface
                 e.ToucheTorgnole = Touche(torgnoles.ActionFrapper);
             }
 
+            // le dash (#134) : celui de la Froggy de ce joueur, qu'il y ait une partie ou non
+            var dash = PartieDash.Actuel;
+            Deplacement.DeplacementWow froggy = dash != null ? dash.JoueurLocal() : null;
+            e.DashConnu = froggy != null && dash.Regles != null;
+            if (e.DashConnu)
+            {
+                int cle = dash.Cle(froggy);
+                e.RechargeDash = dash.Regles.Reste(cle);
+                e.DureeRechargeDash = dash.Regles.DureeRecharge;
+                e.Assomme = dash.Regles.Assomme(cle);
+                e.ToucheDash = Touche(dash.ActionDash);
+            }
+
             e.Meteo = null;
             if (meteo != null && meteo.EnMarche && meteo.Regles != null && meteo.Courant != null)
             {
@@ -292,8 +305,8 @@ namespace Froggy.Interface
         }
 
         /// <summary>
-        /// Le joueur de cette machine : en réseau, son numéro dans le salon ; sinon la Froggy qui a un PlayerInput (comme
-        /// PartieTorgnoles.JoueurLocal).
+        /// Le joueur de cette machine : en réseau, son numéro dans le salon ; sinon la Froggy dont le PlayerInput est
+        /// allumé (comme PartieTorgnoles.JoueurLocal et BotsPartie.Humain).
         /// </summary>
         private int JoueurLocal()
         {
@@ -305,8 +318,19 @@ namespace Froggy.Interface
             }
             if (cookies != null)
                 foreach (var p in cookies.Porteurs)
-                    if (p != null && p.TryGetComponent(out PlayerInput _)) return p.Joueur;
+                    if (EstJoueurLocal(p)) return p.Joueur;
             return ReglesPartie.Personne;
+        }
+
+        /// <summary>
+        /// Vrai pour la Froggy du joueur de cette machine : un PlayerInput <b>allumé</b>, et pas de cerveau de bot. Un bot
+        /// garde un PlayerInput éteint (exigé par FroggyApparence) : le reconnaître à la seule présence du composant
+        /// faisait afficher son score sur la ligne « (toi) » (#132, 18 novembre 2026).
+        /// </summary>
+        public static bool EstJoueurLocal(Component froggy)
+        {
+            return froggy != null && froggy.TryGetComponent(out PlayerInput entree) && entree.enabled
+                   && !froggy.TryGetComponent(out Bots.CerveauBot _);
         }
 
         /// <summary>La couleur du joueur : celle choisie au salon en réseau, sinon celle de son repère d'apparition.</summary>
@@ -400,7 +424,8 @@ namespace Froggy.Interface
         private void OnGUI()
         {
             var e = etat;
-            bool rien = !e.PartieConnue && e.Joueurs.Count == 0 && !e.ObjetsConnus && !e.TorgnoleConnue && string.IsNullOrEmpty(e.Meteo);
+            bool rien = !e.PartieConnue && e.Joueurs.Count == 0 && !e.ObjetsConnus && !e.TorgnoleConnue && string.IsNullOrEmpty(e.Meteo)
+                        && !e.DashConnu;
             if (rien) return;
             Styles();
             float w = Screen.width, h = Screen.height;
@@ -531,6 +556,20 @@ namespace Froggy.Interface
                     e.RechargeTorgnole > 0f ? Gris : Color.white);
                 Jauge(new Rect(zone.x + S(16f), zone.yMax - S(14f), zone.width - S(32f), S(6f)),
                     ContenuHud.Jauge(e.RechargeTorgnole, e.DureeRechargeTorgnole), e.RechargeTorgnole > 0f);
+                bas = zone.y - S(8f);
+            }
+            // le dash (#134), juste au-dessus de la torgnole : même panneau, même jauge
+            string dash = ContenuHud.Dash(e);
+            if (dash.Length > 0)
+            {
+                bool attente = e.RechargeDash > 0f || e.Assomme;
+                float largeur = Mathf.Max(S(300f), gauche.CalcSize(new GUIContent(dash)).x + S(32f));
+                var zone = new Rect(w - largeur - marge, bas - S(60f), largeur, S(60f));
+                Panneau(zone, Fond);
+                Ecrire(new Rect(zone.x + S(16f), zone.y + S(4f), zone.width - S(32f), S(40f)), dash, gauche,
+                    e.Assomme ? Or : attente ? Gris : Color.white);
+                Jauge(new Rect(zone.x + S(16f), zone.yMax - S(14f), zone.width - S(32f), S(6f)),
+                    ContenuHud.Jauge(e.RechargeDash, e.DureeRechargeDash), attente);
                 bas = zone.y - S(8f);
             }
             if (messageTorgnole != null && Time.unscaledTime < finTorgnole)

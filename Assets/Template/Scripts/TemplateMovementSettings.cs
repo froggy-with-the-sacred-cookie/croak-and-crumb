@@ -13,9 +13,6 @@ namespace Froggy.Template
         [Tooltip("Vitesse au sol, en m/s. PROVISOIRE.")]
         public float moveSpeed = 6f;
 
-        [Tooltip("Multiplicateur quand Sprint est tenu. PROVISOIRE.")]
-        public float sprintMultiplier = 1.6f;
-
         [Tooltip("Accélération au sol, en m/s². Grand = réponse nette. PROVISOIRE.")]
         public float groundAcceleration = 60f;
 

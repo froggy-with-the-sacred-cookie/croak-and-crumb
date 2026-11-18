@@ -8,7 +8,7 @@ namespace Froggy.Bots
 {
     /// <summary>
     /// Le cerveau d'une Froggy jouée par l'ordinateur (P3-05). Il ne triche pas : il « appuie » sur les mêmes commandes
-    /// qu'un humain (DeplacementWow.Imposer : avancer, sauter, sprinter ; NageFroggy.Imposer : plonger), se tourne comme
+    /// qu'un humain (DeplacementWow.Imposer : avancer, sauter ; PartieDash.Dasher : dasher ; NageFroggy.Imposer : plonger), se tourne comme
     /// la caméra tourne Froggy, et frappe par PartieTorgnoles.Frapper comme la touche V. Il subit donc la même physique,
     /// la pluie, les malus et les recharges.
     /// Toutes les « tempsReaction » secondes, il lit la partie et décide (ReglesBot) ; entre deux décisions, il suit son
@@ -42,6 +42,9 @@ namespace Froggy.Bots
 
         /// <summary>Ce qu'il veut faire en ce moment (menu de debug, tests).</summary>
         public IntentionBot Intention { get; private set; }
+
+        /// <summary>Nombre de dashs depuis le début (tests, réglages).</summary>
+        public int Dashs { get; private set; }
 
         /// <summary>Nombre de torgnoles données depuis le début (tests, réglages).</summary>
         public int Torgnoles { get; private set; }
@@ -132,6 +135,7 @@ namespace Froggy.Bots
             }
 
             if (moi != null && torgnoles != null && torgnoles.Regles != null) s.torgnolePrete = torgnoles.Regles.Prete(moi.Joueur);
+            s.dashPret = PartieDash.Actuel != null && PartieDash.Actuel.Pret(deplacement);
 
             var objet = GetComponent<PorteurObjet>();
             if (objet != null)
@@ -156,6 +160,7 @@ namespace Froggy.Bots
             var intention = Intention;
             var entrees = new DeplacementWow.Entrees();
             Vector3 position = corps.position;
+            bool face = false;
 
             if (intention.sorte != IntentionBot.Sorte.Attendre)
             {
@@ -169,7 +174,7 @@ namespace Froggy.Bots
                     float tourne = Mathf.Clamp(ecart, -reglages.vitesseRotation * dt, reglages.vitesseRotation * dt);
                     corps.rotation = Quaternion.Euler(0f, corps.rotation.eulerAngles.y + tourne, 0f);
                     entrees.deplacement = new Vector2(0f, Mathf.Abs(ecart) < 60f ? 1f : 0.2f);   // il ralentit pour tourner
-                    entrees.sprint = intention.sprint;
+                    face = Mathf.Abs(ecart) < 25f;
 
                     // sauter : le chemin monte juste devant, ou il est bloqué (rebord, rive, nénuphar)
                     float vitesse = new Vector3(corps.linearVelocity.x, 0f, corps.linearVelocity.z).magnitude;
@@ -187,8 +192,20 @@ namespace Froggy.Bots
             entrees.sautTenu = sautTenu > 0f;
             deplacement.Imposer(entrees);
 
+            if (face) Dasher(intention);
             Frapper(intention);
             if (intention.utiliserObjet) UtiliserObjet();
+        }
+
+        // le dash (#134) part devant lui, vers où il va : seulement une fois tourné vers son chemin, un par décision
+        private void Dasher(IntentionBot intention)
+        {
+            if (!intention.dash || PartieDash.Actuel == null) return;
+            if (!PartieDash.Actuel.Dasher(deplacement)) return;
+            Dashs++;
+            var i = Intention;
+            i.dash = false;
+            Intention = i;
         }
 
         private void Frapper(IntentionBot intention)

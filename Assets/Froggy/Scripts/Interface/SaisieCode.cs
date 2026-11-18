@@ -14,7 +14,7 @@ namespace Froggy.Interface
     /// </summary>
     public sealed class SaisieCode : Selectable, ISubmitHandler, IPointerClickHandler
     {
-        private readonly CodeEnSaisie saisie = new CodeEnSaisie();
+        private CodeEnSaisie saisie = new CodeEnSaisie();
         private Image[] cases;
         private Image[] bords;
         private Text[] lettres;
@@ -28,11 +28,15 @@ namespace Froggy.Interface
 
         public CodeEnSaisie Saisie => saisie;
 
-        /// <summary>Fabrique le champ : 4 cases de 104 × 120, espacées de 18.</summary>
-        public static SaisieCode Construire(FabriqueMenu f, Transform parent, Vector2 position)
+        /// <summary>
+        /// Fabrique le champ : une case par caractère du code (4 en réseau local, 6 en ligne, P2-05), de 104 × 120,
+        /// espacées de 18.
+        /// </summary>
+        public static SaisieCode Construire(FabriqueMenu f, Transform parent, Vector2 position, bool enLigne = true)
         {
             const float largeurCase = 104f, hauteur = 120f, ecart = 18f;
-            int n = Reseau.CodeSalon.Longueur;
+            var saisieDuMode = new CodeEnSaisie(enLigne);
+            int n = saisieDuMode.Longueur;
             float largeur = n * largeurCase + (n - 1) * ecart;
 
             Image zone = FabriqueMenu.Arrondi("Code du salon", parent, true, new Color(1f, 1f, 1f, 0f));
@@ -40,6 +44,7 @@ namespace Froggy.Interface
             FabriqueMenu.Placer(zone.rectTransform, position, new Vector2(largeur + 24f, hauteur + 24f));
 
             var champ = zone.gameObject.AddComponent<SaisieCode>();
+            champ.saisie = saisieDuMode;
             champ.targetGraphic = zone;
             champ.transition = Transition.None;
             champ.cases = new Image[n];

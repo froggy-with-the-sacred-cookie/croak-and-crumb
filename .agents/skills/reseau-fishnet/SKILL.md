@@ -1,6 +1,6 @@
 ---
 name: reseau-fishnet
-description: API et pièges de FishNet 4.7.4 tel qu'installé dans Froggy (version épinglée, prédiction Replicate/Reconcile, PredictionRigidbody, NetworkTickSmoother, simulateur de latence, ping, connexions, transport Tugboat, port, NetworkManager d'une scène, salon, SyncVar/SyncList, ServerRpc, authentification, chargement de scènes, objets globaux). À charger AVANT d'écrire ou de modifier un script qui utilise FishNet, un prefab réseau, un NetworkManager, ou de toucher à la version du paquet. Aussi quand « le port est déjà pris », « Server failed to start », « SpawnablePrefabs is null », que les boutons Server / Client ne répondent pas, qu'un joueur compte double, ou que le ping semble faux.
+description: API et pièges de FishNet 4.7.4 tel qu'installé dans Froggy (version épinglée, prédiction Replicate/Reconcile, PredictionRigidbody, NetworkTickSmoother, simulateur de latence, ping, connexions, transport Tugboat, port, NetworkManager d'une scène, salon, SyncVar/SyncList, ServerRpc, authentification, chargement de scènes, objets globaux, Unity Relay, transport Unity, Unity Cloud). À charger AVANT d'écrire ou de modifier un script qui utilise FishNet, un prefab réseau, un NetworkManager, ou de toucher à la version du paquet. Aussi quand « le port est déjà pris », « Server failed to start », « SpawnablePrefabs is null », que les boutons Server / Client ne répondent pas, qu'un joueur compte double, ou que le ping semble faux.
 ---
 
 # FishNet dans Froggy
@@ -155,3 +155,30 @@ Exemple : `Assets/Froggy/Scripts/Reseau/Partie/PartieReseau.cs`.
   l'image suivante ; attendre une image (coroutine) avant de commencer.
 - Vérifier « en même temps » sans dépendre du réseau : poser les deux joueurs sur le cookie **pendant le compte à
   rebours** (règles en pause), la décision se fait au premier pas de jeu.
+
+## 10. Jouer par internet : Unity Relay (P2-05)
+
+Exemple : `Assets/Froggy/Scripts/Reseau/Salon/RelaisSalon.cs` et `Salon.cs` (`CreerEnLigne`, `RejoindreEnLigne`).
+
+- **Paquets** : `com.unity.services.multiplayer` 2.4.1 (pas `com.unity.services.relay`, déprécié et en conflit, pas
+  Netcode). Dans Unity 6.6, `com.unity.transport` se résout en **6.6.0** (paquet du moteur). FishyUnityTransport
+  2.0.0-pre.2 compile et marche avec FishNet 4.7.4 (vérifié le 18/11/2026) ; il est **copié dans `Packages/`** avec
+  la correction de sa PR #32 (une ligne, repérée « FROGGY »). Ne pas le remplacer par l'URL git officielle sans
+  vérifier que la correction y est.
+- **Transport choisi une fois** : `TransportManager` prend le premier composant `Transport` du NetworkManager au
+  démarrage (sinon il ajoute Tugboat) ; pas de changement de transport en cours de jeu. Le transport Unity sait aussi
+  la connexion directe : `SetConnectionData(adresse, port, ecoute)` (remet le mode direct), il ne lit pas
+  « localhost » (mettre `127.0.0.1`).
+- **Relais** (noms lus dans le paquet installé) : `UnityServices.InitializeAsync(new InitializationOptions().SetProfile(p))`,
+  `AuthenticationService.Instance.SignInAnonymouslyAsync()` ; hôte `RelayService.Instance.CreateAllocationAsync(n - 1)`,
+  `GetJoinCodeAsync(allocation.AllocationId)`, `allocation.ToRelayServerData("dtls")`, `transport.SetRelayServerData(...)`,
+  puis `ServerManager.StartConnection()` et `ClientManager.StartConnection()` ; client `JoinAllocationAsync(code)`,
+  `SetRelayServerData`, `ClientManager.StartConnection()`. Erreurs : `RelayServiceException.Reason`
+  (`JoinCodeNotFound`, `InvalidRequest` pour un faux code, `RateLimited`, `InactiveProject`).
+- **Code** : 6 majuscules et chiffres (vus : `8NTDNR`, `TMQJWD`) ; accepté tapé en minuscules.
+- **Profil par fenêtre MPPM** (lettres, chiffres, - et _, 30 caractères), sinon toutes les fenêtres sont le même joueur.
+- **Projet relié à Unity Cloud** : le jeu lit `Application.cloudProjectId` (code de `services.core`). Si la page
+  Services de l'éditeur reste « signed out » (Hub du Microsoft Store), écrire l'identifiant dans
+  `ProjectSettings.asset` par `SerializedObject` sur `ProjectSettings/ProjectSettings.asset` : le jeu marche,
+  `CloudProjectSettings` (éditeur) reste vide. `UnityConnect.BindProject` (interne) ne fait rien si déconnecté.
+- **Fermer un hôte** : serveur d'abord, puis client (sinon « stale connection » en rouge dans le transport Unity).

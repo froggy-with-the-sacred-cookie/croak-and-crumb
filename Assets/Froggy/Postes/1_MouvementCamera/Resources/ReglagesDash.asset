@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1682c46b6b8af4cd4b4f010361c349fa, type: 3}
+  m_Name: ReglagesDash
+  m_EditorClassIdentifier: Assembly-CSharp::Froggy.Regles.ReglagesDash
+  distance: 4
+  duree: 0.2
+  recharge: 3
+  rayonChoc: 1.1
+  recul: 9
+  dureeAssomme: 1.5
+  visuelProvisoire: 1

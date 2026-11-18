@@ -93,6 +93,13 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
   cache jusqu'au retour. Les écrans ne passent que par `Salon.Local` ; leurs textes sont dans `ContenuSalle` (C# pur).
   Les réglages du joueur (volumes, secousses, flashs, vibrations, de 0 à 1) : `ReglagesJoueur.Actuels`, à lire au
   moment où l'effet part ; les tests écrivent dans un fichier de test, jamais dans le vrai.
+- Partie complète : `Assets/Froggy/Scenes/Partie_JardinJaponais.unity`, lancée par « Solo » (avec 3 bots). Comme une
+  scène de test, elle charge le jardin par-dessus (`DecorDeTest`) et assemble tous les systèmes avec leurs vrais
+  réglages (3 min, météo du jardin). **Un nouveau système de jeu s'y ajoute aussi**, pas seulement dans la scène de test
+  de son poste, sans ses outils `Essai…`. Ses repères sont provisoires : à placer au Bâtisseur. Le salon charge encore la
+  vitrine tant que les objets, la torgnole, la météo et le cookie sacré ne sont pas en réseau. `PartieJardinTests`
+  vérifie que chaque système y est une fois, et **échoue si un système d'une scène de test de poste y manque**. En
+  partie, Échap ou Start ouvre la pause (`MenuPause` : reprendre, rejouer, retour au menu ; le solo se fige).
 - Froggy en ligne (`Assets/Froggy/Scripts/Reseau/FroggyReseau.cs`, P2-02, première version sans prédiction) : le salon
   fait apparaître `Prefabs/Reseau/FroggyReseau` pour chaque joueur, un objet réseau invisible (NetworkTransform, client
   autoritaire) plus une copie de la Froggy du jardin (`PlayerTemplate`), faite sur chaque machine comme les bots.
@@ -107,6 +114,14 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
   cinématiques (super croassement) joue partout et pousse chaque Froggy chez son propriétaire. Une nouvelle mécanique
   de partie s'ajoute à ce préfabriqué avec son script réseau ; la tester à deux fenêtres (skill
   `test-multijoueur-local`, section 7).
+  joueur dans le salon. Prévu avec la #128 : un effet qui déplace un joueur (coup, onde, gel) se décide chez l'hôte puis
+  s'applique chez le propriétaire de la Froggy touchée. Revenir aux capsules de test : `prefabJoueur` du `Salon.prefab` sur `CapsuleReseau`.
+- **Pas de sprint : un dash** (#134, décision de Florent du 18/11/2026). Action « Dash » de l'Input System (Maj gauche,
+  R1). Au sol seulement, 4 m en 0,2 s, recharge 3 s (`Postes/1_MouvementCamera/Resources/ReglagesDash.asset`). Le
+  geste est dans `DeplacementWow.Dasher` (sauter ou quitter le sol le coupe à la vitesse de course : les portées de
+  saut ne changent pas) ; `ReglesDash` (C# pur) tient recharges et assommements ; `PartieDash` s'installe seul en jeu,
+  lit la touche du joueur local, bouscule la Froggy percutée et assomme les deux si elles dashaient toutes les deux.
+  Un bot ou l'hôte dashe par `PartieDash.Actuel.Dasher(froggy)`. Pas encore en réseau pour le choc (avec la #128).
 
 ## Les branches
 

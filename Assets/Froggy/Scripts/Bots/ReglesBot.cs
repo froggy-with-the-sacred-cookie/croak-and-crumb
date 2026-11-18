@@ -18,7 +18,7 @@ namespace Froggy.Bots
         public bool enJeu = true;
         public Vector3 position, avant = Vector3.forward;
         public int cookies;
-        public bool porteSacre, torgnolePrete = true, aUnObjet, objetPret;
+        public bool porteSacre, torgnolePrete = true, aUnObjet, objetPret, dashPret;
         public readonly List<RivalVu> rivaux = new List<RivalVu>();
         public readonly List<Vector3> cookiesVisibles = new List<Vector3>();
         public readonly List<Vector3> boites = new List<Vector3>();
@@ -49,7 +49,9 @@ namespace Froggy.Bots
         public Vector3 but;
         /// <summary>Le joueur visé, ou 0.</summary>
         public int cible;
-        public bool frapper, utiliserObjet, sprint;
+        public bool frapper, utiliserObjet;
+        /// <summary>Dasher maintenant (#134) : rattraper, fuir ; jamais pour un simple cookie.</summary>
+        public bool dash;
         /// <summary>Pourquoi, en mots : pour le menu de debug et les tests.</summary>
         public string raison;
     }
@@ -86,15 +88,15 @@ namespace Froggy.Bots
                 if (proche < 0) return Attendre(objet, "porte le cookie sacré, personne autour");
                 var menace = s.rivaux[proche];
                 if (dProche <= r.porteeFrappe && s.torgnolePrete) return Frapper(menace, r, objet, "coincé avec le cookie sacré : riposte");
-                return Fuir(menace.position, menace.joueur, r, objet, "porte le cookie sacré : fuit");
+                return Fuir(s, menace.position, menace.joueur, r, objet, "porte le cookie sacré : fuit");
             }
 
             // 2. le cookie sacré est en jeu : tous dessus
-            if (s.gobelin.HasValue) return Aller(s.gobelin.Value, 0, r.sprinter, objet, "poursuit le gobelin");
-            if (s.sacreAuSol.HasValue) return Aller(s.sacreAuSol.Value, 0, r.sprinter, objet, "court au cookie sacré");
+            if (s.gobelin.HasValue) return Aller(s.gobelin.Value, 0, DashVers(s, r, s.gobelin.Value), objet, "poursuit le gobelin");
+            if (s.sacreAuSol.HasValue) return Aller(s.sacreAuSol.Value, 0, DashVers(s, r, s.sacreAuSol.Value), objet, "court au cookie sacré");
             for (int i = 0; i < s.rivaux.Count; i++)
                 if (s.rivaux[i].porteSacre)
-                    return Chasser(s, s.rivaux[i], r, alea, objet, r.sprinter, "chasse le porteur du cookie sacré");
+                    return Chasser(s, s.rivaux[i], r, alea, objet, true, "chasse le porteur du cookie sacré");
 
             // 3. chargé et menacé par un moins chargé (lui a tout à gagner) : s'éloigner, riposter si coincé
             if (s.cookies > 0)
@@ -104,15 +106,15 @@ namespace Froggy.Bots
                 if (m >= 0)
                 {
                     if (dm <= r.porteeFrappe && s.torgnolePrete) return Frapper(s.rivaux[m], r, objet, "coincé : riposte");
-                    return Fuir(s.rivaux[m].position, s.rivaux[m].joueur, r, objet, $"porte {s.cookies} cookie(s) : s'éloigne");
+                    return Fuir(s, s.rivaux[m].position, s.rivaux[m].joueur, r, objet, $"porte {s.cookies} cookie(s) : s'éloigne");
                 }
             }
 
             // 4. un leader qui s'envole : on va le chercher, même de loin (contre la boule de neige)
             int leader = PlusCharge(s, r.rayonLeader);
             if (leader >= 0 && s.rivaux[leader].cookies >= s.cookies + r.ecartLeader)
-                // en sprint : le leader chargé fuit en sprintant, à pied on ne le rattrapait jamais (essai du 18 novembre 2026)
-                return Chasser(s, s.rivaux[leader], r, alea, objet, r.sprinter, $"chasse le leader, joueur {s.rivaux[leader].joueur}");
+                // un dash pour combler l'écart quand il est à portée (le sprint, retiré le 18 novembre 2026, servait à ça)
+                return Chasser(s, s.rivaux[leader], r, alea, objet, true, $"chasse le leader, joueur {s.rivaux[leader].joueur}");
 
             // 5. un rival chargé tout près : le plus chargé
             int cookie = PlusProchePoint(s.cookiesVisibles, s.position, out float dCookie);
@@ -142,9 +144,18 @@ namespace Froggy.Bots
             return position + loin.normalized * distance;
         }
 
-        private static IntentionBot Chasser(SituationBot s, RivalVu rival, ReglagesBot r, System.Random alea, bool objet, bool sprint, string raison)
+        /// <summary>Un dash vers « but » : s'il est prêt et que le but est à portée de dash (ni trop près, ni trop loin).</summary>
+        public static bool DashVers(SituationBot s, ReglagesBot r, Vector3 but)
         {
-            var i = Aller(rival.position, rival.joueur, sprint, objet, raison);
+            if (!r.dasher || !s.dashPret) return false;
+            float d = Distance(s.position, but);
+            return d >= r.dashMin && d <= r.dashMax;
+        }
+
+        private static IntentionBot Chasser(SituationBot s, RivalVu rival, ReglagesBot r, System.Random alea, bool objet, bool presse, string raison)
+        {
+            // pressé (leader, porteur du cookie sacré) : un dash pour le rattraper, ou le bousculer, quand il est à portée
+            var i = Aller(rival.position, rival.joueur, presse && !rival.intouchable && DashVers(s, r, rival.position), objet, raison);
             // brouillon : parfois il frappe de trop loin, et rate
             float portee = alea != null && alea.NextDouble() < r.chanceRater ? r.porteeFrappe + 1f : r.porteeFrappe;
             i.frapper = s.torgnolePrete && !rival.intouchable && Distance(s.position, rival.position) <= portee;
@@ -158,11 +169,16 @@ namespace Froggy.Bots
             return i;
         }
 
-        private static IntentionBot Aller(Vector3 but, int cible, bool sprint, bool objet, string raison) =>
-            new IntentionBot { sorte = IntentionBot.Sorte.Aller, but = but, cible = cible, sprint = sprint, utiliserObjet = objet, raison = raison };
+        private static IntentionBot Aller(Vector3 but, int cible, bool dash, bool objet, string raison) =>
+            new IntentionBot { sorte = IntentionBot.Sorte.Aller, but = but, cible = cible, dash = dash, utiliserObjet = objet, raison = raison };
 
-        private static IntentionBot Fuir(Vector3 menace, int joueur, ReglagesBot r, bool objet, string raison) =>
-            new IntentionBot { sorte = IntentionBot.Sorte.Fuir, but = menace, cible = joueur, sprint = r.sprinter, utiliserObjet = objet, raison = raison };
+        // fuir : un dash quand la menace est toute proche (le bot se sert de la position dans la situation)
+        private static IntentionBot Fuir(SituationBot s, Vector3 menace, int joueur, ReglagesBot r, bool objet, string raison) =>
+            new IntentionBot
+            {
+                sorte = IntentionBot.Sorte.Fuir, but = menace, cible = joueur, utiliserObjet = objet, raison = raison,
+                dash = r.dasher && s.dashPret && Distance(s.position, menace) <= r.dashFuite,
+            };
 
         private static IntentionBot Attendre(bool objet, string raison) =>
             new IntentionBot { sorte = IntentionBot.Sorte.Attendre, utiliserObjet = objet, raison = raison };

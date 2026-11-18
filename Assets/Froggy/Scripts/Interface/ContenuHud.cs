@@ -49,6 +49,11 @@ namespace Froggy.Interface
         public float RechargeTorgnole, DureeRechargeTorgnole;
         public string ToucheTorgnole = "";
 
+        // dash du joueur local (PartieDash, #134), assommement compris
+        public bool DashConnu, Assomme;
+        public float RechargeDash, DureeRechargeDash;
+        public string ToucheDash = "";
+
         // météo (GestionnaireMeteo) : vide quand le temps est calme
         public string Meteo;
         public bool MeteoAnnoncee;
@@ -174,6 +179,15 @@ namespace Froggy.Interface
             return e.RechargeTorgnole > 0f
                 ? $"Torgnole{touche} : {Secondes(e.RechargeTorgnole)}"
                 : $"Torgnole{touche} : prête";
+        }
+
+        /// <summary>Le dash du joueur local (#134), ou vide si la scène n'en a pas ; « assommé » prime sur la recharge.</summary>
+        public static string Dash(EtatHud e)
+        {
+            if (!e.DashConnu) return "";
+            if (e.Assomme) return "Assommé !";
+            string touche = e.ToucheDash.Length > 0 ? $" ({e.ToucheDash})" : "";
+            return e.RechargeDash > 0f ? $"Dash{touche} : {Secondes(e.RechargeDash)}" : $"Dash{touche} : prêt";
         }
 
         /// <summary>

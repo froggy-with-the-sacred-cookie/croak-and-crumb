@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "com.firstgeargames.fishnet": "https://github.com/FirstGearGames/FishNet.git?path=Assets/FishNet#a2e2c3e12f5f4e18c96e402113e14030ae7849f0",
+    "com.firstgeargames.fishnet":"https://github.com/FirstGearGames/FishNet.git?path=Assets/FishNet#a2e2c3e12f5f4e18c96e402113e14030ae7849f0",
     "com.unity.ai.assistant": "2.21.0-pre.2",
     "com.unity.ai.inference": "2.6.1",
     "com.unity.ai.navigation": "2.0.16",
@@ -12,6 +12,7 @@
     "com.unity.multiplayer.playmode": "3.0.0",
     "com.unity.pipeline": "0.9.1-exp.1",
     "com.unity.render-pipelines.universal": "17.6.0",
+    "com.unity.services.multiplayer": "2.4.1",
     "com.unity.test-framework": "1.8.0",
     "com.unity.timeline": "6.6.0",
     "com.unity.ugui": "2.6.0",

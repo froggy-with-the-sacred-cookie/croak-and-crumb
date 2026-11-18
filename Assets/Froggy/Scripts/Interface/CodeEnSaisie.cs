@@ -6,12 +6,27 @@ namespace Froggy.Interface
     /// Le code de salon en cours de saisie (P6-03), en C# pur : 4 cases, une case active. Au clavier on tape les lettres
     /// à la suite (Retour arrière efface) ; à la manette, haut et bas font défiler la lettre de la case active, gauche et
     /// droite changent de case. Seules les lettres de CodeSalon entrent (ni O ni I). Testé dans MenusTests.
+    /// En ligne (P2-05, Unity Relay) : 6 cases, lettres et chiffres (le code est donné par Unity).
     /// </summary>
     public sealed class CodeEnSaisie
     {
         public const char Vide = '\0';
 
-        private readonly char[] lettres = new char[CodeSalon.Longueur];
+        private readonly char[] lettres;
+        private readonly string permises;
+
+        /// <summary>Code du réseau local : 4 lettres.</summary>
+        public CodeEnSaisie() : this(false) { }
+
+        /// <summary>En ligne : le code de Unity Relay (6 lettres et chiffres) ; sinon 4 lettres.</summary>
+        public CodeEnSaisie(bool enLigne)
+        {
+            EnLigne = enLigne;
+            lettres = new char[enLigne ? CodeSalon.LongueurEnLigne : CodeSalon.Longueur];
+            permises = enLigne ? CodeSalon.LettresEnLigne : CodeSalon.Lettres;
+        }
+
+        public bool EnLigne { get; }
 
         /// <summary>La case active, de 0 à 3.</summary>
         public int Curseur { get; private set; }
@@ -20,8 +35,10 @@ namespace Froggy.Interface
 
         public char this[int i] => lettres[i];
 
-        /// <summary>Vrai quand les 4 cases sont remplies : on peut rejoindre.</summary>
-        public bool Complet => CodeSalon.EstValide(Code);
+        /// <summary>Vrai quand toutes les cases sont remplies : on peut rejoindre.</summary>
+        public bool Complet => EnLigne
+            ? Code.Length == lettres.Length && CodeSalon.EstValideEnLigne(Code)
+            : CodeSalon.EstValide(Code);
 
         /// <summary>Les lettres tapées, sans les cases vides (« KR » pendant la saisie).</summary>
         public string Code
@@ -39,7 +56,7 @@ namespace Froggy.Interface
         public bool Taper(char c)
         {
             c = char.ToUpperInvariant(c);
-            if (CodeSalon.Lettres.IndexOf(c) < 0) return false;
+            if (permises.IndexOf(c) < 0) return false;
             lettres[Curseur] = c;
             if (Curseur < lettres.Length - 1) Curseur++;
             return true;
@@ -61,7 +78,6 @@ namespace Froggy.Interface
         /// <summary>Fait défiler la lettre de la case active (manette) : +1 vers Z, -1 vers A, en boucle.</summary>
         public void Defiler(int sens)
         {
-            string permises = CodeSalon.Lettres;
             int i = permises.IndexOf(lettres[Curseur]);
             if (i < 0) i = sens >= 0 ? 0 : permises.Length - 1;
             else i = ((i + (sens >= 0 ? 1 : -1)) % permises.Length + permises.Length) % permises.Length;
