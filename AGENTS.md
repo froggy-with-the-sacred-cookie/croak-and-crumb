@@ -50,6 +50,12 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
   `PartieObjets` les fait vivre dans une scène à partir des repères « Boîte à objets » du Bâtisseur ; `PorteurObjet`
   donne l'emplacement d'objet d'une Froggy. Un objet = une `FicheObjet`, listée dans `ReglagesObjets`. L'effet d'un
   objet écoute `PorteurObjet.Utilise`, ou l'événement `ObjetUtilise` du socle.
+  fin partent en événements du socle (`PartieCommencee`, `PartieFinie`). En fin de partie, « Rejouer » (bouton ou R,
+  provisoire en attendant le salon) appelle `DeroulementPartie.Rejouer()`.
+- Réapparition (même dossier) : `ReglesReapparition` (chute, délai, point le plus loin des autres, en C# pur) et
+  `ApparitionJoueurs` dans la scène, qui pose les Froggy sur les repères « Apparition d'un joueur » du Bâtisseur.
+  Avant de frapper un joueur, lire `PorteurCookies.Intouchable` (tombé ou tout juste réapparu) ; `FaireLacher` le
+  refuse déjà. Le retour part en événement du socle (`JoueurReapparu`).
 
 ## Les branches
 

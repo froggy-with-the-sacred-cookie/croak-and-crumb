@@ -50,5 +50,20 @@ namespace Froggy.Reseau
 
         public Prereglage Lire(int index) =>
             prereglages.Count == 0 ? new Prereglage() : prereglages[Mathf.Clamp(index, 0, prereglages.Count - 1)];
+
+        /// <summary>Applique un préréglage au simulateur de latence de FishNet de cette fenêtre seulement.</summary>
+        public void Appliquer(FishNet.Managing.NetworkManager reseau, int index)
+        {
+            if (reseau == null) return;
+            Prereglage p = Lire(index);
+
+            // Chaque fenêtre retarde ses propres envois ; l'hôte fait passer les deux sens par son simulateur.
+            // La moitié de l'aller-retour visé dans chaque fenêtre donne donc le bon ping partout.
+            var simulateur = reseau.TransportManager.LatencySimulator;
+            simulateur.SetLatency(p.allerRetourMs / 2);
+            simulateur.SetPacketLoss(p.pertesPourcent / 100.0);
+            simulateur.SetOutOfOrder(p.desordrePourcent / 100.0);
+            simulateur.SetEnabled(p.Simule);
+        }
     }
 }

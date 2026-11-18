@@ -28,7 +28,12 @@ namespace Froggy.Reseau
             // Dans Awake et Start, le propriétaire n'est pas encore connu : on décide ici.
             var rendu = GetComponentInChildren<Renderer>();
             if (rendu != null)
-                rendu.material.color = IsOwner ? couleurLocale : couleurAutres;
+            {
+                // Dans un salon (P2-03) : la couleur choisie par le joueur ; sinon vert = la mienne, rouge = les autres.
+                rendu.material.color = Salon.Local != null && Salon.Local.CouleurDe(OwnerId, out Color choisie)
+                    ? choisie
+                    : IsOwner ? couleurLocale : couleurAutres;
+            }
 
             if (IsOwner)
             {
