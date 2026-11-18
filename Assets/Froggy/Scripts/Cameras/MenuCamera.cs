@@ -42,6 +42,7 @@ namespace Froggy.Cameras
         private Froggy.Jardin.ChoixMuraille contour;
         private Froggy.Personnages.FroggyApparence apparence;
         private string[] nomsFroggy;
+        [System.NonSerialized] private Vector2 defilement;
         private Froggy.Jardin.VoltigeSakura voltige;
         private bool rouvert;
         private Keyboard ecoute;
@@ -138,7 +139,11 @@ namespace Froggy.Cameras
                 return;
             }
             float hauteur = 585f +(contour != null ? 160f : 0f) + (voltige != null ? 120f : 0f) + (apparence != null ? 70f + 22f * nomsFroggy.Length : 0f);
-            GUILayout.BeginArea(new Rect(16f, 16f, 400f, hauteur), GUI.skin.box);
+            // fenêtre plus basse que le menu (#99) : le cadre s'arrête au bas de l'écran et son contenu défile, à la
+            // molette ou à la barre. Menu ouvert, la caméra ne lit plus la molette : pas de zoom en même temps.
+            float visible = HauteurVisible(hauteur, Screen.height / e, 16f);
+            GUILayout.BeginArea(new Rect(16f, 16f, 400f, visible), GUI.skin.box);
+            defilement = GUILayout.BeginScrollView(defilement, false, visible < hauteur);
             GUILayout.Label("Caméra (debug) · la même touche pour fermer");
             var actuel = Actuel;
             int choix = GUILayout.SelectionGrid((int)actuel, Noms, 1);
@@ -189,8 +194,13 @@ namespace Froggy.Cameras
             }
             GUILayout.FlexibleSpace();
             GUILayout.Label("Les réglages changés ici s'oublient à la fin de la partie.");
+            GUILayout.EndScrollView();
             GUILayout.EndArea();
         }
+
+        /// <summary>La hauteur du cadre du menu : la sienne, ou ce que l'écran laisse sous et sur la marge s'il est plus bas.</summary>
+        public static float HauteurVisible(float hauteurMenu, float hauteurEcran, float marge) =>
+            Mathf.Min(hauteurMenu, Mathf.Max(120f, hauteurEcran - 2f * marge));
 
         private static float Curseur(string nom, float valeur, float min, float max, string format)
         {
