@@ -58,6 +58,67 @@ L'hôte écoute sur le port 7770, ou le suivant s'il est pris (FishNet garde par
 Le code : `Assets/Froggy/Scripts/Reseau/TestReseau.cs` (démarrage), `PanneauTestReseau.cs`, réglages
 `Assets/Froggy/Reseau/ReglagesTestReseau.asset`, le tout dans le prefab `Assets/Froggy/Prefabs/Reseau/TestReseau.prefab`.
 
+## Jouer par code (salon)
+
+Le salon (P2-03) : un joueur crée une partie et reçoit un **code de 4 lettres** (par exemple `KRBF`, jamais de O ni
+de I). Les autres tapent ce code pour le rejoindre, se disent prêts, puis l'hôte lance. Pour l'instant, le code se
+trouve **sur le même réseau local** (même machine ou même wifi) ; jouer depuis deux maisons viendra avec le relais
+(P2-05).
+
+1. **Ouvrir le salon de test** : menu **Froggy ▸ Réseau ▸ 4. Ouvrir le salon de test (jouer par code)**
+   (`Assets/Froggy/Postes/2_Reseau/Salon_Reseau.unity`). Si Unity propose d'enregistrer, répondre « Save ».
+2. **Choisir les joueurs** et **la connexion** : étapes 2 et 3 de la section précédente.
+3. **Lancer** : ▶ (Play). Ici, **rien ne démarre seul** : chaque fenêtre affiche le panneau « Salon » en haut à gauche.
+4. **Fenêtre principale** : **Créer un salon**. Le code s'affiche en grand.
+5. **Chaque autre fenêtre** : cliquer dans la fenêtre, taper le code dans « Code » (minuscules et tirets acceptés),
+   **Rejoindre**. Tous les joueurs apparaissent dans chaque fenêtre, avec leur couleur.
+6. **Couleur suivante** si on veut changer (deux joueurs n'ont jamais la même), puis **Prêt**.
+7. **L'hôte : Lancer la partie** (grisé tant qu'on est seul ou qu'un joueur n'est pas prêt). Le jardin s'ouvre chez
+   tout le monde, une capsule par joueur à sa couleur.
+8. **L'hôte : Revenir au salon**. Tout le monde revient, « pas prêt », et peut relancer. À la fin d'une vraie partie
+   (événement « partie finie »), le retour se fait seul après 5 secondes.
+
+| Message | Ce qu'il veut dire |
+|---|---|
+| « Aucun salon KRBF trouvé sur ce réseau » | Mauvais code, salon pas encore créé, ou autre réseau (pas de relais pour l'instant) |
+| « Code inconnu de cet hôte » | L'hôte trouvé a un autre code (rare) |
+| « Salon plein (4 joueurs) » | Il y a déjà 4 joueurs |
+| « Partie en cours » | On ne rejoint pas une partie commencée : attendre le retour au salon |
+| « Déconnecté : l'hôte a fermé le salon… » | L'hôte est parti ; recréer ou rejoindre un autre salon |
+| Windows demande d'autoriser Unity sur le réseau | Accepter (réseau privé) : sinon les autres machines ne trouvent pas le salon |
+
+**F10** cache le panneau. Ce panneau est **provisoire** : les vrais écrans (titre, salon, fin de partie) sont faits par
+le poste 6 (P6-03) et se branchent sur le même code.
+
+### Brancher un écran sur le salon (poste 6)
+
+Tout passe par `Salon.Local` (`Assets/Froggy/Scripts/Reseau/Salon/Salon.cs`), sans toucher au réseau. Le panneau
+provisoire `PanneauSalon.cs` en est un exemple complet.
+
+```csharp
+using Froggy.Reseau;
+
+Salon salon = Salon.Local;
+salon.Change += Rafraichir;          // joueurs, prêt, couleur, phase, connexion : tout changement
+salon.Erreur += AfficherMessage;     // texte prêt à afficher
+
+salon.Creer();                       // devenir l'hôte ; salon.Code donne le code
+salon.Rejoindre(texteTape);          // le code tel que tapé
+salon.SeDirePret(true);
+salon.CouleurSuivante();             // ou salon.ChoisirCouleur(indice)
+salon.Lancer();                      // hôte ; possible si salon.PeutLancer
+salon.RevenirAuSalon();              // hôte, pendant la partie
+salon.Quitter();
+
+// À lire pour afficher : salon.Connecte, salon.EstHote, salon.Occupe (recherche en cours), salon.Etat,
+// salon.Phase (Salon / EnPartie), salon.Membres (Numero, Couleur, Pret, Hote), salon.Moi, salon.Couleur(indice).
+```
+
+Les règles (4 joueurs au plus, couleur unique, lancement quand tous les invités sont prêts) sont dans `EtatSalon.cs`
+et testées dans `Assets/Froggy/Editor/Tests/SalonTests.cs`. Le prefab `Assets/Froggy/Prefabs/Reseau/Salon.prefab`
+contient le NetworkManager, le salon, la recherche par code, le panneau, les 4 points d'apparition et la caméra ; la
+scène de partie est un champ de `Salon` (`Vitrine_JardinJaponais` pour l'instant).
+
 ## Les 5 règles d'un script réseau
 
 1. **Un objet partagé porte un `NetworkObject`.** Sans lui, chaque joueur a sa propre copie, invisible des autres. Un
@@ -130,6 +191,10 @@ avec P2-02 (#23).
 - **Port qui reste pris après Stop** : dans l'éditeur, FishNet 4.7.4 a gardé le port du serveur ouvert jusqu'au
   redémarrage de Unity (vu le 18/11/2026, cause non trouvée dans FishNet). Arrêter le serveur soi-même dans
   `OnApplicationQuit` l'a évité ; `TestReseau` passe en plus au port suivant si besoin.
+- **Arrivée pendant une partie** : FishNet envoie à tout nouveau joueur les scènes « globales » déjà chargées, donc il
+  tomberait en pleine partie. Le salon refuse donc l'entrée tant que la partie dure (P2-06 décidera mieux).
+- **Recharger la scène qui contient le NetworkManager** en fait apparaître un second. Le salon garde donc sa scène
+  chargée et ajoute / retire la scène de partie par-dessus.
 - **Mémoire** : chaque joueur de Multiplayer Play Mode est un Unity complet (≈ 3 Go). Quand la mémoire manque, Windows
   agrandit son fichier d'échange sur C: et les fenêtres de joueur se ferment sans message.
 - **Build Windows** : le projet est en IL2CPP, il faut les outils C++ de Visual Studio (charge de travail

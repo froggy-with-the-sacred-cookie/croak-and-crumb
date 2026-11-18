@@ -108,15 +108,7 @@ namespace Froggy.Reseau
         {
             if (reglages == null) return;
             Prereglage = Mathf.Clamp(index, 0, Mathf.Max(0, reglages.prereglages.Count - 1));
-            ReglagesTestReseau.Prereglage p = reglages.Lire(Prereglage);
-
-            // Chaque fenêtre retarde ses propres envois ; l'hôte fait passer les deux sens par son simulateur.
-            // La moitié de l'aller-retour visé dans chaque fenêtre donne donc le bon ping partout.
-            var simulateur = reseau.TransportManager.LatencySimulator;
-            simulateur.SetLatency(p.allerRetourMs / 2);
-            simulateur.SetPacketLoss(p.pertesPourcent / 100.0);
-            simulateur.SetOutOfOrder(p.desordrePourcent / 100.0);
-            simulateur.SetEnabled(p.Simule);
+            reglages.Appliquer(reseau, Prereglage);
         }
 
         public void PrereglageSuivant()

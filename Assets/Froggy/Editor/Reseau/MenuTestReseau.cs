@@ -7,8 +7,9 @@ namespace Froggy.Outils
 {
     /// <summary>
     /// Menu Froggy ▸ Réseau (P2-07) : ouvrir la scène de test du poste Réseau, ouvrir la fenêtre Multiplayer Play Mode
-    /// (où l'on coche Player 2-4 : Unity ne permet pas de le faire par script), choisir la connexion simulée.
-    /// Mode d'emploi : Docs/Reseau/GUIDE.md, « Tester à 2, 3 ou 4 ».
+    /// (où l'on coche Player 2-4 : Unity ne permet pas de le faire par script), choisir la connexion simulée,
+    /// ouvrir le salon de test (P2-03).
+    /// Mode d'emploi : Docs/Reseau/GUIDE.md, « Tester à 2, 3 ou 4 » et « Jouer par code (salon) ».
     /// </summary>
     public static class MenuTestReseau
     {
@@ -25,6 +26,21 @@ namespace Froggy.Outils
             }
             if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
             EditorSceneManager.OpenScene(TestReseau.SceneDeTest, OpenSceneMode.Single);
+        }
+
+        /// <summary>Scène du salon (P2-03) : créer, rejoindre par code, prêt, lancer, revenir.</summary>
+        public const string SceneSalon = "Assets/Froggy/Postes/2_Reseau/Salon_Reseau.unity";
+
+        [MenuItem(Racine + "4. Ouvrir le salon de test (jouer par code)", priority = 40)]
+        private static void OuvrirSalon()
+        {
+            if (EditorApplication.isPlaying)
+            {
+                Debug.LogWarning("Arrêter le Play avant d'ouvrir le salon de test.");
+                return;
+            }
+            if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+            EditorSceneManager.OpenScene(SceneSalon, OpenSceneMode.Single);
         }
 
         [MenuItem(Racine + "2. Fenêtre Multiplayer Play Mode (cocher Player 2, 3, 4)", priority = 1)]
