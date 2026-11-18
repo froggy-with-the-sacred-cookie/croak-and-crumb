@@ -15,6 +15,8 @@ namespace Froggy.Socle
         PartieCommencee,
         /// <summary>La partie est finie ; « Auteur » est le gagnant, s'il y en a un (P3-03).</summary>
         PartieFinie,
+        /// <summary>Un joueur tombé hors de l'arène vient de réapparaître ; « Auteur » est ce joueur (P3-04).</summary>
+        JoueurReapparu,
     }
 
     /// <summary>Un événement de partie : quoi, par qui, avec quoi, où. « Auteur » et « Objet » peuvent être vides.</summary>

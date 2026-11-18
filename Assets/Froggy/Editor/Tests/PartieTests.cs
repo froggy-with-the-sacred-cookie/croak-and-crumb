@@ -226,6 +226,53 @@ namespace Froggy.Outils.Tests
             Assert.That(partie.Gagnant, Is.SameAs(sacre.GetComponent<PorteurCookies>()), "le cookie sacré l'emporte sur le nombre");
         }
 
+        [Test]
+        public void RejouerRemetToutAZero()
+        {
+            var reglagesCookies = ScriptableObject.CreateInstance<ReglagesCookies>();
+            var reglagesPartie = ScriptableObject.CreateInstance<ReglagesPartie>();
+            var reglagesReapparition = ScriptableObject.CreateInstance<ReglagesReapparition>();
+            aDetruire.Add(reglagesCookies);
+            aDetruire.Add(reglagesPartie);
+            aDetruire.Add(reglagesReapparition);
+            reglagesPartie.decompte = 0f;
+            reglagesPartie.duree = 1f;
+            scene = EditorSceneManager.NewPreviewScene();
+
+            var cookie = Objet("Cookie", new Vector3(10f, 0f, 0f)).AddComponent<RepereArene>();
+            cookie.sorte = RepereArene.Sorte.Cookie;
+            var j1 = Objet("J1", new Vector3(10f, 0f, 0f)).AddComponent<RepereArene>();   // l'apparition, sur le cookie
+            var froggy = Objet("Froggy", Vector3.zero);
+            froggy.AddComponent<BoxCollider>();
+            froggy.AddComponent<Rigidbody>();
+            var cookies = Objet("Cookies", Vector3.zero).AddComponent<PartieCookies>();
+            cookies.Regler(reglagesCookies);
+            cookies.Demarrer(new[] { cookie }, new[] { froggy });
+            var apparition = Objet("Apparition", Vector3.zero).AddComponent<ApparitionJoueurs>();
+            apparition.Regler(reglagesReapparition, cookies);
+            apparition.Demarrer(new[] { j1 });
+            var partie = Objet("Partie", Vector3.zero).AddComponent<DeroulementPartie>();
+            partie.Regler(reglagesPartie, cookies, apparition);
+            partie.Preparer();
+            partie.Lancer();
+            var porteur = froggy.GetComponent<PorteurCookies>();
+
+            for (int i = 0; i < 60; i++) { partie.Pas(Dt); cookies.Pas(Dt); }
+            Assert.That(partie.Regles.Phase, Is.EqualTo(Phase.Finie));
+            Assert.That(porteur.Nombre, Is.EqualTo(1));
+            froggy.transform.position = new Vector3(-8f, 0.5f, 3f);   // elle s'est promenée
+
+            partie.Rejouer();
+            Assert.That(partie.Regles.Phase, Is.EqualTo(Phase.Decompte), "une nouvelle partie part du compte à rebours");
+            Assert.That(partie.Gagnant, Is.Null);
+            Assert.That(porteur.Nombre, Is.EqualTo(0), "les scores repartent de zéro");
+            Assert.That(Vector3.Distance(froggy.transform.position, new Vector3(10f, 0.52f, 0f)), Is.LessThan(1e-3f),
+                "Froggy est reposée sur son apparition");
+            for (int i = 0; i < 5; i++) { partie.Pas(Dt); cookies.Pas(Dt); }
+            Assert.That(partie.Regles.Phase, Is.EqualTo(Phase.EnJeu));
+            Assert.That(porteur.Nombre, Is.EqualTo(1), "et les cookies sont revenus");
+        }
+
         private GameObject Objet(string nom, Vector3 position)
         {
             var go = new GameObject(nom);
