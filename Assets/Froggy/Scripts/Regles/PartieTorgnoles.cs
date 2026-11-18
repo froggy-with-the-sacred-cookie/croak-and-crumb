@@ -34,6 +34,18 @@ namespace Froggy.Regles
         /// <summary>La recharge provisoire à l'écran : le HUD (P6-02) l'éteint quand il prend sa place.</summary>
         public bool AffichageProvisoire { get => affichageProvisoire; set => affichageProvisoire = value; }
 
+        /// <summary>
+        /// En réseau, chez un joueur qui n'est pas l'hôte (#128) : la touche demande le coup à l'hôte (TorgnoleReseau)
+        /// au lieu de frapper ici. Vide : on frappe ici.
+        /// </summary>
+        public System.Action<PorteurCookies> DemandeFrappe { get; set; }
+
+        /// <summary>
+        /// Chez l'hôte (#128) : le recul d'une Froggy pilotée par une autre machine (son corps est cinématique ici) part
+        /// chez elle, avec sa vitesse à plat. Vide : un corps cinématique ne recule pas (mannequins).
+        /// </summary>
+        public System.Action<PorteurCookies, Vector3> ReculAilleurs { get; set; }
+
         /// <summary>Pour un test : des réglages et une partie de cookies à soi.</summary>
         public void Regler(ReglagesTorgnole r, PartieCookies p)
         {
@@ -70,7 +82,11 @@ namespace Froggy.Regles
             if (frappe != null && frappe.WasPressedThisFrame())
             {
                 var local = JoueurLocal();
-                if (local != null) Frapper(local);
+                if (local != null)
+                {
+                    if (DemandeFrappe != null) DemandeFrappe(local);
+                    else Frapper(local);
+                }
             }
         }
 
@@ -143,9 +159,11 @@ namespace Froggy.Regles
         private void Reculer(PorteurCookies cible, Vector3 direction)
         {
             var corps = cible.GetComponent<Rigidbody>();
-            if (corps == null || corps.isKinematic || reglages.recul <= 0f) return;
+            if (corps == null || reglages.recul <= 0f) return;
+            var vitesse = new Vector3(direction.x * reglages.recul, 0f, direction.z * reglages.recul);
+            if (corps.isKinematic) { ReculAilleurs?.Invoke(cible, vitesse); return; }
             Vector3 v = corps.linearVelocity;
-            corps.linearVelocity = new Vector3(direction.x * reglages.recul, Mathf.Max(v.y, 0f), direction.z * reglages.recul);
+            corps.linearVelocity = new Vector3(vitesse.x, Mathf.Max(v.y, 0f), vitesse.z);
         }
 
         private void OnGUI()

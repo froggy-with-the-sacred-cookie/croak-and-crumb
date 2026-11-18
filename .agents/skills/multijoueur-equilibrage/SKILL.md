@@ -52,6 +52,20 @@ skill `reseau-fishnet` (vérifié dans la version installée), sinon le code du 
 6. Si la cause reste dans la bibliothèque, **contourner dans notre code**, l'écrire (commentaire, skill
    `reseau-fishnet`, guide) et proposer une issue au projet de la bibliothèque.
 
+**Pièges vus en mettant la Froggy en ligne** (Froggy, 18 novembre 2026, #23, #136, #128) :
+
+- **Le compteur de cookies n'était plus là où le salon le cherchait** : avec `FroggyReseau`, `PorteurCookies` est sur
+  la copie visible de la Froggy, pas sur l'objet réseau. L'hôte n'inscrivait personne : ni cookie ramassé ni gobelin
+  attrapé, sans aucune erreur. Le premier test n'avait vérifié que le déplacement. Après un changement du joueur
+  réseau, tester **un ramassage et une capture**, pas seulement la course et le saut.
+- **Une Froggy arrive chez l'hôte après le début de la partie** (ordre d'arrivée des messages) : elle s'inscrit
+  elle-même (`PartieCookies.Inscrire`) ; tout ce qui recense les joueurs au début doit prévoir les retardataires.
+- **Numéros** : les objets numérotaient les joueurs par leur position, différente d'une machine à l'autre ; en ligne,
+  suivre l'ordre du salon (`PartieObjets.Demarrer(…, garderOrdre: true)`). Un message réseau désigne un joueur par
+  son numéro du salon, jamais par un numéro interne d'effet.
+- **Un même événement relayé deux fois** joue l'effet deux fois : « objet utilisé » n'est plus relayé par
+  `PartieReseau`, `ObjetsReseau` l'envoie avec l'objet utilisé.
+
 ## 3. Équilibrer par la simulation
 
 Méthode de Glouton : un mode `-sim N` enchaîne N parties accélérées sans affichage, le « joueur » étant un bot de niveau

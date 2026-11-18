@@ -38,7 +38,16 @@ Le plus simple : le prefab `Assets/Froggy/Prefabs/Reseau/TestReseau.prefab` (P2-
 - `if (!IsOwner) return;` avant de lire des entrées ; ce qui dépend du propriétaire dans `OnStartClient()` (appeler
   `base.OnStartClient()`), pas dans `Awake` / `Start`.
 - Côté serveur, les démos testent `IsServerStarted` (pas `IsServerInitialized`).
-- `NetworkTransform` en client autoritaire = simple mais trichable : réservé aux scènes de test.
+- `NetworkTransform` en client autoritaire = simple mais trichable : réservé aux scènes de test. Exception décidée
+  par Lucas le 18/11/2026 : la Froggy en ligne (P2-02, `FroggyReseau`) l'utilise en attendant la prédiction.
+- **`NetworkBehaviour` a une propriété `SceneManager`** (celui de FishNet) : dans un script réseau,
+  `SceneManager.sceneCount` ne compile pas. Alias : `using ScenesUnity = UnityEngine.SceneManagement.SceneManager;`.
+- **Recul, gel, onde sur la Froggy d'un autre** : chez l'hôte, son corps est cinématique (elle suit le réseau) et
+  ne bouge pas. L'hôte décide, puis envoie l'effet à son propriétaire (`[TargetRpc] void X(NetworkConnection conn, …)`,
+  connexion lue sur `FroggyReseau.Owner`). Un effet joué sur toutes les machines qui ne pousse que les corps non
+  cinématiques (super croassement) pousse donc chaque Froggy chez son propriétaire, sans code réseau.
+- **Demande d'un joueur** (`[ServerRpc(RequireOwnership = false)]`) : vérifier que l'appelant est bien le joueur de
+  cette Froggy (`Salon.Local.NumeroDe(appelant.ClientId, out n)`), sinon n'importe qui frappe pour un autre.
 
 ## 4. Prédiction (pour P2-02)
 

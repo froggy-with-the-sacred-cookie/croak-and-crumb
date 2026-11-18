@@ -56,6 +56,18 @@ namespace Froggy.Objets
         /// <summary>Ce joueur est-il gelé en ce moment ?</summary>
         public bool EstGele(GameObject joueur) => joueur != null && Regles.EstGele(Numero(joueur));
 
+        /// <summary>
+        /// En réseau, chez un joueur qui n'est pas l'hôte (#128) : le projectile vole ici mais ne touche personne ;
+        /// c'est l'hôte qui gèle et brise la glace (GelReseau appelle Geler et Degeler).
+        /// </summary>
+        public bool Miroir { get; set; }
+
+        /// <summary>Brise la glace de ce joueur, s'il est gelé (en réseau, à la demande de l'hôte).</summary>
+        public void Degeler(GameObject joueur)
+        {
+            if (joueur != null && numeros.TryGetValue(joueur, out int n)) Liberer(n);
+        }
+
         private void OnEnable() => EvenementsPartie.Emis += Reagir;
 
         private void OnDisable()
@@ -76,7 +88,7 @@ namespace Froggy.Objets
                 var porteur = e.Auteur.GetComponent<PorteurObjet>();
                 if (porteur != null && reglages.fiche != null && porteur.DernierUtilise == reglages.fiche) Tirer(e.Auteur);
             }
-            else if (e.Type == TypeEvenement.CoupDonne && e.Objet != null)
+            else if (e.Type == TypeEvenement.CoupDonne && e.Objet != null && !Miroir)
             {
                 // le coup brise la glace : la torgnole a déjà fait lâcher son cookie, il repart
                 int n = Numero(e.Objet);
@@ -126,7 +138,8 @@ namespace Froggy.Objets
                     if (Regles.EstGele(n)) continue;
                     cibles.Add((n, j.transform.position, Intouchable(j)));
                 }
-                int touche = ReglesGelEclair.Toucher(p.position, p.direction, pas, reglages.rayon, cibles, out float aJoueur);
+                float aJoueur = float.MaxValue;
+                int touche = Miroir ? -1 : ReglesGelEclair.Toucher(p.position, p.direction, pas, reglages.rayon, cibles, out aJoueur);
                 float aMur = Mur(p, pas);
 
                 bool fini = false;
@@ -164,6 +177,7 @@ namespace Froggy.Objets
             var corps = joueur.GetComponent<Rigidbody>();
             if (corps != null && !corps.isKinematic) corps.linearVelocity = new Vector3(0f, Mathf.Min(0f, corps.linearVelocity.y), 0f);
             geles[n] = (joueur, cle, visuelProvisoire ? Glace(joueur) : null);
+            if (Miroir) RetirerProjectileVers(joueur);   // l'hôte l'a vu toucher : il s'arrête ici aussi
 
             var porteur = joueur.GetComponent<PorteurCookies>();
             if (porteur != null)
@@ -173,6 +187,20 @@ namespace Froggy.Objets
             }
             Gele?.Invoke(joueur);
             return true;
+        }
+
+        private void RetirerProjectileVers(GameObject joueur)
+        {
+            int meilleur = -1;
+            float plusPres = float.MaxValue;
+            for (int i = 0; i < projectiles.Count; i++)
+            {
+                float d = (projectiles[i].position - joueur.transform.position).sqrMagnitude;
+                if (d < plusPres) { plusPres = d; meilleur = i; }
+            }
+            if (meilleur < 0) return;
+            if (projectiles[meilleur].visuel != null) Destroy(projectiles[meilleur].visuel.gameObject);
+            projectiles.RemoveAt(meilleur);
         }
 
         private void Liberer(int numero)

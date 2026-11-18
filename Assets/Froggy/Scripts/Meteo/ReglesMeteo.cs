@@ -96,6 +96,23 @@ namespace Froggy.Meteo
             return true;
         }
 
+        /// <summary>
+        /// En réseau, chez un joueur qui n'est pas l'hôte : prend l'état reçu de l'hôte (#128). Ce qui change par rapport
+        /// à l'état d'avant (fin de l'ancien événement, annonce, début) va dans « changements », comme pendant un pas ;
+        /// une annonce manquée (message arrivé tard) passe directement au début.
+        /// </summary>
+        public void Imposer(PhaseMeteo phase, int courant, float reste, List<(ChangementMeteo, int)> changements)
+        {
+            if (phase == PhaseMeteo.Calme || courant < 0 || courant >= durees.Count) { phase = PhaseMeteo.Calme; courant = -1; }
+            bool autre = courant != Courant;
+            if (Phase == PhaseMeteo.Actif && (phase != PhaseMeteo.Actif || autre)) changements.Add((ChangementMeteo.Fin, Courant));
+            if (phase == PhaseMeteo.Annonce && (Phase != PhaseMeteo.Annonce || autre)) changements.Add((ChangementMeteo.Annonce, courant));
+            if (phase == PhaseMeteo.Actif && (Phase != PhaseMeteo.Actif || autre)) changements.Add((ChangementMeteo.Debut, courant));
+            Phase = phase;
+            Courant = courant;
+            Reste = Mathf.Max(0f, reste);
+        }
+
         /// <summary>Tire un événement selon les poids ; -1 si aucun ne peut sortir.</summary>
         public int Tirer()
         {

@@ -69,8 +69,8 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
   préfabriqué `Assets/Froggy/Gobelin/Gobelin_Kappa`, menu **Froggy ▸ Gobelin**) depuis le repère « Départ du gobelin »
   et tient `PorteurCookieSacre` à jour. Une torgnole (`CoupDonne`) ou un cookie lâché le font tomber ; un autre coup
   passe par `PartieCookieSacre.FaireLacher(porteur, direction)`. Réglages :
-  `Postes/5_MeteoEvenements/ReglagesCookieSacre.asset`. En réseau, il n'est pas encore dans `PartieReseau` ; chez un
-  joueur qui n'est pas l'hôte (« Miroir »), il ne décide rien.
+  `Postes/5_MeteoEvenements/ReglagesCookieSacre.asset`. En réseau, `CookieSacreReseau` envoie l'état de l'hôte ; chez
+  un joueur qui n'est pas l'hôte (« Miroir »), il ne décide rien et le montre (`Refleter`).
 - HUD de partie (`Assets/Froggy/Scripts/Interface/`) : `ContenuHud` écrit les textes (scores, minuteur, objet,
   torgnole, cookie sacré, météo, fin, en C# pur) et `HudPartie` les dessine. Il s'installe seul en jeu, ne lit que ce
   que la scène a, et éteint les affichages provisoires des postes (menu **Froggy ▸ HUD de partie** pour les
@@ -98,8 +98,15 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
   autoritaire) plus une copie de la Froggy du jardin (`PlayerTemplate`), faite sur chaque machine comme les bots.
   Chez son propriétaire, elle garde contrôleur, caméra et touches ; chez les autres, elle suit la position reçue, corps
   cinématique, animée par `FroggyApparence.VitesseExterne` / `AuSolExterne`. Elle porte les cookies sous le numéro du
-  joueur dans le salon. Prévu avec la #128 : un effet qui déplace un joueur (coup, onde, gel) se décide chez l'hôte puis
-  s'applique chez le propriétaire de la Froggy touchée. Revenir aux capsules de test : `prefabJoueur` du `Salon.prefab` sur `CapsuleReseau`.
+  joueur dans le salon. Revenir aux capsules de test : `prefabJoueur` du `Salon.prefab` sur `CapsuleReseau`.
+- Partie en ligne (`Prefabs/Reseau/PartieReseau`, scripts dans `Scripts/Reseau/Partie/`, #128) : **l'hôte décide,
+  les autres montrent** (leurs composants passent en « Miroir »). `PartieReseau` (cookies, temps, gagnant),
+  `MeteoReseau`, `CookieSacreReseau`, `TorgnoleReseau` (la touche demande le coup à l'hôte ; le recul part chez le
+  propriétaire de la Froggy touchée), `ObjetsReseau` (boîtes, objet tenu, « objet utilisé » envoyé à tous, numéros
+  dans l'ordre du salon) et `GelReseau` (l'hôte décide qui est gelé). Un effet qui ne pousse que les corps non
+  cinématiques (super croassement) joue partout et pousse chaque Froggy chez son propriétaire. Une nouvelle mécanique
+  de partie s'ajoute à ce préfabriqué avec son script réseau ; la tester à deux fenêtres (skill
+  `test-multijoueur-local`, section 7).
 
 ## Les branches
 

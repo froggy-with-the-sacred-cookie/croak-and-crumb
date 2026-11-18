@@ -51,6 +51,15 @@ namespace Froggy.Objets
         /// <summary>L'emplacement d'objet provisoire à l'écran : le HUD (P6-02) l'éteint quand il prend sa place.</summary>
         public bool AffichageProvisoire { get => affichageProvisoire; set => affichageProvisoire = value; }
 
+        /// <summary>
+        /// En réseau, chez un joueur qui n'est pas l'hôte (#128) : rien ne se décide ici (ni prise, ni utilisation) ;
+        /// ObjetsReseau montre les boîtes et les objets reçus de l'hôte.
+        /// </summary>
+        public bool Miroir { get; set; }
+
+        /// <summary>En Miroir : la touche demande l'utilisation à l'hôte (ObjetsReseau). Vide : on utilise ici.</summary>
+        public System.Action<PorteurObjet> DemandeUtiliser { get; set; }
+
         /// <summary>Pour un test : des réglages à soi (une copie, jamais l'asset partagé).</summary>
         public void Regler(ReglagesObjets r) => reglages = r;
 
@@ -85,8 +94,11 @@ namespace Froggy.Objets
             Demarrer(reperes, froggys);
         }
 
-        /// <summary>(Re)lance la partie avec ces repères et ces Froggy (un test donne les siens).</summary>
-        public void Demarrer(IEnumerable<RepereArene> reperes, IEnumerable<GameObject> froggys)
+        /// <summary>
+        /// (Re)lance la partie avec ces repères et ces Froggy (un test donne les siens). « garderOrdre » : les numéros
+        /// suivent l'ordre donné (en réseau, celui du salon, le même partout) au lieu des positions.
+        /// </summary>
+        public void Demarrer(IEnumerable<RepereArene> reperes, IEnumerable<GameObject> froggys, bool garderOrdre = false)
         {
             if (reglages == null) reglages = ScriptableObject.CreateInstance<ReglagesObjets>();
             foreach (var b in boites) if (b != null) Detruire(b);
@@ -107,7 +119,8 @@ namespace Froggy.Objets
             foreach (var p in points) boites.Add(Montrer(p));
 
             // même ordre que PartieCookies : une Froggy a le même numéro pour les cookies et pour les objets
-            foreach (var froggy in froggys.OrderBy(f => f.transform.position.x).ThenBy(f => f.transform.position.z))
+            var ordre = garderOrdre ? froggys : froggys.OrderBy(f => f.transform.position.x).ThenBy(f => f.transform.position.z);
+            foreach (var froggy in ordre)
             {
                 var porteur = froggy.GetComponent<PorteurObjet>();
                 if (porteur == null) porteur = froggy.AddComponent<PorteurObjet>();
@@ -123,7 +136,9 @@ namespace Froggy.Objets
 
         private void Update()
         {
-            if (local != null && utiliser != null && utiliser.WasPressedThisFrame()) Utiliser(local);
+            if (local == null || utiliser == null || !utiliser.WasPressedThisFrame()) return;
+            if (DemandeUtiliser != null) DemandeUtiliser(local);
+            else Utiliser(local);
         }
 
         private void FixedUpdate() => Pas(Time.fixedDeltaTime);
@@ -131,7 +146,7 @@ namespace Froggy.Objets
         /// <summary>Un pas de la partie, au pas physique (un test l'appelle hors jeu).</summary>
         public void Pas(float dt)
         {
-            if (Regles == null) return;
+            if (Regles == null || Miroir) return;
             positions.Clear();
             foreach (var p in porteurs)
                 if (p != null && p.isActiveAndEnabled) positions.Add((p.Joueur, p.transform.position));
@@ -152,7 +167,7 @@ namespace Froggy.Objets
         /// </summary>
         public FicheObjet Utiliser(PorteurObjet porteur)
         {
-            if (Regles == null || porteur == null || !porteurs.Contains(porteur)) return null;
+            if (Regles == null || Miroir || porteur == null || !porteurs.Contains(porteur)) return null;
             var entrave = porteur.GetComponent<Modificateurs>();
             if (entrave != null && entrave.Entrave) return null;   // gelé : l'objet est gardé pour plus tard
             int objet = Regles.Utiliser(porteur.Joueur);
@@ -165,7 +180,21 @@ namespace Froggy.Objets
             return fiche;
         }
 
-        private FicheObjet Fiche(int objet) => objet == ReglesObjets.Aucun ? null : fiches[objet];
+        /// <summary>La fiche de l'objet de ce rang (celui des règles), ou null.</summary>
+        public FicheObjet Fiche(int objet) => objet < 0 || objet >= fiches.Count ? null : fiches[objet];
+
+        /// <summary>Le rang de cette fiche dans les règles, ou ReglesObjets.Aucun.</summary>
+        public int Rang(FicheObjet fiche) => fiche != null ? fiches.IndexOf(fiche) : ReglesObjets.Aucun;
+
+        /// <summary>En Miroir : montre les boîtes pleines reçues de l'hôte (dans l'ordre des points).</summary>
+        public void MontrerBoites(IReadOnlyList<bool> pleines)
+        {
+            for (int i = 0; i < boites.Count; i++)
+            {
+                bool voir = i < pleines.Count && pleines[i];
+                if (boites[i] != null && boites[i].activeSelf != voir) boites[i].SetActive(voir);
+            }
+        }
 
         private void Annoncer(string texte)
         {
