@@ -153,6 +153,8 @@ namespace Froggy.Objets
         public FicheObjet Utiliser(PorteurObjet porteur)
         {
             if (Regles == null || porteur == null || !porteurs.Contains(porteur)) return null;
+            var entrave = porteur.GetComponent<Modificateurs>();
+            if (entrave != null && entrave.Entrave) return null;   // gelé : l'objet est gardé pour plus tard
             int objet = Regles.Utiliser(porteur.Joueur);
             if (objet == ReglesObjets.Aucun) return null;
             FicheObjet fiche = fiches[objet];

@@ -120,6 +120,9 @@ Pièges :
   2026, macOS) lance le Test Runner **dans l'éditeur ouvert**, sans second éditeur, et rend le résumé et chaque
   résultat en JSON (236 tests en quelques secondes). Mêmes règles que `run_tests` : hors mode Play, scène ouverte non
   modifiée.
+- **`TestRunnerApi.Execute` part en différé** (MCP officiel, `Unity_RunCommand`, Froggy, 18 novembre 2026) : l'appel
+  rend la main avant que la série démarre. Un rapport écrit dans un fichier par `ICallbacks` doit être **effacé avant
+  le lancement** ; sinon on lit le « FINI » de la série d'avant (207 lus au lieu de 222 : les nouveaux tests manquaient).
 
 ## 5. Build en ligne de commande
 
@@ -194,3 +197,19 @@ Pièges :
   gobelin) : `CreateInstance` puis `AssetDatabase.CreateAsset`, puis `EditorSceneManager.NewScene` en mode `Single`, et
   la référence gardée en mémoire ne pointait plus sur rien : la scène s'est enregistrée avec ces champs vides, sans
   erreur. Relire l'asset par `AssetDatabase.LoadAssetAtPath` après l'ouverture de la scène, et contrôler les champs.
+- **Enregistrer une scène de poste quand le jardin est chargé par-dessus** (Froggy, 18 novembre 2026, deux fois : #13
+  et #14) : `SaveScene` y écrit le brouillard et le ciel du jardin (`m_FogColor`, `m_LinearFogStart/End`,
+  `m_SkyboxMaterial`). Après chaque sauvegarde, lire `git diff` de la scène ; rétablir par `RenderSettings` (gris 0,5,
+  0 à 300 m, `Default-Skybox.mat` par `GetBuiltinExtraResource`) puis réenregistrer.
+- **`PrefabUtility.SaveAsPrefabAssetAndConnect` rend le préfabriqué, pas l'instance** : placer l'objet de la scène
+  avant l'appel (ou le retrouver ensuite), sinon c'est la racine du préfabriqué qui bouge et l'instance reste à 0.
+- **Capturer la caméra du jeu** : `Unity_Camera_Capture` sans argument rend la vue Scène. Rendre `Camera.main` dans une
+  `RenderTexture` (`targetTexture`, `Render()`, `ReadPixels`) et l'enregistrer dans le scratchpad.
+- **Récupérer `develop` pendant que Unity est ouvert** (Froggy, 18 novembre 2026) : Unity importe pendant que git écrit
+  les fichiers. Après la mise à jour, des `.meta` d'animations qui n'étaient à personne sont apparus : supprimés (Unity
+  les a réécrits ensuite avec les mêmes identifiants, mais un bruit d'arrondi dans l'avatar), ou réimportés par
+  l'**ancienne** version d'un postprocesseur pas encore recompilé (`loopTime` remis à 0 sur Nage et Porter). Après
+  chaque mise à jour : `git status`, comparer à `develop` tout fichier qui n'est pas à soi, le rétablir
+  (`git checkout -- <fichier>`) s'il ne fait que refléter l'import, puis réimporter une fois le code compilé.
+  **Ce qui l'évite** (essayé le même jour, mise à jour propre) : `AssetDatabase.DisallowAutoRefresh()` avant la
+  commande git, puis `AllowAutoRefresh()` et `Refresh()` après : Unity importe une fois, les scripts compilés d'abord.
