@@ -93,6 +93,13 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
   cache jusqu'au retour. Les écrans ne passent que par `Salon.Local` ; leurs textes sont dans `ContenuSalle` (C# pur).
   Les réglages du joueur (volumes, secousses, flashs, vibrations, de 0 à 1) : `ReglagesJoueur.Actuels`, à lire au
   moment où l'effet part ; les tests écrivent dans un fichier de test, jamais dans le vrai.
+- Froggy en ligne (`Assets/Froggy/Scripts/Reseau/FroggyReseau.cs`, P2-02, première version sans prédiction) : le salon
+  fait apparaître `Prefabs/Reseau/FroggyReseau` pour chaque joueur, un objet réseau invisible (NetworkTransform, client
+  autoritaire) plus une copie de la Froggy du jardin (`PlayerTemplate`), faite sur chaque machine comme les bots.
+  Chez son propriétaire, elle garde contrôleur, caméra et touches ; chez les autres, elle suit la position reçue, corps
+  cinématique, animée par `FroggyApparence.VitesseExterne` / `AuSolExterne`. Elle porte les cookies sous le numéro du
+  joueur dans le salon. Prévu avec la #128 : un effet qui déplace un joueur (coup, onde, gel) se décide chez l'hôte puis
+  s'applique chez le propriétaire de la Froggy touchée. Revenir aux capsules de test : `prefabJoueur` du `Salon.prefab` sur `CapsuleReseau`.
 
 ## Les branches
 
