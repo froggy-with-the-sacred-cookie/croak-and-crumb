@@ -1,0 +1,234 @@
+{
+  "generator": "sound-forge 0.6.0",
+  "preset": null,
+  "sound": {
+    "name": "Arrivée du gobelin",
+    "layers": [
+      {
+        "name": "Premier coup de bois",
+        "waveform": "white_noise",
+        "pitch": {
+          "start": 215.0,
+          "end": 215.0,
+          "time": 0.008
+        },
+        "envelope": {
+          "attack": 0.0012,
+          "decay": 0.008,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "low_pass",
+          "cutoff": {
+            "start": 5100.0,
+            "end": 5100.0,
+            "time": 0.008
+          },
+          "resonance": 0.2
+        },
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.7,
+        "start": 0.0,
+        "resonator": {
+          "material": "wood",
+          "decay": 0.65,
+          "brightness": 0.34,
+          "dry": 0.12
+        }
+      },
+      {
+        "name": "Basse de l’annonce",
+        "waveform": "sine",
+        "pitch": {
+          "start": 136.0,
+          "end": 68.0,
+          "time": 0.281
+        },
+        "envelope": {
+          "attack": 0.012,
+          "decay": 0.281,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": null,
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.7,
+        "start": 0.0,
+        "resonator": null
+      },
+      {
+        "name": "Premier appel rauque",
+        "waveform": "saw",
+        "pitch": {
+          "start": 135.0,
+          "end": 89.0,
+          "time": 0.235
+        },
+        "envelope": {
+          "attack": 0.036,
+          "decay": 0.235,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "low_pass",
+          "cutoff": {
+            "start": 1160.0,
+            "end": 452.0,
+            "time": 0.235
+          },
+          "resonance": 0.58
+        },
+        "vibrato": {
+          "rate_hz": 23.0,
+          "depth_semitones": 0.44
+        },
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.64,
+        "start": 0.125,
+        "resonator": null
+      },
+      {
+        "name": "Deuxième coup",
+        "waveform": "white_noise",
+        "pitch": {
+          "start": 175.0,
+          "end": 175.0,
+          "time": 0.008
+        },
+        "envelope": {
+          "attack": 0.0012,
+          "decay": 0.008,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "low_pass",
+          "cutoff": {
+            "start": 5100.0,
+            "end": 5100.0,
+            "time": 0.008
+          },
+          "resonance": 0.2
+        },
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.64,
+        "start": 0.36,
+        "resonator": {
+          "material": "wood",
+          "decay": 0.54,
+          "brightness": 0.32,
+          "dry": 0.12
+        }
+      },
+      {
+        "name": "Réponse grave",
+        "waveform": "triangle",
+        "pitch": {
+          "start": 107.0,
+          "end": 64.0,
+          "time": 0.43
+        },
+        "envelope": {
+          "attack": 0.034,
+          "decay": 0.43,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "low_pass",
+          "cutoff": {
+            "start": 640.0,
+            "end": 640.0,
+            "time": 0.43
+          },
+          "resonance": 0.2
+        },
+        "vibrato": {
+          "rate_hz": 17.0,
+          "depth_semitones": 0.59
+        },
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.7,
+        "start": 0.39,
+        "resonator": null
+      },
+      {
+        "name": "Tintement du butin",
+        "waveform": "white_noise",
+        "pitch": {
+          "start": 932.0,
+          "end": 932.0,
+          "time": 0.008
+        },
+        "envelope": {
+          "attack": 0.0012,
+          "decay": 0.008,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "low_pass",
+          "cutoff": {
+            "start": 5100.0,
+            "end": 5100.0,
+            "time": 0.008
+          },
+          "resonance": 0.2
+        },
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.2,
+        "start": 0.58,
+        "resonator": {
+          "material": "bell",
+          "decay": 0.41,
+          "brightness": 0.49,
+          "dry": 0.12
+        }
+      }
+    ],
+    "effects": {
+      "drive": null,
+      "echo": null,
+      "reverb": null
+    },
+    "peak_db": -5.5
+  },
+  "variants": 3,
+  "amount": 0.18,
+  "seed": 62740,
+  "files": [
+    "sfx_gobelin_arrivee_01.wav",
+    "sfx_gobelin_arrivee_02.wav",
+    "sfx_gobelin_arrivee_03.wav"
+  ]
+}
