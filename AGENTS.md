@@ -110,7 +110,9 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
   les autres montrent** (leurs composants passent en « Miroir »). `PartieReseau` (cookies, temps, gagnant),
   `MeteoReseau`, `CookieSacreReseau`, `TorgnoleReseau` (la touche demande le coup à l'hôte ; le recul part chez le
   propriétaire de la Froggy touchée), `ObjetsReseau` (boîtes, objet tenu, « objet utilisé » envoyé à tous, numéros
-  dans l'ordre du salon) et `GelReseau` (l'hôte décide qui est gelé). Un effet qui ne pousse que les corps non
+  dans l'ordre du salon), `GelReseau` (l'hôte décide qui est gelé) et `ReapparitionReseau` (l'hôte décide la chute
+  et la réapparition ; la Froggy d'un autre joueur est posée chez son propriétaire ; un repère « Apparition d'un
+  joueur » par joueur dans le préfabriqué). Un effet qui ne pousse que les corps non
   cinématiques (super croassement) joue partout et pousse chaque Froggy chez son propriétaire. Une nouvelle mécanique
   de partie s'ajoute à ce préfabriqué avec son script réseau ; la tester à deux fenêtres (skill
   `test-multijoueur-local`, section 7).

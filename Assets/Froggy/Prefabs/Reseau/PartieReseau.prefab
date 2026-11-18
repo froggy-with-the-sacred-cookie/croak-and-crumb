@@ -119,6 +119,8 @@ GameObject:
   - component: {fileID: 8055285663673181109}
   - component: {fileID: 7906589829903040198}
   - component: {fileID: 837134008996484863}
+  - component: {fileID: 8012796949891533176}
+  - component: {fileID: 3853200025710250469}
   m_Layer: 0
   m_Name: PartieReseau
   m_TagString: Untagged
@@ -143,6 +145,7 @@ Transform:
   - {fileID: 1393532183270544367}
   - {fileID: 9093798694542056748}
   - {fileID: 1002813297851284336}
+  - {fileID: 2935560732528403325}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8323199054783479740
@@ -431,6 +434,83 @@ MonoBehaviour:
   _componentIndexCache: 255
   _addedNetworkObject: {fileID: 8323199054783479740}
   _networkObjectCache: {fileID: 0}
+--- !u!114 &8012796949891533176
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1757615929357730268}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f5be36d615f9054fae8c19d79dbcc24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Froggy.Regles.ApparitionJoueurs
+  reglages: {fileID: 11400000, guid: 22178b578276f7848bbd28fa23a4b168, type: 2}
+  partie: {fileID: 8401164890271491837}
+  clignoter: 1
+--- !u!114 &3853200025710250469
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1757615929357730268}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f709525a6f0afa488f2ba2eb732fbb0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Froggy.Reseau.ReapparitionReseau
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 8323199054783479740}
+  _networkObjectCache: {fileID: 0}
+--- !u!1 &4154053908456394189
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5837803083897627622}
+  - component: {fileID: 295837268655050886}
+  m_Layer: 0
+  m_Name: Joueur 3
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5837803083897627622
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4154053908456394189}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3.5, y: 0, z: -9.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2935560732528403325}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &295837268655050886
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4154053908456394189}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f16ee5ca6ce047c2a460051419b1e8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Froggy.Arene.RepereArene
+  sorte: 0
+  joueur: 3
+  parties: 7
 --- !u!1 &4554025270787449012
 GameObject:
   m_ObjectHideFlags: 0
@@ -476,6 +556,147 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Froggy.Arene.RepereArene
   sorte: 1
+  joueur: 1
+  parties: 7
+--- !u!1 &4667358080908380406
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3948828234760437001}
+  - component: {fileID: 9047019579754635104}
+  m_Layer: 0
+  m_Name: Joueur 2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3948828234760437001
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4667358080908380406}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.5, y: 0.14, z: -9.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2935560732528403325}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &9047019579754635104
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4667358080908380406}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f16ee5ca6ce047c2a460051419b1e8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Froggy.Arene.RepereArene
+  sorte: 0
+  joueur: 2
+  parties: 7
+--- !u!1 &6675201120899081900
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2562248296213667351}
+  - component: {fileID: 5110777588155461780}
+  m_Layer: 0
+  m_Name: Joueur 4
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2562248296213667351
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6675201120899081900}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 6.5, y: 0, z: -9}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2935560732528403325}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5110777588155461780
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6675201120899081900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f16ee5ca6ce047c2a460051419b1e8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Froggy.Arene.RepereArene
+  sorte: 0
+  joueur: 4
+  parties: 7
+--- !u!1 &7124723288699965780
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7507864258295347123}
+  - component: {fileID: 6618358672437340347}
+  m_Layer: 0
+  m_Name: Joueur 1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7507864258295347123
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7124723288699965780}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -2.5, y: 0, z: -9}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2935560732528403325}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6618358672437340347
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7124723288699965780}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f16ee5ca6ce047c2a460051419b1e8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Froggy.Arene.RepereArene
+  sorte: 0
   joueur: 1
   parties: 7
 --- !u!1 &7222971668709587693
@@ -608,6 +829,41 @@ MonoBehaviour:
   sorte: 1
   joueur: 1
   parties: 7
+--- !u!1 &7699976625532935771
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2935560732528403325}
+  m_Layer: 0
+  m_Name: "Rep\xE8res d'apparition (provisoires)"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2935560732528403325
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7699976625532935771}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 7507864258295347123}
+  - {fileID: 3948828234760437001}
+  - {fileID: 5837803083897627622}
+  - {fileID: 2562248296213667351}
+  m_Father: {fileID: 494187914795458922}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8933318120309402303
 GameObject:
   m_ObjectHideFlags: 0
