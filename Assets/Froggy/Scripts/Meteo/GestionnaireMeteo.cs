@@ -36,6 +36,12 @@ namespace Froggy.Meteo
 
         public event Action<DefinitionEvenement> Annonce, Debut, Fin;
 
+        /// <summary>
+        /// En réseau, chez un joueur qui n'est pas l'hôte (#128) : il ne tire rien et montre l'état reçu (Refleter).
+        /// Posé par MeteoReseau.
+        /// </summary>
+        public bool Miroir { get; set; }
+
         /// <summary>L'annonce provisoire à l'écran : le HUD (P6-02) l'éteint quand il prend sa place.</summary>
         public bool AffichageProvisoire { get => affichageProvisoire; set => affichageProvisoire = value; }
 
@@ -97,7 +103,7 @@ namespace Froggy.Meteo
         /// <summary>Annonce tout de suite cet événement de la fiche (un essai, une règle qui le déclenche).</summary>
         public bool Annoncer(DefinitionEvenement evenement)
         {
-            if (!EnMarche || Regles == null) return false;
+            if (!EnMarche || Regles == null || Miroir) return false;
             changements.Clear();
             bool ok = Regles.Annoncer(definitions.IndexOf(evenement), changements);
             Appliquer();
@@ -109,9 +115,21 @@ namespace Froggy.Meteo
         /// <summary>Un pas, au pas physique (un test l'appelle hors jeu).</summary>
         public void Pas(float dt)
         {
-            if (!EnMarche || Regles == null) return;
+            if (!EnMarche || Regles == null || Miroir) return;
             changements.Clear();
             Regles.Pas(dt, changements);
+            Appliquer();
+        }
+
+        /// <summary>
+        /// En Miroir : montre l'état décidé par l'hôte. Annonce, début et fin partent comme chez lui (effets sur les
+        /// Froggy, rendu, son). Sans effet tant que la partie n'a pas commencé ici.
+        /// </summary>
+        public void Refleter(PhaseMeteo phase, int courant, float reste)
+        {
+            if (!EnMarche || Regles == null) return;
+            changements.Clear();
+            Regles.Imposer(phase, courant, reste, changements);
             Appliquer();
         }
 

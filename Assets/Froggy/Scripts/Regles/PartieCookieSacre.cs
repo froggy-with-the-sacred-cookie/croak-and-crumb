@@ -16,7 +16,7 @@ namespace Froggy.Regles
     /// un cookie pour une autre raison (« cookie lâché », P3-02) le lâche aussi ; le gel éclair appellera FaireLacher().
     /// Un joueur intouchable (P3-04) ne le lâche pas. Une nouvelle partie (« Rejouer ») le remet à zéro.
     /// En réseau (P2-04), chez un joueur qui n'est pas l'hôte (DeroulementPartie en « Miroir »), il ne décide rien, comme
-    /// PartieCookies. Il n'est pas encore dans PartieReseau : la copie chez les joueurs reste à faire.
+    /// PartieCookies : CookieSacreReseau lui envoie l'état de l'hôte, qu'il montre par Refleter (#128).
     /// Événement émis : « cookie sacré » (socle), à l'apparition (auteur : le gobelin), puis à chaque fois qu'il change de
     /// main ou tombe (auteur : le joueur). Le message à l'écran est provisoire, en attendant le HUD (P6-02).
     /// </summary>
@@ -47,6 +47,11 @@ namespace Froggy.Regles
         private float largeurModele = 1f;
         private Vector3 centreModele;   // le centre des maillages du cookie, depuis son origine (Cookie_Sacre : à sa base)
         private ReglesPartie partieVue;   // la partie en cours : si DeroulementPartie en refait une (« Rejouer »), on repart de zéro
+        // en Miroir (réseau) : ce qui est déjà montré, pour ne replacer le cookie qu'à un changement
+        private EtatCookieSacre etatMontre = EtatCookieSacre.Absent;
+        private int porteurMontre = ReglesPartie.Personne;
+        private Vector3 solMontre;
+        private readonly List<Vector3> aucuneMenace = new List<Vector3>();
         private GUIStyle style;
 
         public ReglesCookieSacre Regles { get; private set; }
@@ -77,6 +82,7 @@ namespace Froggy.Regles
             if (leGobelin != null) Detruire(leGobelin.gameObject);
             if (leCookie != null) Detruire(leCookie);
             leGobelin = null; leCookie = null;
+            etatMontre = EtatCookieSacre.Absent; porteurMontre = ReglesPartie.Personne;
             if (deroulement != null) deroulement.PorteurCookieSacre = null;
         }
 
@@ -140,6 +146,53 @@ namespace Froggy.Regles
         }
 
         /// <summary>
+        /// En réseau, chez un joueur qui n'est pas l'hôte (#128) : montre l'état décidé par l'hôte (gobelin, cookie sacré,
+        /// porteur), sans rien décider ni émettre : les événements « cookie sacré » arrivent déjà par PartieReseau.
+        /// Appelé à chaque image par CookieSacreReseau.
+        /// </summary>
+        public void Refleter(EtatCookieSacre etat, int porteur, Vector3 auSol, Vector3 gobelinIci, float gobelinCap,
+            bool gobelinAttrape, float dt)
+        {
+            if (Regles == null) Preparer();
+            if (etat == EtatCookieSacre.Absent)
+            {
+                if (Regles.Etat != EtatCookieSacre.Absent || leGobelin != null) Preparer();   // une nouvelle partie
+                return;
+            }
+            if (leGobelin == null && leCookie == null) Apparaitre(gobelinIci, emettre: false);
+            Regles.Imposer(etat, porteur, auSol);
+
+            bool change = etat != etatMontre || porteur != porteurMontre || (etat == EtatCookieSacre.AuSol && auSol != solMontre);
+            if (change)
+            {
+                bool montre = true;
+                switch (etat)
+                {
+                    case EtatCookieSacre.Porte:
+                        var qui = Porteur(porteur);
+                        if (qui == null) { montre = false; break; }   // sa Froggy n'est pas encore là : on réessaie
+                        if (etatMontre == EtatCookieSacre.Gobelin && leGobelin != null) leGobelin.Attraper();
+                        Porter(qui);
+                        if (deroulement != null) deroulement.PorteurCookieSacre = qui;
+                        break;
+                    case EtatCookieSacre.AuSol:
+                        Poser(auSol);
+                        if (deroulement != null) deroulement.PorteurCookieSacre = null;
+                        break;
+                }
+                if (montre) { etatMontre = etat; porteurMontre = porteur; solMontre = auSol; }
+            }
+
+            if (leGobelin != null && leGobelin.gameObject.activeSelf)
+            {
+                if (gobelinAttrape) leGobelin.Attraper();
+                leGobelin.Pas(dt, aucuneMenace, bouger: false);   // apparition, attrapé, départ : comme chez l'hôte
+                if (leGobelin.gameObject.activeSelf && leGobelin.EtatActuel != FuiteGobelin.Etat.Attrape)
+                    leGobelin.Suivre(gobelinIci, Quaternion.Euler(0f, gobelinCap, 0f), dt);
+            }
+        }
+
+        /// <summary>
         /// Écoute les événements du socle (un test l'appelle directement). Une torgnole sur le porteur (« coup donné »,
         /// « Objet » le touché) ou un cookie lâché par le porteur (« cookie lâché ») font tomber le cookie sacré, à 40° de
         /// la direction du coup : il ne se pose pas sur le cookie ordinaire qui tombe avec lui.
@@ -165,7 +218,10 @@ namespace Froggy.Regles
 
         private PorteurCookies Porteur(int joueur) => cookies.Porteurs.FirstOrDefault(p => p != null && p.Joueur == joueur);
 
-        private void Apparaitre()
+        private void Apparaitre() => Apparaitre(null, true);
+
+        // « imposee » : en Miroir, là où l'hôte l'a fait apparaître ; « emettre » faux : l'hôte a déjà annoncé l'apparition
+        private void Apparaitre(Vector3? imposee, bool emettre)
         {
             Transform repere = depart;
             if (repere == null)
@@ -173,8 +229,8 @@ namespace Froggy.Regles
                 var trouve = FindObjectsByType<RepereArene>().FirstOrDefault(r => r.sorte == RepereArene.Sorte.Gobelin);
                 if (trouve != null) repere = trouve.transform;
             }
-            Vector3 ici = repere != null ? repere.position
-                : joueurs.Count > 0 ? joueurs[0].Item2 + new Vector3(0f, 0f, 6f) : transform.position;
+            Vector3 ici = imposee ?? (repere != null ? repere.position
+                : joueurs.Count > 0 ? joueurs[0].Item2 + new Vector3(0f, 0f, 6f) : transform.position);
 
             GameObject go = gobelin != null ? Instantiate(gobelin, ici, Quaternion.identity, transform) : CapsuleProvisoire(ici);
             go.name = "Gobelin";
@@ -187,7 +243,8 @@ namespace Froggy.Regles
             (largeurModele, centreModele) = Mesurer(leCookie);
             // entre ses mains : redressé (Cookie_Sacre penche de 45° en arrière), couronne vers l'avant, centré
             Accrocher(leGobelin.Mains, Vector3.zero, largeurDansLesMains, Quaternion.Euler(45f, 0f, 0f), centrer: true);
-            EvenementsPartie.Emettre(TypeEvenement.CookieSacre, go, leCookie, ici);
+            etatMontre = EtatCookieSacre.Gobelin;
+            if (emettre) EvenementsPartie.Emettre(TypeEvenement.CookieSacre, go, leCookie, ici);
         }
 
         /// <summary>Au-dessus de la tête du porteur, à plat et bien visible.</summary>

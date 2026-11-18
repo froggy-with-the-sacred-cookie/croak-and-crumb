@@ -108,6 +108,16 @@ namespace Froggy.Regles
             return true;
         }
 
+        /// <summary>
+        /// En réseau, chez un joueur qui n'est pas l'hôte : prend l'état reçu de l'hôte (#128), sans rien décider.
+        /// </summary>
+        public void Imposer(EtatCookieSacre etat, int porteur, Vector3 auSol)
+        {
+            Etat = etat;
+            Porteur = etat == EtatCookieSacre.Porte ? porteur : ReglesPartie.Personne;
+            PositionAuSol = auSol;
+        }
+
         private void Donner(int joueur)
         {
             Etat = EtatCookieSacre.Porte;

@@ -79,3 +79,33 @@ Puis :
 - Port encore pris : `unity close <projet>` puis `unity open <projet>` (vérifier avant qu'aucune scène n'a de
   modification non enregistrée : `close` quitte sans enregistrer).
 - Remettre le préréglage de connexion sur **Parfait** avant de commiter (l'asset est partagé par toute l'équipe).
+
+## 7. Jouer une partie à deux par script
+
+Une IA ne peut pas donner le focus à une fenêtre ni appuyer sur une touche : elle pilote tout par
+`unity command eval --project-path <fenêtre>` (principale, ou `Library/VP/<vpId>` pour Player 2).
+
+- **Player 2 décoché** : rouvrir le panneau par
+  `EditorApplication.ExecuteMenuItem("Froggy/Réseau/2. Fenêtre Multiplayer Play Mode (cocher Player 2, 3, 4)")` et
+  demander à l'humain de cocher. `Library/VP/SystemData.json` dit qui est actif (`"Active"`).
+- **Salon** : hôte `Salon.Local.Creer()` puis lire `Salon.Local.Code` ; Player 2 `Salon.Local.Rejoindre(code)`, puis
+  `SeDirePret(true)` ; hôte `Lancer()` quand `PeutLancer`. Si le salon crée en ligne par défaut (Unity Relay),
+  poser `EnLigne = false` pour un test sur une machine.
+- **La partie de test dure 30 s** (`ReglagesPartie_Essai`) : la rallonger chez l'hôte dès qu'elle est « en jeu »,
+  sans toucher à l'asset partagé : champ `<Reste>k__BackingField` de `ReglesPartie` par réflexion, à 600. Les autres
+  recopient le temps restant. Le gobelin n'arrive alors qu'à la dernière minute.
+- **Téléporter une Froggy** : `Rigidbody.position` et `transform.position`, sur la fenêtre de son propriétaire.
+  L'hôte voit la nouvelle place 0,1 à 0,2 s plus tard : une action décidée par l'hôte (torgnole, ramassage) lancée
+  dans le même appel part de l'ancienne place. Placer, faire un appel vide, puis agir.
+- **Simuler une touche** : appeler ce que la touche appelle (`PartieTorgnoles.DemandeFrappe(JoueurLocal())`,
+  `PartieObjets.DemandeUtiliser(Local)` chez un client ; `Frapper` / `Utiliser` chez l'hôte).
+  `DeplacementWow.Imposer` **verrouille le clavier** de cette Froggy jusqu'à la fin du Play : si un humain joue
+  aussi, rendre la main en remettant le champ privé `imposees` à faux (réflexion). Prévenir l'humain avant.
+- **Donner un objet précis** (le tirage est au hasard) : chez l'hôte, `ReglesObjets.emplacements`
+  (`SortedDictionary<int, int>`, numéro du joueur vers rang de la fiche) et retirer le joueur de `enRecharge`.
+- **Mesurer chez un joueur** (vitesse d'un recul, onde reçue) : un enregistreur branché sur
+  `EditorApplication.update`, son résultat rangé par `AppDomain.CurrentDomain.SetData`, relu dans un appel suivant.
+  Chaque appel du CLI fige l'éditeur un instant : une mesure de fluidité par script est faussée, la fluidité se juge
+  en jouant.
+- **Tests EditMode dans l'éditeur ouvert** : `unity command test run --mode editor --format json` (sans second
+  éditeur, contrairement à `unity test`).

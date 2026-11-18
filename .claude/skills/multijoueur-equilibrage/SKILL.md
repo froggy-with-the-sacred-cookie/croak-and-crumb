@@ -52,6 +52,17 @@ skill `reseau-fishnet` (vérifié dans la version installée), sinon le code du 
 6. Si la cause reste dans la bibliothèque, **contourner dans notre code**, l'écrire (commentaire, skill
    `reseau-fishnet`, guide) et proposer une issue au projet de la bibliothèque.
 
+**Règles pour une mécanique de partie en ligne** :
+
+- **L'objet réseau du joueur n'est pas sa Froggy** (`FroggyReseau` : un objet invisible et une copie visible) : les
+  composants de jeu (`PorteurCookies`, `PorteurObjet`) sont sur la Froggy. Après un changement du joueur réseau,
+  tester un ramassage et une capture, pas seulement la course et le saut : un joueur non inscrit ne donne aucune erreur.
+- **Ce qui recense les joueurs au début de la partie prévoit les retardataires** : une Froggy peut arriver chez
+  l'hôte juste après (ordre des messages) et doit s'inscrire à son arrivée.
+- **Un message désigne un joueur par son numéro du salon**, le même sur toutes les machines, jamais par sa position
+  ni par un numéro interne d'effet.
+- **Un événement ne passe que par un chemin réseau** : relayé deux fois, son effet joue deux fois.
+
 ## 3. Équilibrer par la simulation
 
 Méthode de Glouton : un mode `-sim N` enchaîne N parties accélérées sans affichage, le « joueur » étant un bot de niveau

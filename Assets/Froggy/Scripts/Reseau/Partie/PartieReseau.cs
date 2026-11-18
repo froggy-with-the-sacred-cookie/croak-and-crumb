@@ -236,6 +236,7 @@ namespace Froggy.Reseau
         /// </summary>
         private void Relayer(EvenementPartie e)
         {
+            if (e.Type == TypeEvenement.ObjetUtilise) return;   // ObjetsReseau l'envoie avec l'objet utilisé (#128)
             var porteur = e.Auteur != null ? e.Auteur.GetComponent<PorteurCookies>() : null;
             int joueur = porteur != null ? porteur.Joueur : ReglesPartie.Personne;
             int nombre = porteur != null && cookies.Regles != null ? cookies.Regles.Portes(joueur) : 0;

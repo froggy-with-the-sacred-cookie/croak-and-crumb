@@ -84,6 +84,20 @@ namespace Froggy.Regles
             }
         }
 
+        /// <summary>
+        /// En réseau, chez un joueur qui n'est pas l'hôte (#128) : il rejoint en douceur la position reçue, et sa course
+        /// s'anime d'après sa vitesse. Le reste (apparition, attrapé, départ) suit Pas(dt, …, bouger: false).
+        /// </summary>
+        public void Suivre(Vector3 position, Quaternion rotation, float dt)
+        {
+            Vector3 avant = transform.position;
+            float k = 1f - Mathf.Exp(-12f * Mathf.Max(0f, dt));
+            transform.SetPositionAndRotation(Vector3.Lerp(avant, position, k), Quaternion.Slerp(transform.rotation, rotation, k));
+            if (EtatActuel != Etat.Fuite || dt <= 0f || reglages == null) return;
+            Vector3 deplace = transform.position - avant; deplace.y = 0f;
+            Vitesse(deplace.magnitude / dt / Mathf.Max(0.01f, reglages.vitesse));
+        }
+
         private void Courir(float dt, IReadOnlyList<Vector3> menaces)
         {
             Vector3 ici = transform.position;
