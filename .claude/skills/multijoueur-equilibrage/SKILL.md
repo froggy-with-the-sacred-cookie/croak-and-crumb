@@ -7,7 +7,7 @@ description: Règles du multijoueur de Froggy (autorité, état synchronisé ou 
 
 Froggy est **exclusivement multijoueur** (2 à 4 joueurs, Notion) avec **FishNet**. Ce skill garde ce qu'a appris
 Glouton (Unity 6, 2 à 6 joueurs en ligne, octobre 2026) ; il est indépendant de la bibliothèque. Pour l'API FishNet,
-lire la documentation de la version installée : ne jamais l'écrire de mémoire.
+skill `reseau-fishnet` (vérifié dans la version installée), sinon le code du paquet : ne jamais l'écrire de mémoire.
 
 ## 1. Autorité et synchronisation (Glouton)
 
@@ -36,6 +36,21 @@ lire la documentation de la version installée : ne jamais l'écrire de mémoire
   journal), `-players n`, `-bots n`, `-difficulty`, `-roundtime s`.
 - Réseau local : le premier lancement d'un build sur macOS ouvre la fenêtre du pare-feu, qui bloque le test. Relancer
   avant d'accuser le code.
+- Froggy dans l'éditeur : Multiplayer Play Mode et le prefab `TestReseau` (démarrage automatique, latence simulée,
+  panneau). Mode d'emploi pour une IA : skill `test-multijoueur-local` ; pour un humain : `Docs/Reseau/GUIDE.md`.
+
+**Déboguer un problème réseau** (Froggy, P2-07, novembre 2026) :
+
+1. **Compter juste** : les joueurs = connexions **authentifiées** et objets joueurs visibles, dans **chaque** fenêtre ;
+   le total brut des connexions peut compter une tentative avortée.
+2. **Lire chaque journal** : celui de la fenêtre principale (`Logs/Editor.log`) et celui de chaque clone
+   (`Library/VP/<vpId>/Logs/Editor.log`), dans l'ordre des événements (« Local server is… », « Local client is… »).
+3. **Regarder le système** : qui tient le port (`Get-NetUDPEndpoint -LocalPort 7770`), mémoire et disque.
+4. **Isoler la couche** : refaire le geste suspect avec la bibliothèque seule, hors du jeu, sur un autre port (exemple :
+   un `LiteNetLib.NetManager` démarré puis arrêté sur 7790 libérait bien son port, donc la fuite venait d'au-dessus).
+5. **Reproduire deux fois** : un bug de démarrage ou d'arrêt n'apparaît souvent qu'au **deuxième Play**.
+6. Si la cause reste dans la bibliothèque, **contourner dans notre code**, l'écrire (commentaire, skill
+   `reseau-fishnet`, guide) et proposer une issue au projet de la bibliothèque.
 
 ## 3. Équilibrer par la simulation
 
