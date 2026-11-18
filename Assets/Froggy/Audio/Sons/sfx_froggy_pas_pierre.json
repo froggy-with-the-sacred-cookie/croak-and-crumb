@@ -1,0 +1,121 @@
+{
+  "generator": "sound-forge 0.6.0",
+  "preset": null,
+  "sound": {
+    "name": "Pas sur la pierre",
+    "layers": [
+      {
+        "name": "Arête de roche",
+        "waveform": "white_noise",
+        "pitch": {
+          "start": 590.0,
+          "end": 590.0,
+          "time": 0.008
+        },
+        "envelope": {
+          "attack": 0.0012,
+          "decay": 0.008,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "low_pass",
+          "cutoff": {
+            "start": 5100.0,
+            "end": 5100.0,
+            "time": 0.008
+          },
+          "resonance": 0.2
+        },
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.78,
+        "start": 0.0,
+        "resonator": {
+          "material": "stone",
+          "decay": 0.21,
+          "brightness": 0.48,
+          "dry": 0.12
+        }
+      },
+      {
+        "name": "Contact bref",
+        "waveform": "white_noise",
+        "pitch": {
+          "start": 440.0,
+          "end": 440.0,
+          "time": 0.035
+        },
+        "envelope": {
+          "attack": 0.0015,
+          "decay": 0.035,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "band_pass",
+          "cutoff": {
+            "start": 2400.0,
+            "end": 750.0,
+            "time": 0.035
+          },
+          "resonance": 0.2
+        },
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.4,
+        "start": 0.0,
+        "resonator": null
+      },
+      {
+        "name": "Paume",
+        "waveform": "sine",
+        "pitch": {
+          "start": 235.0,
+          "end": 114.0,
+          "time": 0.049
+        },
+        "envelope": {
+          "attack": 0.003,
+          "decay": 0.049,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": null,
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.32,
+        "start": 0.0,
+        "resonator": null
+      }
+    ],
+    "effects": {
+      "drive": null,
+      "echo": null,
+      "reverb": null
+    },
+    "peak_db": -12.0
+  },
+  "variants": 5,
+  "amount": 0.34,
+  "seed": 60505,
+  "files": [
+    "sfx_froggy_pas_pierre_01.wav",
+    "sfx_froggy_pas_pierre_02.wav",
+    "sfx_froggy_pas_pierre_03.wav",
+    "sfx_froggy_pas_pierre_04.wav",
+    "sfx_froggy_pas_pierre_05.wav"
+  ]
+}

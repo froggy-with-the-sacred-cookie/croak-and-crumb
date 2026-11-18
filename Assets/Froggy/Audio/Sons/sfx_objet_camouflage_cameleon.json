@@ -1,0 +1,117 @@
+{
+  "generator": "sound-forge 0.6.0",
+  "preset": null,
+  "sound": {
+    "name": "Camouflage caméléon",
+    "layers": [
+      {
+        "name": "Feuilles et peau",
+        "waveform": "white_noise",
+        "pitch": {
+          "start": 440.0,
+          "end": 440.0,
+          "time": 0.21
+        },
+        "envelope": {
+          "attack": 0.02,
+          "decay": 0.21,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "band_pass",
+          "cutoff": {
+            "start": 3750.0,
+            "end": 1160.0,
+            "time": 0.21
+          },
+          "resonance": 0.2
+        },
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.61,
+        "start": 0.0,
+        "resonator": null
+      },
+      {
+        "name": "Glissé feutré",
+        "waveform": "sine",
+        "pitch": {
+          "start": 590.0,
+          "end": 171.0,
+          "time": 0.28
+        },
+        "envelope": {
+          "attack": 0.027,
+          "decay": 0.28,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": null,
+        "vibrato": {
+          "rate_hz": 15.0,
+          "depth_semitones": 0.57
+        },
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.64,
+        "start": 0.024,
+        "resonator": null
+      },
+      {
+        "name": "Effacement",
+        "waveform": "brown_noise",
+        "pitch": {
+          "start": 440.0,
+          "end": 440.0,
+          "time": 0.24
+        },
+        "envelope": {
+          "attack": 0.033,
+          "decay": 0.24,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "band_pass",
+          "cutoff": {
+            "start": 1490.0,
+            "end": 460.0,
+            "time": 0.24
+          },
+          "resonance": 0.2
+        },
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.33,
+        "start": 0.129,
+        "resonator": null
+      }
+    ],
+    "effects": {
+      "drive": null,
+      "echo": null,
+      "reverb": null
+    },
+    "peak_db": -9.0
+  },
+  "variants": 3,
+  "amount": 0.24,
+  "seed": 62591,
+  "files": [
+    "sfx_objet_camouflage_cameleon_01.wav",
+    "sfx_objet_camouflage_cameleon_02.wav",
+    "sfx_objet_camouflage_cameleon_03.wav"
+  ]
+}

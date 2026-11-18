@@ -34,6 +34,7 @@ namespace Froggy.Deplacement
         private BoxCollider boite;
         private TemplatePlayerController ancien;
         private Modificateurs modificateurs;
+        private NageFroggy nage;
         private InputAction moveAction, jumpAction, sprintAction, pasDeCote, courseAuto;
         private bool pret;
 
@@ -53,6 +54,9 @@ namespace Froggy.Deplacement
         /// </summary>
         public event System.Action<Collider> Atterrissage;
 
+        /// <summary>Une impulsion de saut a réellement été appliquée.</summary>
+        public event System.Action ImpulsionSaut;
+
         private void Initialiser()
         {
             if (pret) return;
@@ -63,6 +67,9 @@ namespace Froggy.Deplacement
             // chaque Froggy en a un, pour que les autres postes le trouvent sans toucher au préfabriqué
             modificateurs = GetComponent<Modificateurs>();
             if (modificateurs == null) modificateurs = gameObject.AddComponent<Modificateurs>();
+            // la nage (P1-02) : sans effet tant que Froggy n'est pas dans une ZoneEau
+            nage = GetComponent<NageFroggy>();
+            if (nage == null) nage = gameObject.AddComponent<NageFroggy>();
             if (visuel == null) visuel = transform.Find("Visual");
             var entree = GetComponent<PlayerInput>();
             if (entree != null)
@@ -136,6 +143,19 @@ namespace Froggy.Deplacement
             sautAppuye = false;
 
             Vector3 v = corps.linearVelocity;
+
+            // dans l'eau, la nage prend la main (P1-02) ; un saut demandé peut servir à ressortir
+            if (nage != null && nage.Nager(dt, transform.TransformPoint(boite.center), entrees.deplacement, tampon > 0f,
+                    reglages, reglagesWow, modificateurs, corps, out bool sautUtilise))
+            {
+                AuSol = etaitAuSol = montee = false;
+                SolTouche = null;
+                coyote = 0f;
+                if (sautUtilise) tampon = 0f;
+                tampon -= dt;
+                return;
+            }
+
             AuSol = v.y <= 0.01f && Sol();   // en montée, on ne se recolle pas au sol
             // annoncé avant le saut éventuel du même pas : un saut enchaîné par le tampon part sans contact physique
             if (AuSol && !etaitAuSol) Atterrissage?.Invoke(SolTouche);
@@ -152,7 +172,8 @@ namespace Froggy.Deplacement
             Vector3 horizontal = Vector3.MoveTowards(new Vector3(v.x, 0f, v.z), voulue, acceleration * dt);
 
             // la hauteur se donne, la vitesse se dérive
-            if (tampon > 0f && coyote > 0f)
+            bool saute = tampon > 0f && coyote > 0f;
+            if (saute)
             {
                 v.y = Mathf.Sqrt(2f * -Physics.gravity.y * reglages.jumpHeight * facteurSaut);
                 tampon = coyote = 0f;
@@ -168,6 +189,7 @@ namespace Froggy.Deplacement
             if (v.y <= 0f) montee = false;
 
             corps.linearVelocity = new Vector3(horizontal.x, v.y, horizontal.z);
+            if (saute) ImpulsionSaut?.Invoke();
         }
 
         /// <summary>La vitesse voulue au sol : x pas de côté, y avant / arrière, dans le repère du cap ; recul plus lent.</summary>

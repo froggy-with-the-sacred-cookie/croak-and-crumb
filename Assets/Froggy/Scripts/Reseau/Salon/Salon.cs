@@ -42,6 +42,10 @@ namespace Froggy.Reseau
         [Tooltip("Secondes entre « partie finie » et le retour au salon.")]
         [SerializeField] private float delaiRetour = 5f;
 
+        [Tooltip("Règles de partie en réseau (PartieReseau, P2-04), apparues quand tous les joueurs sont là. Vide : " +
+                 "pas de règles (on se promène).")]
+        [SerializeField] private NetworkObject prefabPartie;
+
         [Header("Salon")]
         [Tooltip("Objet réseau du salon (SalonReseau, NetworkObject global).")]
         [SerializeField] private NetworkObject prefabSalonReseau;
@@ -66,6 +70,7 @@ namespace Froggy.Reseau
         private RechercheSalon recherche;
         private EtatSalon etat;                       // hôte seulement
         private readonly Dictionary<int, NetworkObject> joueurs = new();
+        private NetworkObject partie;                 // hôte : les règles de la partie en cours
         private LocalConnectionState etatServeur = LocalConnectionState.Stopped;
         private Coroutine enCours;
         private Coroutine retourPrevu;
@@ -110,6 +115,19 @@ namespace Froggy.Reseau
 
         public Color Couleur(int indice) =>
             couleurs.Length == 0 ? Color.white : couleurs[Mathf.Clamp(indice, 0, couleurs.Length - 1)];
+
+        /// <summary>Numéro (1 à 4) d'un joueur d'après son identifiant FishNet ; faux s'il n'est pas dans le salon.</summary>
+        public bool NumeroDe(int clientId, out int numero)
+        {
+            foreach (MembreSalon m in Membres)
+            {
+                if (m.ClientId != clientId) continue;
+                numero = m.Numero;
+                return true;
+            }
+            numero = 0;
+            return false;
+        }
 
         /// <summary>Couleur d'un joueur d'après son identifiant FishNet ; faux s'il n'est pas dans le salon.</summary>
         public bool CouleurDe(int clientId, out Color couleur)
@@ -340,6 +358,8 @@ namespace Froggy.Reseau
             if (retourPrevu != null) StopCoroutine(retourPrevu);
             retourPrevu = null;
 
+            if (partie != null && partie.IsSpawned) reseau.ServerManager.Despawn(partie);
+            partie = null;
             foreach (NetworkObject joueur in joueurs.Values)
                 if (joueur != null && joueur.IsSpawned) reseau.ServerManager.Despawn(joueur);
             joueurs.Clear();
@@ -367,6 +387,28 @@ namespace Froggy.Reseau
                 ou != null ? ou.position : Vector3.up * 2f, ou != null ? ou.rotation : Quaternion.identity);
             reseau.ServerManager.Spawn(joueur, conn);
             joueurs[conn.ClientId] = joueur;
+            CommencerSiTousLa();
+        }
+
+        /// <summary>
+        /// Quand chaque joueur du salon a son personnage, les règles de partie apparaissent et la partie commence
+        /// (P2-04) : l'hôte seul décide, les autres reçoivent.
+        /// </summary>
+        private void CommencerSiTousLa()
+        {
+            if (prefabPartie == null || partie != null || etat == null || etat.Phase != PhaseSalon.EnPartie) return;
+            foreach (MembreSalon m in etat.Membres)
+                if (!joueurs.ContainsKey(m.ClientId)) return;
+
+            partie = Instantiate(prefabPartie);
+            reseau.ServerManager.Spawn(partie);
+            var porteurs = new List<Froggy.Regles.PorteurCookies>();
+            foreach (NetworkObject j in joueurs.Values)
+            {
+                var p = j != null ? j.GetComponent<Froggy.Regles.PorteurCookies>() : null;
+                if (p != null) porteurs.Add(p);
+            }
+            partie.GetComponent<PartieReseau>().Commencer(porteurs);
         }
 
         /// <summary>Fin de partie (P3-03) : retour au salon après un court délai.</summary>
@@ -391,6 +433,7 @@ namespace Froggy.Reseau
             if (etatServeur != LocalConnectionState.Stopped || enCours != null) return;
             etat = null;
             joueurs.Clear();
+            partie = null;
             recherche.Arreter();
         }
 
@@ -415,6 +458,7 @@ namespace Froggy.Reseau
                 joueurs.Remove(conn.ClientId);
             }
             if (etat.Retirer(conn.ClientId)) Publier();
+            CommencerSiTousLa(); // celui qui manquait est parti pendant le chargement
         }
 
         private void QuandClientChange(ClientConnectionStateArgs args)

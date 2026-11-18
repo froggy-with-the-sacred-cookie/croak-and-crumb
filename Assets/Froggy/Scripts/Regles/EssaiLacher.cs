@@ -42,8 +42,9 @@ namespace Froggy.Regles
         private void OnGUI()
         {
             if (cible == null) return;
-            if (style == null) style = new GUIStyle(GUI.skin.label) { fontSize = 16 };
-            var zone = new Rect(14f, Screen.height - 34f, 700f, 26f);
+            // en bas à droite : le menu de debug s'ouvre à gauche
+            if (style == null) style = new GUIStyle(GUI.skin.label) { fontSize = 16, alignment = TextAnchor.UpperRight };
+            var zone = new Rect(Screen.width - 914f, Screen.height - 34f, 900f, 26f);
             string texte = $"L : faire lâcher un cookie au mannequin (il en porte {cible.Nombre})";
             style.normal.textColor = Color.black;
             GUI.Label(new Rect(zone.x + 1f, zone.y + 1f, zone.width, zone.height), texte, style);
