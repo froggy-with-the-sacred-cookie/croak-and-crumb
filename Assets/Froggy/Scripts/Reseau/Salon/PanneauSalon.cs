@@ -31,7 +31,10 @@ namespace Froggy.Reseau
             if (!visible) return;
             PreparerStyles();
 
-            GUILayout.BeginArea(new Rect(10, 10, largeur, Screen.height - 20));
+            // En partie : en bas à gauche, pour laisser le haut au score et au temps (P2-04).
+            bool enPartie = salon.Connecte && salon.Phase == PhaseSalon.EnPartie;
+            GUILayout.BeginArea(enPartie ? new Rect(10, Screen.height - 250, largeur, 240)
+                                         : new Rect(10, 10, largeur, Screen.height - 20));
             GUILayout.BeginVertical(fond);
             GUILayout.Label("<b>Salon</b> <size=11>(provisoire, P2-03)</size>", texte);
 

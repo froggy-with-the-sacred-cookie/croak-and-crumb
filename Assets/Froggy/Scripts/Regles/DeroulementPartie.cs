@@ -10,8 +10,9 @@ namespace Froggy.Regles
     /// à rebours (par les Modificateurs du socle, sans toucher au contrôleur), arrête les cookies avant le départ et après
     /// la fin, et émet « partie commencée » et « partie finie ».
     /// Le cookie sacré n'existe pas encore (P5-08) : celui qui le portera se donne par PorteurCookieSacre.
-    /// Le retour au salon n'existe pas non plus (P2-03) : à la fin, la partie s'arrête et l'événement « partie finie » part.
+    /// À la fin, l'événement « partie finie » part ; en réseau, le salon (P2-03) ramène alors tout le monde.
     /// L'affichage (temps, gagnant) est provisoire, en attendant le HUD (P6-02).
+    /// En réseau (P2-04, PartieReseau) : l'hôte le fait tourner ; chez les autres il est en « Miroir » (Refleter).
     /// </summary>
     public class DeroulementPartie : MonoBehaviour
     {
@@ -64,12 +65,26 @@ namespace Froggy.Regles
             Regles.Lancer();
         }
 
+        /// <summary>En réseau, chez un joueur qui n'est pas l'hôte (P2-04) : rien ne se décide ici, voir Refleter.</summary>
+        public bool Miroir { get; set; }
+
+        /// <summary>En Miroir : montre l'état décidé par l'hôte (phase, temps restant, prolongation, gagnant).</summary>
+        public void Refleter(Phase phase, float reste, float prolonge, int gagnant)
+        {
+            if (Regles == null) Preparer();
+            Regles.Imposer(phase, reste, prolonge, gagnant);
+            Gagnant = null;
+            if (phase == Phase.Finie && cookies != null)
+                foreach (var p in cookies.Porteurs)
+                    if (p != null && p.Joueur == gagnant) Gagnant = p;
+        }
+
         private void FixedUpdate() => Pas(Time.fixedDeltaTime);
 
         /// <summary>Un pas de la partie, au pas physique (un test l'appelle hors jeu). À appeler avant celui des cookies.</summary>
         public void Pas(float dt)
         {
-            if (Regles == null || cookies == null) return;
+            if (Regles == null || cookies == null || Miroir) return;
             Phase avant = Regles.Phase;
 
             scores.Clear();

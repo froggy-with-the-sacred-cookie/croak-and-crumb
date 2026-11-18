@@ -54,6 +54,17 @@ namespace Froggy.Regles
         }
 
         /// <summary>
+        /// En réseau, chez un joueur qui n'est pas l'hôte (P2-04) : prend l'état décidé par l'hôte, pour l'afficher.
+        /// </summary>
+        public void Imposer(Phase phase, float reste, float prolonge, int gagnant)
+        {
+            Phase = phase;
+            Reste = reste;
+            Prolonge = prolonge;
+            Gagnant = gagnant;
+        }
+
+        /// <summary>
         /// Un pas de la partie. « scores » donne le nombre de cookies de chaque joueur, « porteurCookieSacre » celui qui
         /// porte le cookie sacré (Personne s'il est au sol ou n'existe pas).
         /// </summary>
