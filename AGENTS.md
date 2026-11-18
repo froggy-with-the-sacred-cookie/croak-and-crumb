@@ -46,6 +46,10 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
 - Déroulement d'une partie (même dossier) : `ReglesPartie` (compte à rebours, durée, gagnant, prolongation, en C# pur)
   et `DeroulementPartie` dans la scène. Le porteur du cookie sacré se donne par `PorteurCookieSacre` ; le début et la
   fin partent en événements du socle (`PartieCommencee`, `PartieFinie`).
+- Objets (`Assets/Froggy/Scripts/Objets/`) : `ReglesObjets` porte les règles en C# pur (boîtes, tirage, recharge) ;
+  `PartieObjets` les fait vivre dans une scène à partir des repères « Boîte à objets » du Bâtisseur ; `PorteurObjet`
+  donne l'emplacement d'objet d'une Froggy. Un objet = une `FicheObjet`, listée dans `ReglagesObjets`. L'effet d'un
+  objet écoute `PorteurObjet.Utilise`, ou l'événement `ObjetUtilise` du socle.
 
 ## Les branches
 
