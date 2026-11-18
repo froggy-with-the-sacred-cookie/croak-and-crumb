@@ -45,6 +45,11 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
   Faire lâcher un cookie à un joueur (un coup, un malus) : `PartieCookies.FaireLacher(porteur, direction)`.
 - Déroulement d'une partie (même dossier) : `ReglesPartie` (compte à rebours, durée, gagnant, prolongation, en C# pur)
   et `DeroulementPartie` dans la scène. Le porteur du cookie sacré se donne par `PorteurCookieSacre` ; le début et la
+  fin partent en événements du socle (`PartieCommencee`, `PartieFinie`).
+- Objets (`Assets/Froggy/Scripts/Objets/`) : `ReglesObjets` porte les règles en C# pur (boîtes, tirage, recharge) ;
+  `PartieObjets` les fait vivre dans une scène à partir des repères « Boîte à objets » du Bâtisseur ; `PorteurObjet`
+  donne l'emplacement d'objet d'une Froggy. Un objet = une `FicheObjet`, listée dans `ReglagesObjets`. L'effet d'un
+  objet écoute `PorteurObjet.Utilise`, ou l'événement `ObjetUtilise` du socle.
   fin partent en événements du socle (`PartieCommencee`, `PartieFinie`). En fin de partie, « Rejouer » (bouton ou R,
   provisoire en attendant le salon) appelle `DeroulementPartie.Rejouer()`.
 - Réapparition (même dossier) : `ReglesReapparition` (chute, délai, point le plus loin des autres, en C# pur) et
