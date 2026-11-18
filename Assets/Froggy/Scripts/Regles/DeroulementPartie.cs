@@ -33,6 +33,12 @@ namespace Froggy.Regles
 
         public ReglesPartie Regles { get; private set; }
 
+        /// <summary>
+        /// L'affichage provisoire (temps, gagnant, « Rejouer » et sa touche R) : le HUD (P6-02) l'éteint quand il prend
+        /// sa place, et reprend « Rejouer ».
+        /// </summary>
+        public bool AffichageProvisoire { get => affichageProvisoire; set => affichageProvisoire = value; }
+
         /// <summary>Celui qui porte le cookie sacré, ou vide. Tenu à jour par PartieCookieSacre (P5-08).</summary>
         public PorteurCookies PorteurCookieSacre { get; set; }
 

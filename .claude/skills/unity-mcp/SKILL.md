@@ -90,7 +90,10 @@ Pièges :
   l'interface IMGUI (`OnGUI`). `capture game_view --source screen --save_path <chemin>` la montre. Le chemin doit être
   dans le projet, et un chemin relatif `Temp/x.png` atterrit dans **`Assets/Temp/`** (importé, et partagé avec les
   fenêtres Multiplayer Play Mode) : déplacer l'image hors du projet, puis `AssetDatabase.DeleteAsset("Assets/Temp")`
-  pour ne pas laisser de `Assets/Temp.meta` dans `git status`.
+  pour ne pas laisser de `Assets/Temp.meta` dans `git status`. Sur macOS (18 novembre 2026, HUD P6-02), un chemin
+  **absolu** `<projet>/Captures/x.png` atterrit aussi dans `Assets/Captures/` : même remède.
+- **Un fond IMGUI semi-transparent paraît bien plus clair qu'attendu** (Froggy, 18 novembre 2026, HUD) : le projet
+  mélange en espace linéaire ; un fond sombre à 0,84 d'opacité semblait à moitié transparent. Monter vers 0,94.
 - **Poser un clip humanoïde sans jouer** (Froggy, 18 novembre 2026, gestes de Froggy P) : en mode édition,
   `AnimationClip.SampleAnimation` et un `PlayableGraph` évalué laissent le modèle au repos (os et formes immobiles).
   Seul `AnimationMode.StartAnimationMode()` puis `BeginSampling` / `SampleAnimationClip` / `EndSampling` pose la pose,
@@ -113,6 +116,13 @@ Pièges :
   Unity process »), comme `-batchmode`. Froggy, 28 octobre 2026 : on a exécuté les méthodes `[Test]` / `[TestCase]` par
   réflexion dans `unity command eval` (une `AssertionException` = un échec). Les tests dans `Assets/Froggy/Editor/`
   voient NUnit sans asmdef.
+- **Mieux : `unity command test run --mode EditMode [--filter <Ns.Classe>] --result-only`** (Froggy, 18 novembre
+  2026, macOS) lance le Test Runner **dans l'éditeur ouvert**, sans second éditeur, et rend le résumé et chaque
+  résultat en JSON (236 tests en quelques secondes). Mêmes règles que `run_tests` : hors mode Play, scène ouverte non
+  modifiée.
+- **`TestRunnerApi.Execute` part en différé** (MCP officiel, `Unity_RunCommand`, Froggy, 18 novembre 2026) : l'appel
+  rend la main avant que la série démarre. Un rapport écrit dans un fichier par `ICallbacks` doit être **effacé avant
+  le lancement** ; sinon on lit le « FINI » de la série d'avant (207 lus au lieu de 222 : les nouveaux tests manquaient).
 
 ## 5. Build en ligne de commande
 
@@ -194,3 +204,19 @@ Pièges :
   gobelin) : `CreateInstance` puis `AssetDatabase.CreateAsset`, puis `EditorSceneManager.NewScene` en mode `Single`, et
   la référence gardée en mémoire ne pointait plus sur rien : la scène s'est enregistrée avec ces champs vides, sans
   erreur. Relire l'asset par `AssetDatabase.LoadAssetAtPath` après l'ouverture de la scène, et contrôler les champs.
+- **Enregistrer une scène de poste quand le jardin est chargé par-dessus** (Froggy, 18 novembre 2026, deux fois : #13
+  et #14) : `SaveScene` y écrit le brouillard et le ciel du jardin (`m_FogColor`, `m_LinearFogStart/End`,
+  `m_SkyboxMaterial`). Après chaque sauvegarde, lire `git diff` de la scène ; rétablir par `RenderSettings` (gris 0,5,
+  0 à 300 m, `Default-Skybox.mat` par `GetBuiltinExtraResource`) puis réenregistrer.
+- **`PrefabUtility.SaveAsPrefabAssetAndConnect` rend le préfabriqué, pas l'instance** : placer l'objet de la scène
+  avant l'appel (ou le retrouver ensuite), sinon c'est la racine du préfabriqué qui bouge et l'instance reste à 0.
+- **Capturer la caméra du jeu** : `Unity_Camera_Capture` sans argument rend la vue Scène. Rendre `Camera.main` dans une
+  `RenderTexture` (`targetTexture`, `Render()`, `ReadPixels`) et l'enregistrer dans le scratchpad.
+- **Récupérer `develop` pendant que Unity est ouvert** (Froggy, 18 novembre 2026) : Unity importe pendant que git écrit
+  les fichiers. Après la mise à jour, des `.meta` d'animations qui n'étaient à personne sont apparus : supprimés (Unity
+  les a réécrits ensuite avec les mêmes identifiants, mais un bruit d'arrondi dans l'avatar), ou réimportés par
+  l'**ancienne** version d'un postprocesseur pas encore recompilé (`loopTime` remis à 0 sur Nage et Porter). Après
+  chaque mise à jour : `git status`, comparer à `develop` tout fichier qui n'est pas à soi, le rétablir
+  (`git checkout -- <fichier>`) s'il ne fait que refléter l'import, puis réimporter une fois le code compilé.
+  **Ce qui l'évite** (essayé le même jour, mise à jour propre) : `AssetDatabase.DisallowAutoRefresh()` avant la
+  commande git, puis `AllowAutoRefresh()` et `Refresh()` après : Unity importe une fois, les scripts compilés d'abord.

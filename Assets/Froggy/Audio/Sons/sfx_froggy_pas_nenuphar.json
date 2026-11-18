@@ -1,0 +1,108 @@
+{
+  "generator": "sound-forge 0.6.0",
+  "preset": null,
+  "sound": {
+    "name": "Pas sur un nénuphar",
+    "layers": [
+      {
+        "name": "Feuille souple",
+        "waveform": "white_noise",
+        "pitch": {
+          "start": 440.0,
+          "end": 440.0,
+          "time": 0.075
+        },
+        "envelope": {
+          "attack": 0.004,
+          "decay": 0.075,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "band_pass",
+          "cutoff": {
+            "start": 2600.0,
+            "end": 860.0,
+            "time": 0.075
+          },
+          "resonance": 0.2
+        },
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.43,
+        "start": 0.0,
+        "resonator": null
+      },
+      {
+        "name": "Appui mouillé",
+        "waveform": "sine",
+        "pitch": {
+          "start": 290.0,
+          "end": 138.0,
+          "time": 0.068
+        },
+        "envelope": {
+          "attack": 0.003,
+          "decay": 0.068,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": null,
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.58,
+        "start": 0.0,
+        "resonator": null
+      },
+      {
+        "name": "Goutte courte",
+        "waveform": "sine",
+        "pitch": {
+          "start": 770.0,
+          "end": 520.0,
+          "time": 0.061
+        },
+        "envelope": {
+          "attack": 0.003,
+          "decay": 0.061,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": null,
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.17,
+        "start": 0.033,
+        "resonator": null
+      }
+    ],
+    "effects": {
+      "drive": null,
+      "echo": null,
+      "reverb": null
+    },
+    "peak_db": -12.0
+  },
+  "variants": 5,
+  "amount": 0.37,
+  "seed": 60803,
+  "files": [
+    "sfx_froggy_pas_nenuphar_01.wav",
+    "sfx_froggy_pas_nenuphar_02.wav",
+    "sfx_froggy_pas_nenuphar_03.wav",
+    "sfx_froggy_pas_nenuphar_04.wav",
+    "sfx_froggy_pas_nenuphar_05.wav"
+  ]
+}

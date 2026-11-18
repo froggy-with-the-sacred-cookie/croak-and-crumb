@@ -45,6 +45,12 @@ namespace Froggy.Objets
         /// <summary>La Froggy du joueur de cette machine : celle que la touche d'utilisation commande.</summary>
         public PorteurObjet Local => local;
 
+        /// <summary>L'action « utiliser l'objet » : le HUD (P6-02) y lit la touche à afficher.</summary>
+        public InputAction ActionUtiliser => utiliser;
+
+        /// <summary>L'emplacement d'objet provisoire à l'écran : le HUD (P6-02) l'éteint quand il prend sa place.</summary>
+        public bool AffichageProvisoire { get => affichageProvisoire; set => affichageProvisoire = value; }
+
         /// <summary>Pour un test : des réglages à soi (une copie, jamais l'asset partagé).</summary>
         public void Regler(ReglagesObjets r) => reglages = r;
 
@@ -108,7 +114,9 @@ namespace Froggy.Objets
                 porteurs.Add(porteur);
                 porteur.Numeroter(porteurs.Count);
                 porteur.Vider();
-                if (local == null && froggy.GetComponent<PlayerInput>() != null) local = porteur;
+                // un PlayerInput allumé : les bots (P3-05) en gardent un éteint, exigé par FroggyApparence
+                var entree = froggy.GetComponent<PlayerInput>();
+                if (local == null && entree != null && entree.enabled) local = porteur;
             }
             if (local == null && porteurs.Count > 0) local = porteurs[0];
         }
@@ -145,6 +153,8 @@ namespace Froggy.Objets
         public FicheObjet Utiliser(PorteurObjet porteur)
         {
             if (Regles == null || porteur == null || !porteurs.Contains(porteur)) return null;
+            var entrave = porteur.GetComponent<Modificateurs>();
+            if (entrave != null && entrave.Entrave) return null;   // gelé : l'objet est gardé pour plus tard
             int objet = Regles.Utiliser(porteur.Joueur);
             if (objet == ReglesObjets.Aucun) return null;
             FicheObjet fiche = fiches[objet];

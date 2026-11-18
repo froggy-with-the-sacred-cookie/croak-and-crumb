@@ -1,0 +1,186 @@
+{
+  "generator": "sound-forge 0.6.0",
+  "preset": null,
+  "sound": {
+    "name": "Super croassement",
+    "layers": [
+      {
+        "name": "Première poussée gutturale",
+        "waveform": "saw",
+        "pitch": {
+          "start": 111.0,
+          "end": 70.0,
+          "time": 0.19
+        },
+        "envelope": {
+          "attack": 0.028,
+          "decay": 0.19,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "low_pass",
+          "cutoff": {
+            "start": 1100.0,
+            "end": 360.0,
+            "time": 0.19
+          },
+          "resonance": 0.58
+        },
+        "vibrato": {
+          "rate_hz": 19.0,
+          "depth_semitones": 0.61
+        },
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.77,
+        "start": 0.0,
+        "resonator": null
+      },
+      {
+        "name": "Caisse thoracique",
+        "waveform": "sine",
+        "pitch": {
+          "start": 84.0,
+          "end": 57.0,
+          "time": 0.27
+        },
+        "envelope": {
+          "attack": 0.023,
+          "decay": 0.27,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": null,
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.61,
+        "start": 0.0,
+        "resonator": null
+      },
+      {
+        "name": "Air granuleux",
+        "waveform": "brown_noise",
+        "pitch": {
+          "start": 440.0,
+          "end": 440.0,
+          "time": 0.23
+        },
+        "envelope": {
+          "attack": 0.023,
+          "decay": 0.23,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "band_pass",
+          "cutoff": {
+            "start": 580.0,
+            "end": 265.0,
+            "time": 0.23
+          },
+          "resonance": 0.2
+        },
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.38,
+        "start": 0.0,
+        "resonator": null
+      },
+      {
+        "name": "Seconde voix large",
+        "waveform": "saw",
+        "pitch": {
+          "start": 144.0,
+          "end": 78.0,
+          "time": 0.3
+        },
+        "envelope": {
+          "attack": 0.032,
+          "decay": 0.3,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "low_pass",
+          "cutoff": {
+            "start": 1550.0,
+            "end": 474.0,
+            "time": 0.3
+          },
+          "resonance": 0.56
+        },
+        "vibrato": {
+          "rate_hz": 23.0,
+          "depth_semitones": 0.73
+        },
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.85,
+        "start": 0.165,
+        "resonator": null
+      },
+      {
+        "name": "Petit souffle final",
+        "waveform": "brown_noise",
+        "pitch": {
+          "start": 440.0,
+          "end": 440.0,
+          "time": 0.2
+        },
+        "envelope": {
+          "attack": 0.027,
+          "decay": 0.2,
+          "sustain": 0.0,
+          "hold": 0.0,
+          "release": 0.0
+        },
+        "filter": {
+          "mode": "band_pass",
+          "cutoff": {
+            "start": 1200.0,
+            "end": 480.0,
+            "time": 0.2
+          },
+          "resonance": 0.2
+        },
+        "vibrato": null,
+        "unison": {
+          "voices": 1,
+          "detune_cents": 0.0
+        },
+        "gain": 0.4,
+        "start": 0.23,
+        "resonator": null
+      }
+    ],
+    "effects": {
+      "drive": null,
+      "echo": null,
+      "reverb": null
+    },
+    "peak_db": -4.4
+  },
+  "variants": 3,
+  "amount": 0.2,
+  "seed": 62442,
+  "files": [
+    "sfx_objet_super_croassement_01.wav",
+    "sfx_objet_super_croassement_02.wav",
+    "sfx_objet_super_croassement_03.wav"
+  ]
+}

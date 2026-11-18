@@ -53,6 +53,9 @@ namespace Froggy.Regles
         public FuiteGobelin Gobelin => leGobelin;
         public GameObject Cookie => leCookie;
 
+        /// <summary>Le message provisoire à l'écran : le HUD (P6-02) l'éteint quand il prend sa place.</summary>
+        public bool MessageProvisoire { get => messageProvisoire; set => messageProvisoire = value; }
+
         /// <summary>Pour un test : des réglages, une partie, des cookies et un départ du gobelin à soi.</summary>
         public void Regler(ReglagesCookieSacre r, DeroulementPartie d, PartieCookies c, Transform departGobelin = null)
         {

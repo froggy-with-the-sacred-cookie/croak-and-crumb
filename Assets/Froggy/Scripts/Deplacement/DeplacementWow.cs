@@ -17,6 +17,8 @@ namespace Froggy.Deplacement
     /// avec les mêmes réglages ; seul le repère change. Le remplace tant qu'il est actif (CameraOrbitale l'active et le
     /// coupe avec elle). La logique tient dans Pas(), appelée au pas physique, pour que les tests la fassent tourner hors jeu.
     /// Le composant Modificateurs de Froggy (socle commun, T-01 ; ajouté ici s'il manque) multiplie la vitesse et la hauteur du saut.
+    /// Sur un nénuphar (#16), il le signale à chaque pas (le dessin du nénuphar s'enfonce) et son propre dessin le suit ;
+    /// la physique ne bouge pas : le collider du nénuphar reste où il est.
     /// </summary>
     [RequireComponent(typeof(Rigidbody), typeof(BoxCollider))]
     public class DeplacementWow : MonoBehaviour
@@ -34,6 +36,7 @@ namespace Froggy.Deplacement
         private BoxCollider boite;
         private TemplatePlayerController ancien;
         private Modificateurs modificateurs;
+        private NageFroggy nage;
         private InputAction moveAction, jumpAction, sprintAction, pasDeCote, courseAuto;
         private bool pret;
 
@@ -42,6 +45,12 @@ namespace Froggy.Deplacement
         [System.NonSerialized] private bool imposees, sautAppuye, auto;
         [System.NonSerialized] private float coyote, tampon;
         [System.NonSerialized] private bool montee, etaitAuSol;
+        // le dessin posé sur le dessin d'un nénuphar : descendu de tant, en m (rien ne bouge côté physique)
+        [System.NonSerialized] private float decalageVisuel;
+        [System.NonSerialized] private Vector3 baseVisuel;
+        [System.NonSerialized] private bool baseVisuelLue;
+        // en l'air, le dessin revient à la place du corps à cette vitesse, en m/s (le saut le cache)
+        private const float RetourVisuel = 1.5f;
 
         public bool AuSol { get; private set; }
         public bool CourseAuto => auto;
@@ -53,6 +62,9 @@ namespace Froggy.Deplacement
         /// </summary>
         public event System.Action<Collider> Atterrissage;
 
+        /// <summary>Une impulsion de saut a réellement été appliquée.</summary>
+        public event System.Action ImpulsionSaut;
+
         private void Initialiser()
         {
             if (pret) return;
@@ -63,6 +75,9 @@ namespace Froggy.Deplacement
             // chaque Froggy en a un, pour que les autres postes le trouvent sans toucher au préfabriqué
             modificateurs = GetComponent<Modificateurs>();
             if (modificateurs == null) modificateurs = gameObject.AddComponent<Modificateurs>();
+            // la nage (P1-02) : sans effet tant que Froggy n'est pas dans une ZoneEau
+            nage = GetComponent<NageFroggy>();
+            if (nage == null) nage = gameObject.AddComponent<NageFroggy>();
             if (visuel == null) visuel = transform.Find("Visual");
             var entree = GetComponent<PlayerInput>();
             if (entree != null)
@@ -122,7 +137,31 @@ namespace Froggy.Deplacement
                 entrees.sautTenu = jumpAction.IsPressed();
                 if (jumpAction.WasPressedThisFrame()) sautAppuye = true;
             }
-            TournerVisuel(Time.deltaTime);
+            Dessiner(Time.deltaTime);
+        }
+
+        /// <summary>Le dessin, à chaque image (ou dans un test) : tourné vers le cap, posé sur le dessin du nénuphar.</summary>
+        public void Dessiner(float dt)
+        {
+            Initialiser();
+            TournerVisuel(dt);
+            SuivreNenuphar(dt);
+        }
+
+        private void SuivreNenuphar(float dt)
+        {
+            if (visuel == null) return;
+            if (!baseVisuelLue)
+            {
+                baseVisuel = visuel.localPosition;
+                baseVisuelLue = true;
+            }
+            var nenuphar = AuSol ? Nenuphar.Sous(SolTouche) : null;
+            float avant = decalageVisuel;
+            decalageVisuel = nenuphar != null ? nenuphar.DecalageEn(transform.position)
+                                              : Mathf.MoveTowards(decalageVisuel, 0f, RetourVisuel * dt);
+            if (decalageVisuel != 0f || avant != 0f)   // hors des nénuphars, on ne touche pas au dessin
+                visuel.localPosition = baseVisuel + Vector3.down * decalageVisuel;
         }
 
         private void FixedUpdate() => Pas(Time.fixedDeltaTime);
@@ -136,10 +175,30 @@ namespace Froggy.Deplacement
             sautAppuye = false;
 
             Vector3 v = corps.linearVelocity;
+
+            // dans l'eau, la nage prend la main (P1-02) ; un saut demandé peut servir à ressortir
+            if (nage != null && nage.Nager(dt, transform.TransformPoint(boite.center), entrees.deplacement, tampon > 0f,
+                    reglages, reglagesWow, modificateurs, corps, out bool sautUtilise))
+            {
+                AuSol = etaitAuSol = montee = false;
+                SolTouche = null;
+                coyote = 0f;
+                if (sautUtilise) tampon = 0f;
+                tampon -= dt;
+                return;
+            }
+
             AuSol = v.y <= 0.01f && Sol();   // en montée, on ne se recolle pas au sol
             // annoncé avant le saut éventuel du même pas : un saut enchaîné par le tampon part sans contact physique
-            if (AuSol && !etaitAuSol) Atterrissage?.Invoke(SolTouche);
+            bool pose = AuSol && !etaitAuSol;
+            if (pose) Atterrissage?.Invoke(SolTouche);
             etaitAuSol = AuSol;
+            // le nénuphar sous les pieds le sait (son dessin s'enfonce, plonge d'autant plus qu'on tombe vite)
+            if (AuSol)
+            {
+                var nenuphar = Nenuphar.Sous(SolTouche);
+                if (nenuphar != null) nenuphar.Porter(this, transform.position, pose ? -v.y : 0f);
+            }
             coyote = AuSol ? reglages.coyoteTime : coyote - dt;
             tampon -= dt;
             if (AuSol) montee = false;
@@ -152,7 +211,8 @@ namespace Froggy.Deplacement
             Vector3 horizontal = Vector3.MoveTowards(new Vector3(v.x, 0f, v.z), voulue, acceleration * dt);
 
             // la hauteur se donne, la vitesse se dérive
-            if (tampon > 0f && coyote > 0f)
+            bool saute = tampon > 0f && coyote > 0f;
+            if (saute)
             {
                 v.y = Mathf.Sqrt(2f * -Physics.gravity.y * reglages.jumpHeight * facteurSaut);
                 tampon = coyote = 0f;
@@ -168,6 +228,7 @@ namespace Froggy.Deplacement
             if (v.y <= 0f) montee = false;
 
             corps.linearVelocity = new Vector3(horizontal.x, v.y, horizontal.z);
+            if (saute) ImpulsionSaut?.Invoke();
         }
 
         /// <summary>La vitesse voulue au sol : x pas de côté, y avant / arrière, dans le repère du cap ; recul plus lent.</summary>

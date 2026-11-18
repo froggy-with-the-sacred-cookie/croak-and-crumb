@@ -36,6 +36,9 @@ namespace Froggy.Meteo
 
         public event Action<DefinitionEvenement> Annonce, Debut, Fin;
 
+        /// <summary>L'annonce provisoire à l'écran : le HUD (P6-02) l'éteint quand il prend sa place.</summary>
+        public bool AffichageProvisoire { get => affichageProvisoire; set => affichageProvisoire = value; }
+
         /// <summary>Pour un test : une fiche à soi, et les Froggy à toucher (sinon toutes celles de la scène).</summary>
         public void Regler(ReglagesMeteo r, IEnumerable<Modificateurs> cibles = null)
         {
