@@ -1,0 +1,454 @@
+{
+ "pieces": [
+  {
+   "nom": "Muraille_Artisan_Mur_2",
+   "pos": [
+    -24.0,
+    0.0,
+    -20.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_1",
+   "pos": [
+    -20.0,
+    0.0,
+    -20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_1",
+   "pos": [
+    -16.0,
+    0.0,
+    -20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_2",
+   "pos": [
+    -12.0,
+    0.0,
+    -20.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_1",
+   "pos": [
+    -8.0,
+    0.0,
+    -20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_1",
+   "pos": [
+    -4.0,
+    0.0,
+    -20.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Muraille_Artisan_Porte",
+   "pos": [
+    0.0,
+    0.0,
+    -20.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_1",
+   "pos": [
+    4.0,
+    0.0,
+    -20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_2",
+   "pos": [
+    8.0,
+    0.0,
+    -20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_2",
+   "pos": [
+    12.0,
+    0.0,
+    -20.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_1",
+   "pos": [
+    16.0,
+    0.0,
+    -20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_2",
+   "pos": [
+    20.0,
+    0.0,
+    -20.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_1",
+   "pos": [
+    24.0,
+    0.0,
+    -20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_1",
+   "pos": [
+    -24.0,
+    0.0,
+    20.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_1",
+   "pos": [
+    -20.0,
+    0.0,
+    20.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_2",
+   "pos": [
+    -16.0,
+    0.0,
+    20.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_1",
+   "pos": [
+    -12.0,
+    0.0,
+    20.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_2",
+   "pos": [
+    -8.0,
+    0.0,
+    20.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_1",
+   "pos": [
+    -4.0,
+    0.0,
+    20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_1",
+   "pos": [
+    0.0,
+    0.0,
+    20.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_2",
+   "pos": [
+    4.0,
+    0.0,
+    20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_1",
+   "pos": [
+    8.0,
+    0.0,
+    20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_1",
+   "pos": [
+    12.0,
+    0.0,
+    20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_1",
+   "pos": [
+    16.0,
+    0.0,
+    20.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_2",
+   "pos": [
+    20.0,
+    0.0,
+    20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_1",
+   "pos": [
+    24.0,
+    0.0,
+    20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_1",
+   "pos": [
+    -26.6,
+    0.0,
+    -18.0
+   ],
+   "lacet": 270
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_1",
+   "pos": [
+    -26.6,
+    0.0,
+    -14.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_1",
+   "pos": [
+    -26.6,
+    0.0,
+    -10.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_2",
+   "pos": [
+    -26.6,
+    0.0,
+    -6.0
+   ],
+   "lacet": 270
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_2",
+   "pos": [
+    -26.6,
+    0.0,
+    -2.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_1",
+   "pos": [
+    -26.6,
+    0.0,
+    2.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_1",
+   "pos": [
+    -26.6,
+    0.0,
+    6.0
+   ],
+   "lacet": 270
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_2",
+   "pos": [
+    -26.6,
+    0.0,
+    10.0
+   ],
+   "lacet": 270
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_1",
+   "pos": [
+    -26.6,
+    0.0,
+    14.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_2",
+   "pos": [
+    -26.6,
+    0.0,
+    18.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_1",
+   "pos": [
+    26.6,
+    0.0,
+    -18.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_2",
+   "pos": [
+    26.6,
+    0.0,
+    -14.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_1",
+   "pos": [
+    26.6,
+    0.0,
+    -10.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_1",
+   "pos": [
+    26.6,
+    0.0,
+    -6.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_2",
+   "pos": [
+    26.6,
+    0.0,
+    -2.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_2",
+   "pos": [
+    26.6,
+    0.0,
+    2.0
+   ],
+   "lacet": 270
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_1",
+   "pos": [
+    26.6,
+    0.0,
+    6.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_1",
+   "pos": [
+    26.6,
+    0.0,
+    10.0
+   ],
+   "lacet": 270
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_1",
+   "pos": [
+    26.6,
+    0.0,
+    14.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Muraille_Artisan_Mur_1",
+   "pos": [
+    26.6,
+    0.0,
+    18.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Muraille_Artisan_Angle",
+   "pos": [
+    -26.6,
+    0.0,
+    -20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Muraille_Artisan_Angle",
+   "pos": [
+    -26.6,
+    0.0,
+    20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Muraille_Artisan_Angle",
+   "pos": [
+    26.6,
+    0.0,
+    -20.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Muraille_Artisan_Angle",
+   "pos": [
+    26.6,
+    0.0,
+    20.6
+   ],
+   "lacet": 0
+  }
+ ]
+}

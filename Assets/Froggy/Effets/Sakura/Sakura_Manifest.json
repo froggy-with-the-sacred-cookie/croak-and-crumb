@@ -1,0 +1,35 @@
+{
+  "statut": "proposition, validation visuelle en attente",
+  "cout_credits": 0,
+  "duree_boucle_s": 8,
+  "fps": 24,
+  "graine": 291026,
+  "longueur_maillage_particule_m": 1,
+  "maillages": {
+    "Petale_Sakura_Ouvert": {
+      "triangles_double_face": 96,
+      "sommets": 70
+    },
+    "Petale_Sakura_Courbe": {
+      "triangles_double_face": 96,
+      "sommets": 70
+    },
+    "Petale_Sakura_Torsade": {
+      "triangles_double_face": 96,
+      "sommets": 70
+    }
+  },
+  "verification": {
+    "instances": 48,
+    "fleurs": 0,
+    "petales": 48,
+    "ecart_bouclage_max": 6.612390279769897e-08,
+    "instances_deplacees_apres_1s": 48,
+    "triangles_scene": 4608,
+    "chute_artistique_m_s": [
+      0.5,
+      0.75
+    ],
+    "aucune_validation_Unity": true
+  }
+}

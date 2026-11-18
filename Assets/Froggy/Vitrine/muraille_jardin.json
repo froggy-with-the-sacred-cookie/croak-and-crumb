@@ -1,0 +1,328 @@
+{
+ "pieces": [
+  {
+   "nom": "Muraille_Mur_2",
+   "pos": [
+    -16.0,
+    0.0,
+    -14.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Muraille_Mur_1",
+   "pos": [
+    -12.0,
+    0.0,
+    -14.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Muraille_Mur_1",
+   "pos": [
+    -8.0,
+    0.0,
+    -14.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Muraille_Mur_2",
+   "pos": [
+    -4.0,
+    0.0,
+    -14.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Muraille_Mur_1",
+   "pos": [
+    0.0,
+    0.0,
+    -14.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Muraille_Mur_1",
+   "pos": [
+    4.0,
+    0.0,
+    -14.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Muraille_Mur_1",
+   "pos": [
+    8.0,
+    0.0,
+    -14.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Muraille_Mur_1",
+   "pos": [
+    12.0,
+    0.0,
+    -14.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Muraille_Mur_2",
+   "pos": [
+    16.0,
+    0.0,
+    -14.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Muraille_Mur_2",
+   "pos": [
+    -16.0,
+    0.0,
+    14.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Muraille_Mur_1",
+   "pos": [
+    -12.0,
+    0.0,
+    14.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Muraille_Mur_2",
+   "pos": [
+    -8.0,
+    0.0,
+    14.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Muraille_Mur_1",
+   "pos": [
+    -4.0,
+    0.0,
+    14.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Muraille_Mur_1",
+   "pos": [
+    0.0,
+    0.0,
+    14.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Muraille_Mur_1",
+   "pos": [
+    4.0,
+    0.0,
+    14.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Muraille_Mur_2",
+   "pos": [
+    8.0,
+    0.0,
+    14.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Muraille_Mur_1",
+   "pos": [
+    12.0,
+    0.0,
+    14.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Muraille_Mur_2",
+   "pos": [
+    16.0,
+    0.0,
+    14.6
+   ],
+   "lacet": 180
+  },
+  {
+   "nom": "Muraille_Mur_1",
+   "pos": [
+    -18.6,
+    0.0,
+    -12.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Muraille_Mur_1",
+   "pos": [
+    -18.6,
+    0.0,
+    -8.0
+   ],
+   "lacet": 270
+  },
+  {
+   "nom": "Muraille_Mur_2",
+   "pos": [
+    -18.6,
+    0.0,
+    -4.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Muraille_Mur_1",
+   "pos": [
+    -18.6,
+    0.0,
+    0.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Muraille_Mur_1",
+   "pos": [
+    -18.6,
+    0.0,
+    4.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Muraille_Mur_1",
+   "pos": [
+    -18.6,
+    0.0,
+    8.0
+   ],
+   "lacet": 270
+  },
+  {
+   "nom": "Muraille_Mur_2",
+   "pos": [
+    -18.6,
+    0.0,
+    12.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Muraille_Mur_1",
+   "pos": [
+    18.6,
+    0.0,
+    -12.0
+   ],
+   "lacet": 270
+  },
+  {
+   "nom": "Muraille_Mur_1",
+   "pos": [
+    18.6,
+    0.0,
+    -8.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Muraille_Mur_1",
+   "pos": [
+    18.6,
+    0.0,
+    -4.0
+   ],
+   "lacet": 270
+  },
+  {
+   "nom": "Muraille_Mur_1",
+   "pos": [
+    18.6,
+    0.0,
+    0.0
+   ],
+   "lacet": 270
+  },
+  {
+   "nom": "Muraille_Mur_2",
+   "pos": [
+    18.6,
+    0.0,
+    4.0
+   ],
+   "lacet": 90
+  },
+  {
+   "nom": "Muraille_Mur_2",
+   "pos": [
+    18.6,
+    0.0,
+    8.0
+   ],
+   "lacet": 270
+  },
+  {
+   "nom": "Muraille_Mur_1",
+   "pos": [
+    18.6,
+    0.0,
+    12.0
+   ],
+   "lacet": 270
+  },
+  {
+   "nom": "Muraille_Angle",
+   "pos": [
+    -18.6,
+    0.0,
+    -14.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Muraille_Angle",
+   "pos": [
+    -18.6,
+    0.0,
+    14.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Muraille_Angle",
+   "pos": [
+    18.6,
+    0.0,
+    -14.6
+   ],
+   "lacet": 0
+  },
+  {
+   "nom": "Muraille_Angle",
+   "pos": [
+    18.6,
+    0.0,
+    14.6
+   ],
+   "lacet": 0
+  }
+ ]
+}
