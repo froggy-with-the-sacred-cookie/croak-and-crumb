@@ -132,7 +132,7 @@ namespace Froggy.Interface
         // le HUD habillé et ce qu'il lit en plus de l'état
         private VueHud vue;
         private readonly DonneesVueHud donneesVue = new DonneesVueHud();
-        private readonly Dictionary<PorteurCookies, Renderer> rendus = new Dictionary<PorteurCookies, Renderer>();
+        private readonly Dictionary<Transform, Renderer> rendus = new Dictionary<Transform, Renderer>();
         private System.Action rejouer;
 
         private GUIStyle texte, petit, gauche, droite, grand, enorme, bouton;
@@ -243,12 +243,47 @@ namespace Froggy.Interface
             if (cookies != null)
                 foreach (var p in cookies.Porteurs)
                     if (p != null)
-                        d.Froggy.Add(new FroggyHud { Joueur = p.Joueur, Cookies = p.Nombre, Couleur = CouleurDe(p.Joueur), Tete = Tete(p) });
+                        d.Froggy.Add(new FroggyHud { Joueur = p.Joueur, Cookies = p.Nombre, Couleur = CouleurDe(p.Joueur), Tete = Tete(p.transform) });
+            PhotographierRepere(d);
             vue.Montrer(etat, d);
         }
 
-        // le haut de la tête d'une Froggy : le haut de son dessin (le premier rendu trouvé), sinon 1,2 m au-dessus
-        private Vector3 Tete(PorteurCookies p)
+        // où est le cookie sacré dans le monde (#152) : sur le gobelin, au sol, ou sur la Froggy qui le porte ; en réseau,
+        // PartieCookieSacre reflète l'état de l'hôte, et le porteur seul suffit quand il n'y a que lui
+        private void PhotographierRepere(DonneesVueHud d)
+        {
+            d.SacreVisible = d.SacrePorte = d.SacreChezMoi = false;
+            switch (etat.Sacre)
+            {
+                case EtatCookieSacre.Gobelin:
+                    if (sacre != null && sacre.Gobelin != null)
+                    {
+                        d.SacreIci = Tete(sacre.Gobelin.transform);
+                        d.SacreVisible = true;
+                    }
+                    break;
+                case EtatCookieSacre.AuSol:
+                    if (sacre != null && sacre.Regles != null)
+                    {
+                        Vector3 sol = sacre.Cookie != null ? sacre.Cookie.transform.position : sacre.Regles.PositionAuSol;
+                        d.SacreIci = sol + Vector3.up * .5f;
+                        d.SacreVisible = true;
+                    }
+                    break;
+                case EtatCookieSacre.Porte:
+                    PorteurCookies porteur = cookies != null ? cookies.Trouver(etat.PorteurSacre) : null;
+                    if (porteur != null)
+                    {
+                        d.SacreIci = Tete(porteur.transform);
+                        d.SacreVisible = d.SacrePorte = true;
+                        d.SacreChezMoi = etat.PorteurSacre == etat.Local;
+                    }
+                    break;
+            }
+        }
+
+        // le haut de la tête d'une Froggy ou du gobelin : le haut de son dessin (le premier rendu trouvé), sinon 1,2 m
+        private Vector3 Tete(Transform p)
         {
             if (!rendus.TryGetValue(p, out Renderer rendu) || rendu == null)
             {
@@ -256,7 +291,7 @@ namespace Froggy.Interface
                 if (rendu == null) rendu = p.GetComponentInChildren<Renderer>();
                 rendus[p] = rendu;
             }
-            Vector3 pos = p.transform.position;
+            Vector3 pos = p.position;
             float haut = rendu != null ? rendu.bounds.max.y : pos.y + 1.2f;
             return new Vector3(pos.x, haut + .25f, pos.z);
         }
