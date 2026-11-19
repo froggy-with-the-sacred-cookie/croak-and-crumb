@@ -39,6 +39,11 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
 - Scènes de test : une par poste dans `Assets/Froggy/Postes/`, presque vide, qui charge le jardin par-dessus
   (`DecorDeTest`). À deux sur le même poste : menu **Froggy ▸ Scènes de test ▸ Nouvelle scène perso** (ignorée par
   Git). Ce qui se partage vit dans un préfabriqué, pas dans une scène.
+- Où ranger un asset : ce qui est à nous vit sous `Assets/Froggy/`, un pack externe sous `Assets/ThirdParty/<pack>/`,
+  rien d'autre à la racine d'`Assets/`. La base de la Froggy (`PlayerTemplate`) est dans `Assets/Froggy/Joueur/`
+  (son `LISEZMOI`). `Personnages/<Modèle>/` ne reçoit que des Froggy : tout FBX y est importé en humanoïde (le gobelin
+  a son dossier `Gobelin/`). Les réglages et essais d'un poste vont dans `Postes/<n>_<poste>/`. Un fichier déplacé part
+  avec son `.meta`, et les chemins `"Assets/…"` écrits dans le code se cherchent et se corrigent dans le même commit.
 - Cookies (`Assets/Froggy/Scripts/Regles/`) : `ReglesCookies` porte les règles en C# pur (sans scène ni réseau, c'est
   ce que l'hôte fera tourner) ; `PartieCookies` les fait vivre dans une scène à partir des repères « Apparition de
   cookies » du Bâtisseur ; `PorteurCookies` donne le score d'une Froggy. Les valeurs sont dans `ReglagesCookies`.
@@ -126,14 +131,12 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
   cinématiques (super croassement) joue partout et pousse chaque Froggy chez son propriétaire. Une nouvelle mécanique
   de partie s'ajoute à ce préfabriqué avec son script réseau ; la tester à deux fenêtres (skill
   `test-multijoueur-local`, section 7).
-  joueur dans le salon. Prévu avec la #128 : un effet qui déplace un joueur (coup, onde, gel) se décide chez l'hôte puis
-  s'applique chez le propriétaire de la Froggy touchée. Revenir aux capsules de test : `prefabJoueur` du `Salon.prefab` sur `CapsuleReseau`.
 - **Pas de sprint : un dash** (#134, décision de Florent du 18/11/2026). Action « Dash » de l'Input System (Maj gauche,
   R1). Au sol seulement, 4 m en 0,2 s, recharge 3 s (`Postes/1_MouvementCamera/Resources/ReglagesDash.asset`). Le
   geste est dans `DeplacementWow.Dasher` (sauter ou quitter le sol le coupe à la vitesse de course : les portées de
   saut ne changent pas) ; `ReglesDash` (C# pur) tient recharges et assommements ; `PartieDash` s'installe seul en jeu,
   lit la touche du joueur local, bouscule la Froggy percutée et assomme les deux si elles dashaient toutes les deux.
-  Un bot ou l'hôte dashe par `PartieDash.Actuel.Dasher(froggy)`. Pas encore en réseau pour le choc (avec la #128).
+  Un bot ou l'hôte dashe par `PartieDash.Actuel.Dasher(froggy)`. Le choc n'est pas encore en réseau (aucun script dans `Scripts/Reseau/Partie/`).
 
 ## Les branches
 

@@ -59,7 +59,7 @@ panneau. La simulation ne marche qu'en éditeur et en build de développement.
 L'hôte écoute sur le port 7770, ou le suivant s'il est pris (FishNet garde parfois l'ancien port ouvert, voir
 « Pièges connus »). Il note le port choisi dans `%TEMP%\froggy-test-reseau-port.txt`, que les autres fenêtres lisent.
 Le code : `Assets/Froggy/Scripts/Reseau/TestReseau.cs` (démarrage), `PanneauTestReseau.cs`, réglages
-`Assets/Froggy/Reseau/ReglagesTestReseau.asset`, le tout dans le prefab `Assets/Froggy/Prefabs/Reseau/TestReseau.prefab`.
+`Assets/Froggy/Postes/2_Reseau/ReglagesTestReseau.asset`, le tout dans le prefab `Assets/Froggy/Prefabs/Reseau/TestReseau.prefab`.
 
 ## Jouer par code (salon)
 
