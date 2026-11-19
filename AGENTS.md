@@ -104,7 +104,12 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
   cache jusqu'au retour. Les écrans ne passent que par `Salon.Local` ; leurs textes sont dans `ContenuSalle` (C# pur).
   Les réglages du joueur (volumes, secousses, flashs, vibrations, de 0 à 1 ; champ de vision en degrés ; touches) :
   `ReglagesJoueur.Actuels`, à lire au moment où l'effet part ; les tests écrivent dans un fichier de test, jamais dans
-  le vrai. Paramètres (`PanneauReglages`) s'ouvre aussi depuis la pause.
+  le vrai. Paramètres (`PanneauReglages`) s'ouvre aussi depuis la pause ; « Taille du HUD » (75 à 150 %) agrandit le
+  HUD de partie. Le style suit les maquettes de Julien (page Notion P6-03, copies dans `Captures/menus/julien/`) :
+  `FabriqueMenu` (double bordure, titres à traits verts, curseurs à nénuphar), accueil en variante A (boutons à gauche,
+  peinture de la carte à droite), et `EcranChargement` entre le menu et la partie (peinture de la carte, astuce de
+  `ContenuChargement`, barre ; il s'efface au compte à rebours). Les peintures des cartes vont dans
+  `Interface/Resources/Cartes/`. Comparer avec les versions d'avant : menu **Froggy ▸ Menus**.
 - Commandes (P6-05, `Scripts/Interface/Commandes.cs`) : **toute touche du jeu est une action de la carte « Player »
   d'`InputSystem_Actions`**, avec une liaison clavier et une manette ; le joueur la change dans Paramètres ▸ Commandes.
   Un poste prend sa copie par `Commandes.Creer("NomAction")` (rendue par `Commandes.Liberer`), ou appelle

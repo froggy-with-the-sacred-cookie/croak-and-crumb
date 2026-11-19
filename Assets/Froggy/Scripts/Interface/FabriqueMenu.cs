@@ -42,6 +42,31 @@ namespace Froggy.Interface
             arrondiContour = null;
         }
 
+        private const string CleHabille = "Froggy.Menus.habille";
+
+        /// <summary>
+        /// Le style des maquettes de Julien (page Notion P6-03, 19/11/2026) : double bordure turquoise des panneaux, titre
+        /// encadré de traits verts, poignée des curseurs en nénuphar. Vrai par défaut ; faux : le style du 18/11, pour
+        /// comparer (garde-fou 7). Gardé dans l'éditeur, toujours vrai dans un build. Lu à la construction des écrans.
+        /// </summary>
+        public static bool Habille
+        {
+            get
+            {
+#if UNITY_EDITOR
+                return UnityEditor.EditorPrefs.GetBool(CleHabille, true);
+#else
+                return true;
+#endif
+            }
+            set
+            {
+#if UNITY_EDITOR
+                UnityEditor.EditorPrefs.SetBool(CleHabille, value);
+#endif
+            }
+        }
+
         // ---------------------------------------------------------------- Placement
 
         /// <summary>Un objet d'interface vide, centré sur son parent.</summary>
@@ -92,6 +117,18 @@ namespace Froggy.Interface
         {
             Image image = Arrondi(nom, parent, true, fond, finesse);
             Placer(image.rectTransform, position, taille);
+            if (Habille)
+            {
+                // la maquette de Julien : un halo turquoise autour, un filet clair à l'intérieur
+                Image halo = Arrondi("Halo", image.transform, false, new Color(bord.r, bord.g, bord.b, .3f), finesse * .8f);
+                Etirer(halo.rectTransform);
+                halo.rectTransform.offsetMin = new Vector2(-8f, -8f);
+                halo.rectTransform.offsetMax = new Vector2(8f, 8f);
+                Image filet = Arrondi("Filet", image.transform, false, new Color(1f, 1f, 1f, .28f), finesse * 1.6f);
+                Etirer(filet.rectTransform);
+                filet.rectTransform.offsetMin = new Vector2(9f, 9f);
+                filet.rectTransform.offsetMax = new Vector2(-9f, -9f);
+            }
             Image contour = Arrondi("Bord", image.transform, false, bord, finesse);
             Etirer(contour.rectTransform);
             return image.rectTransform;
@@ -158,7 +195,24 @@ namespace Froggy.Interface
             ombre.effectDistance = new Vector2(3f, -4f);
             Image trait = Arrondi("Trait du titre", parent, true, Anis, 3f);
             Placer(trait.rectTransform, position + new Vector2(0f, -62f), new Vector2(420f, 12f));
+            if (Habille) Tirets(parent, position, texte.preferredWidth);
             return texte;
+        }
+
+        /// <summary>
+        /// Les trois traits verts de chaque côté d'un titre, en éventail (comme le logo FROGGY et les titres des maquettes
+        /// de Julien).
+        /// </summary>
+        public static void Tirets(Transform parent, Vector2 centre, float largeurTexte)
+        {
+            for (int cote = -1; cote <= 1; cote += 2)
+            for (int i = -1; i <= 1; i++)
+            {
+                Image trait = Arrondi("Tiret du titre", parent, true, Anis, 4f);
+                float x = cote * (largeurTexte * .5f + 34f + (i == 0 ? 6f : 0f));
+                Placer(trait.rectTransform, centre + new Vector2(x, i * 20f), new Vector2(30f, 9f));
+                trait.rectTransform.localEulerAngles = new Vector3(0f, 0f, -cote * i * 28f);
+            }
         }
 
         // ---------------------------------------------------------------- Boutons
@@ -294,6 +348,19 @@ namespace Froggy.Interface
             poignee.raycastTarget = true;
             // Le Slider étire la poignée sur la hauteur de la piste : sizeDelta.y s'y ajoute. Poignée ronde de 1,6 × la piste.
             poignee.rectTransform.sizeDelta = new Vector2(taille.y * 1.6f, taille.y * 0.6f);
+            Sprite nenuphar = Habille ? Resources.Load<Sprite>("MenuEtang/Nenuphar_Anis") : null;
+            if (nenuphar != null)
+            {
+                // la maquette de Julien : une piste nuit cerclée de turquoise, la poignée est un petit nénuphar
+                piste.color = new Color32(13, 40, 62, 255);
+                Image bordPiste = Arrondi("Bord", piste.transform, false, Turquoise, 3f);
+                Etirer(bordPiste.rectTransform);
+                bordPiste.transform.SetSiblingIndex(0);
+                poignee.sprite = nenuphar;
+                poignee.type = Image.Type.Simple;
+                poignee.preserveAspect = true;
+                poignee.rectTransform.sizeDelta = new Vector2(taille.y * 2.4f, taille.y * 1.4f);
+            }
 
             var curseur = piste.gameObject.AddComponent<Slider>();
             curseur.fillRect = remplissage.rectTransform;

@@ -32,6 +32,11 @@ namespace Froggy.Interface
         /// <summary>Le champ de vision vertical de la caméra en troisième personne, en degrés (CameraOrbitale).</summary>
         [Range(ChampMin, ChampMax)] public float champDeVision = ChampDefaut;
 
+        /// <summary>La taille du HUD de partie (1 = celle de la maquette, 5 % de l'écran à 1080p) : de loin, sur une télé,
+        /// on l'agrandit (consigne Xbox XAG 101 : le texte doit pouvoir grandir).</summary>
+        public const float TailleHudMin = .75f, TailleHudMax = 1.5f;
+        [Range(TailleHudMin, TailleHudMax)] public float tailleHud = 1f;
+
         /// <summary>Les touches changées par le joueur (écran Commandes) ; les autres gardent celles du jeu.</summary>
         public List<ToucheJoueur> touches = new List<ToucheJoueur>();
 
@@ -65,6 +70,9 @@ namespace Froggy.Interface
             vibrations = Borne(vibrations);
             champDeVision = float.IsNaN(champDeVision) || float.IsInfinity(champDeVision)
                 ? ChampDefaut : Mathf.Clamp(champDeVision, ChampMin, ChampMax);
+            // un ancien fichier sans la taille du HUD la lit à 0 : elle redevient 1
+            tailleHud = float.IsNaN(tailleHud) || float.IsInfinity(tailleHud) || tailleHud <= 0f
+                ? 1f : Mathf.Clamp(tailleHud, TailleHudMin, TailleHudMax);
             if (touches == null) touches = new List<ToucheJoueur>();
             touches.RemoveAll(x => x == null || string.IsNullOrEmpty(x.id) || x.chemin == null);
         }

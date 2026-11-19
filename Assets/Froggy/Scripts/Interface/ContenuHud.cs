@@ -238,6 +238,28 @@ namespace Froggy.Interface
             return t.ToString("0.0", CultureInfo.InvariantCulture).Replace('.', ',') + " s";
         }
 
+        /// <summary>« 1er », « 2e », « 3e », « 4e » : le rang d'un joueur au classement.</summary>
+        public static string Rang(int rang) => rang <= 1 ? "1er" : rang + "e";
+
+        /// <summary>
+        /// Le classement de fin (maquette de Julien, P6-03) : le gagnant d'abord (il peut avoir gagné avec le cookie
+        /// sacré sans avoir le plus de cookies), puis le plus de cookies, puis le plus petit numéro.
+        /// </summary>
+        public static List<JoueurHud> Classement(EtatHud e, List<JoueurHud> dans = null)
+        {
+            var liste = dans ?? new List<JoueurHud>(e.Joueurs.Count);
+            liste.Clear();
+            liste.AddRange(e.Joueurs);
+            int gagnant = e.Gagnant;
+            liste.Sort((a, b) =>
+            {
+                if ((a.Joueur == gagnant) != (b.Joueur == gagnant)) return a.Joueur == gagnant ? -1 : 1;
+                int c = b.Cookies.CompareTo(a.Cookies);
+                return c != 0 ? c : a.Joueur.CompareTo(b.Joueur);
+            });
+            return liste;
+        }
+
         /// <summary>
         /// La clé d'une icône du HUD habillé (Resources/Hud/Icones) d'après un nom affiché : « Gel éclair » → « gel_eclair »,
         /// « Pluie tropicale » → « pluie_tropicale ». Minuscules, sans accents, tout ce qui n'est ni lettre ni chiffre

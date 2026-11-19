@@ -12,9 +12,22 @@ namespace Froggy.Outils
     {
         public const string Dossier = "Assets/Froggy/Interface/Resources/Touches/";
         public const string DossierHud = "Assets/Froggy/Interface/Resources/Hud/";
+        public const string DossierCartes = "Assets/Froggy/Interface/Resources/Cartes/";
 
         private void OnPreprocessTexture()
         {
+            // les peintures des cartes (écran de chargement, accueil) : grandes, donc compressées, sans mipmaps
+            if (assetPath.StartsWith(DossierCartes))
+            {
+                var peinture = (TextureImporter)assetImporter;
+                peinture.textureType = TextureImporterType.Sprite;
+                peinture.spriteImportMode = SpriteImportMode.Single;
+                peinture.mipmapEnabled = false;
+                peinture.wrapMode = TextureWrapMode.Clamp;
+                peinture.maxTextureSize = 2048;
+                peinture.textureCompression = TextureImporterCompression.CompressedHQ;
+                return;
+            }
             if (!assetPath.StartsWith(Dossier) && !assetPath.StartsWith(DossierHud)) return;
             var importeur = (TextureImporter)assetImporter;
             importeur.textureType = TextureImporterType.Sprite;

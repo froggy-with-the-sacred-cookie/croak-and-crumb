@@ -18,7 +18,33 @@ namespace Froggy.Interface
         private static void Vider()
         {
             disque = null;
+            degrade = null;
             anneaux.Clear();
+        }
+
+        private static Sprite degrade;
+
+        /// <summary>Un dégradé vertical, opaque en bas et transparent en haut (pour poser du texte sur une peinture).</summary>
+        public static Sprite Degrade
+        {
+            get
+            {
+                if (degrade != null) return degrade;
+                var texture = new Texture2D(4, 64, TextureFormat.RGBA32, false)
+                {
+                    name = "HUD_Degrade", wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Bilinear
+                };
+                var pixels = new Color32[4 * 64];
+                for (int y = 0; y < 64; y++)
+                {
+                    float t = 1f - y / 63f;
+                    byte a = (byte)Mathf.RoundToInt(255f * t * t);
+                    for (int x = 0; x < 4; x++) pixels[y * 4 + x] = new Color32(255, 255, 255, a);
+                }
+                texture.SetPixels32(pixels);
+                texture.Apply(false, true);
+                return degrade = Sprite.Create(texture, new Rect(0, 0, 4, 64), new Vector2(.5f, .5f), 100f);
+            }
         }
 
         /// <summary>Un disque plein, 128 px.</summary>
