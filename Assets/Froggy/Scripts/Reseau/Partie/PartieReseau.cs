@@ -262,9 +262,10 @@ namespace Froggy.Reseau
 
         // ---------------------------------------------------------------- Outils
 
-        private IEnumerable<RepereArene> Reperes()
+        // les repères de cookies de l'arène (la partie complète, placés au Bâtisseur), comme PartieCookies hors ligne
+        private static IEnumerable<RepereArene> Reperes()
         {
-            foreach (var r in GetComponentsInChildren<RepereArene>())
+            foreach (var r in FindObjectsByType<RepereArene>())
                 if (r.sorte == RepereArene.Sorte.Cookie) yield return r;
         }
 
