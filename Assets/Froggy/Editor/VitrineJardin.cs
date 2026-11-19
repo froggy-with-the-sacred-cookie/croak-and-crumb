@@ -41,7 +41,7 @@ namespace Froggy.Outils
         private static string Muraille => $"Assets/Froggy/Vitrine/muraille_jardin{variante}.json";
         private static string MurailleArtisanale => $"Assets/Froggy/Vitrine/muraille_jardin{variante}_artisan.json";
         private static string BordureBambous => $"Assets/Froggy/Vitrine/muraille_jardin{variante}_bambous.json";
-        private const string Joueur = "Assets/Template/Prefabs/PlayerTemplate.prefab";
+        private const string Joueur = "Assets/Froggy/Joueur/Prefabs/PlayerTemplate.prefab";
         private static string DossierCaptures => $"Captures/vitrine{variante}";
         private static readonly Color Ciel = new Color(0.70f, 0.82f, 0.90f);
 

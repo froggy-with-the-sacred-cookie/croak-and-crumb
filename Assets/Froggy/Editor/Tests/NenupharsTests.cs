@@ -18,9 +18,9 @@ namespace Froggy.Outils.Tests
     /// </summary>
     public class NenupharsTests
     {
-        private const string CheminCourse = "Assets/Template/Settings/TemplateMovementSettings.asset";
+        private const string CheminCourse = "Assets/Froggy/Joueur/Settings/TemplateMovementSettings.asset";
         private const string CheminWow = "Assets/Froggy/Vitrine/ReglagesWow.asset";
-        private const string CheminMatiere = "Assets/Template/Settings/TemplateNoFriction.physicMaterial";
+        private const string CheminMatiere = "Assets/Froggy/Joueur/Settings/TemplateNoFriction.physicMaterial";
         private const string CheminPrefab = "Assets/Froggy/Prefabs/Gris/Gris_Nenuphar.prefab";
         private const string CheminJardin = "Assets/Froggy/Prefabs/JardinJaponais/Nenuphar_Moyen.prefab";
 

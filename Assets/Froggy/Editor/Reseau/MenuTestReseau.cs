@@ -13,7 +13,7 @@ namespace Froggy.Outils
     /// </summary>
     public static class MenuTestReseau
     {
-        public const string CheminReglages = "Assets/Froggy/Reseau/ReglagesTestReseau.asset";
+        public const string CheminReglages = "Assets/Froggy/Postes/2_Reseau/ReglagesTestReseau.asset";
         private const string Racine = "Froggy/Réseau/";
 
         [MenuItem(Racine + "1. Ouvrir la scène de test", priority = 0)]

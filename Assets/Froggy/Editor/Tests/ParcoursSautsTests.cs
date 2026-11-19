@@ -19,9 +19,9 @@ namespace Froggy.Outils.Tests
     {
         public enum Moment { UnPeuTot, AuBord, EnRetard }
 
-        private const string CheminCourse = "Assets/Template/Settings/TemplateMovementSettings.asset";
+        private const string CheminCourse = "Assets/Froggy/Joueur/Settings/TemplateMovementSettings.asset";
         private const string CheminWow = "Assets/Froggy/Vitrine/ReglagesWow.asset";
-        private const string CheminMatiere = "Assets/Template/Settings/TemplateNoFriction.physicMaterial";
+        private const string CheminMatiere = "Assets/Froggy/Joueur/Settings/TemplateNoFriction.physicMaterial";
 
         private TemplateMovementSettings course;
         private ReglagesWow wow;
