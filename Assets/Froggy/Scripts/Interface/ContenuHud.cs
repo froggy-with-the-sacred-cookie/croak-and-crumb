@@ -27,6 +27,8 @@ namespace Froggy.Interface
         public bool PartieConnue;
         public Phase Phase = Phase.Attente;
         public float Reste;
+        /// <summary>La durée de la partie (hors prolongation), en s ; 0 si on ne la connaît pas.</summary>
+        public float Duree;
         public int Gagnant = ReglesPartie.Personne;
         public bool RejouerPermis;
 
@@ -234,6 +236,41 @@ namespace Froggy.Interface
             float t = Mathf.Ceil(s * 10f - 1e-3f) / 10f;
             if (t <= 0f) t = 0f;   // ni négatif ni « -0,0 »
             return t.ToString("0.0", CultureInfo.InvariantCulture).Replace('.', ',') + " s";
+        }
+
+        /// <summary>
+        /// La clé d'une icône du HUD habillé (Resources/Hud/Icones) d'après un nom affiché : « Gel éclair » → « gel_eclair »,
+        /// « Pluie tropicale » → « pluie_tropicale ». Minuscules, sans accents, tout ce qui n'est ni lettre ni chiffre
+        /// devient un seul « _ ». Un objet ou une météo nouveaux ont ainsi leur icône en déposant « &lt;clé&gt;.png ».
+        /// </summary>
+        public static string CleIcone(string nom)
+        {
+            if (string.IsNullOrEmpty(nom)) return "";
+            var cle = new System.Text.StringBuilder(nom.Length);
+            foreach (char brut in nom.Trim().ToLowerInvariant())
+            {
+                if (brut == 'œ') { cle.Append("oe"); continue; }
+                if (brut == 'æ') { cle.Append("ae"); continue; }
+                char c = SansAccent(brut);
+                if (char.IsLetterOrDigit(c)) cle.Append(c);
+                else if (cle.Length > 0 && cle[cle.Length - 1] != '_') cle.Append('_');
+            }
+            return cle.ToString().TrimEnd('_');
+        }
+
+        // à la main plutôt que par string.Normalize, que les builds IL2CPP ne garantissent pas
+        private static char SansAccent(char c)
+        {
+            switch (c)
+            {
+                case 'à': case 'â': case 'ä': return 'a';
+                case 'é': case 'è': case 'ê': case 'ë': return 'e';
+                case 'î': case 'ï': return 'i';
+                case 'ô': case 'ö': return 'o';
+                case 'ù': case 'û': case 'ü': return 'u';
+                case 'ç': return 'c';
+                default: return c;
+            }
         }
     }
 }

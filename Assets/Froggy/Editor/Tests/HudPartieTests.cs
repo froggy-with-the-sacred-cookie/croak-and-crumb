@@ -343,5 +343,102 @@ namespace Froggy.Outils.Tests
             go.transform.position = position;
             return go;
         }
+
+        // ---------------------------------------------------------------- HUD habillé (refonte du 19/11/2026)
+
+        private static readonly string[] IconesDuHud =
+        {
+            "dash", "torgnole", "super_croassement", "camouflage_cameleon", "gel_eclair", "assomme", "plongeon",
+            "cookie", "cookie_sacre", "couronne", "pluie_tropicale", "neige"
+        };
+
+        [TestCase("Gel éclair", "gel_eclair")]
+        [TestCase("Camouflage caméléon", "camouflage_cameleon")]
+        [TestCase("Super croassement", "super_croassement")]
+        [TestCase("Pluie tropicale", "pluie_tropicale")]
+        [TestCase("Neige", "neige")]
+        [TestCase("  L'Averse d'essai ", "l_averse_d_essai")]
+        [TestCase("Cœur", "coeur")]
+        [TestCase("", "")]
+        public void LaCleDUneIconeVientDuNomAffiche(string nom, string cle)
+        {
+            Assert.That(ContenuHud.CleIcone(nom), Is.EqualTo(cle));
+        }
+
+        [Test]
+        public void ChaqueIconeDuHudSeCharge()
+        {
+            foreach (string cle in IconesDuHud)
+                Assert.That(Resources.Load<Sprite>(VueHud.DossierIcones + cle), Is.Not.Null, cle);
+        }
+
+        [Test]
+        public void ChaqueObjetEtChaqueMeteoDuJardinOntUneIcone()
+        {
+            // un objet ou une météo ajoutés sans icône : le HUD montrerait une poche vide (ou une pastille muette)
+            var reglagesObjets = UnityEditor.AssetDatabase.LoadAssetAtPath<ReglagesObjets>("Assets/Froggy/Postes/4_ObjetsCapacites/ReglagesObjets.asset");
+            Assert.That(reglagesObjets, Is.Not.Null);
+            foreach (var fiche in reglagesObjets.objets)
+                Assert.That(fiche.icone != null || Resources.Load<Sprite>(VueHud.DossierIcones + ContenuHud.CleIcone(fiche.nom)) != null,
+                    Is.True, "icône de l'objet « " + fiche.nom + " »");
+            var meteo = UnityEditor.AssetDatabase.LoadAssetAtPath<Meteo.ReglagesMeteo>("Assets/Froggy/Postes/5_MeteoEvenements/ReglagesMeteo_Jardin.asset");
+            Assert.That(meteo, Is.Not.Null);
+            foreach (var tirage in meteo.evenements)
+                Assert.That(Resources.Load<Sprite>(VueHud.DossierIcones + ContenuHud.CleIcone(tirage.evenement.nom)), Is.Not.Null,
+                    "icône de la météo « " + tirage.evenement.nom + " »");
+        }
+
+        [Test]
+        public void LeHudHabilleMontreLaPartie()
+        {
+            var parent = new GameObject("HUD de test");
+            aDetruire.Add(parent);
+            var vue = VueHud.Creer(parent.transform);
+            var e = Etat(Phase.EnJeu, 95f, (1, 3), (2, 1), (3, 0), (4, 5));
+            e.Duree = 180f;
+            e.Local = 2;
+            e.TorgnoleConnue = true; e.RechargeTorgnole = 2f; e.DureeRechargeTorgnole = 5f;
+            e.DashConnu = true;
+            e.ObjetsConnus = true; e.Objet = null;
+            var d = new DonneesVueHud();
+
+            vue.Montrer(e, d);
+            Assert.That(vue.PastillesVisibles, Is.EqualTo(4), "un jeton par joueur, à 4");
+            Assert.That(vue.Couronne, Is.EqualTo(4), "la couronne sur le plus de cookies");
+            Assert.That(vue.TexteMinuteur, Is.EqualTo("1:35"));
+            Assert.That(vue.BarreVisible, Is.True);
+            Assert.That(vue.TorgnolePrete, Is.False, "en recharge");
+            Assert.That(vue.DashPret, Is.True);
+            Assert.That(vue.ObjetTenu, Is.False, "pas d'objet : poche vide");
+            Assert.That(vue.FinVisible, Is.False);
+            Assert.That(vue.Annonces, Is.Empty);
+
+            // le cookie sacré porté par le joueur local : la couronne passe sur lui, l'annonce le dit avec le temps de garde
+            e.Sacre = EtatCookieSacre.Porte; e.PorteurSacre = 2;
+            e.Objet = "Super croassement";
+            vue.Montrer(e, d);
+            Assert.That(vue.Couronne, Is.EqualTo(2));
+            Assert.That(vue.Annonces, Has.Some.StartsWith("Tu portes le cookie sacré"));
+            Assert.That(vue.ObjetTenu, Is.True, "icône trouvée d'après le nom de l'objet");
+
+            // la météo annoncée : sa pastille et son étiquette
+            e.Meteo = "Pluie tropicale"; e.MeteoAnnoncee = true; e.MeteoReste = 4.2f; e.MeteoEffets = "course plus rapide";
+            vue.Montrer(e, d);
+            Assert.That(vue.MeteoVisible, Is.True);
+            Assert.That(vue.Annonces, Has.Some.Contains("Pluie tropicale"));
+
+            // à 2 joueurs : deux jetons seulement
+            var deux = Etat(Phase.EnJeu, 30f, (1, 0), (2, 2));
+            vue.Montrer(deux, d);
+            Assert.That(vue.PastillesVisibles, Is.EqualTo(2));
+            Assert.That(vue.Couronne, Is.EqualTo(2));
+            Assert.That(vue.BarreVisible, Is.False, "durée inconnue, ou dernière minute : pas de barre");
+
+            // la fin : le classement remplace tout le reste
+            e.Phase = Phase.Finie; e.Gagnant = 2;
+            vue.Montrer(e, d);
+            Assert.That(vue.FinVisible, Is.True);
+            Assert.That(vue.TexteMinuteur, Is.Empty);
+        }
     }
 }

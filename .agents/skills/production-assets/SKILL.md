@@ -95,3 +95,27 @@ sommets et cerné d'un contour se fait par script (skill `modele-3d-blender`) ; 
   lumière neutre venue du dessus dans les textures (sans ombre portée ni halo peint), et l'étalonnage fait par le moteur.
 
 Rien n'est validé tant que l'équipe ne l'a pas dit ; noter qui a validé et quand.
+
+## 5. L'interface (HUD, menus)
+
+Circuit repris de Lovecraft (`zharrow/lovecraft`, `Outils/hud/gen_hud.py`) et éprouvé sur Froggy le 19 novembre 2026
+(refonte du HUD, #63 ; guide et tirages dans `Captures/refonte_ui/`, recherche `Docs/Recherches/hud-party-games-2026-11-19.md`) :
+
+1. **La direction d'ensemble d'abord**, jamais pièce par pièce : Gemini repeint **seulement l'interface** sur une vraie
+   capture du jeu (ici, l'interdit de la capture ne vaut pas : on veut justement l'accord avec la vraie scène), en
+   plusieurs pistes vraiment différentes, une conversation par piste.
+2. **Joindre la capture, toujours.** Sans elle, Gemini invente tout le jeu ; le HUD paraît plus beau parce que tout le
+   décor l'est, et on ne peut plus rien juger. Même avec elle, il redessine parfois la scène : le dire, et juger les
+   pièces sur la vraie capture.
+3. **Le cahier des charges compte plus que le style.** Cinq pistes (étang, jardin zen, biscuit, léger, autocollants) ont
+   été jugées « très grossières » : toutes affichaient tout, en permanence, dans des boîtes. Ce qui a débloqué : la
+   recherche sur les jeux du genre (HUD ~5 % de l'écran, score en gros, jetons de couleur numérotés, annonces qui
+   passent, icônes plutôt que phrases), puis un prompt qui dit la place et la hiérarchie.
+4. **Gemini ne tient ni les tailles ni les interdits** (le nuage météo a gardé son visage malgré deux « no face »).
+   Dès que la structure est trouvée : Gemini ne fait plus que les **icônes**, sur fond magenta, sans fond ni cadre ;
+   jetons, anneaux, étiquettes et touches se dessinent **par code**, et une **maquette à l'échelle** (1920 × 1080, sur
+   une capture sans HUD, `game_view --source camera`) fixe les tailles au pixel avant Unity.
+5. **Les icônes** : identité du personnage jointe (vue de face du vrai modèle), style joint « pour le trait seulement » ;
+   les actions et objets en **symboles** (Florent : « juste une illustration de dash, pas une grenouille qui dash ») ;
+   découpe `Tools/art/decoupe_icones.py`, contrôle `Tools/art/controle_icones.py` (64 et 40 px, niveaux de gris). Une
+   partie peinte en transparence sur le magenta ressort violette : la repeindre en code plutôt que retirer.

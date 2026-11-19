@@ -21,5 +21,18 @@ namespace Froggy.Outils
             Menu.SetChecked(Chemin, HudPartie.Affiche);
             return true;
         }
+
+        // coché : le HUD habillé (VueHud, refonte du 19/11/2026) ; décoché : l'ancien dessin du jalon 1, pour comparer
+        private const string CheminHabille = "Froggy/HUD de partie habillé";
+
+        [MenuItem(CheminHabille, priority = 41)]
+        private static void BasculerHabille() => HudPartie.Habille = !HudPartie.Habille;
+
+        [MenuItem(CheminHabille, true)]
+        private static bool CocherHabille()
+        {
+            Menu.SetChecked(CheminHabille, HudPartie.Habille);
+            return true;
+        }
     }
 }

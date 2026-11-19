@@ -36,6 +36,9 @@ namespace Froggy.Regles
 
         public Phase Phase { get; private set; } = Phase.Attente;
 
+        /// <summary>La durée d'une partie, hors compte à rebours et prolongation, en s (la barre de temps du HUD).</summary>
+        public float Duree => duree;
+
         /// <summary>Le temps qui reste dans la phase en cours, en s (compte à rebours ou partie). 0 en prolongation.</summary>
         public float Reste { get; private set; }
 
