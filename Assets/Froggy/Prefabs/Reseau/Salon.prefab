@@ -120,7 +120,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Froggy.Reseau.Salon
   enLigne: 1
-  scenePartie: Vitrine_JardinJaponais
+  scenePartie: Partie_JardinJaponais
   prefabJoueur: {fileID: 291364705442974439, guid: 8ba55335c39399f49837cff234bd6780, type: 3}
   apparitions:
   - {fileID: 4355821949841339020}
