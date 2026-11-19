@@ -23,6 +23,8 @@ namespace Froggy.Socle
         {
             Scene scene = SceneManager.GetSceneByPath(decor);
             if (scene.IsValid() && scene.isLoaded) { Activer(); return; }   // déjà ouvert à côté dans l'éditeur
+            // déjà en cours de chargement (en ligne, le salon charge le décor juste avant la partie) : on l'attend
+            if (scene.IsValid()) { StartCoroutine(AttendreLeDecor()); return; }
 
             AsyncOperation chargement;
 #if UNITY_EDITOR
@@ -34,6 +36,12 @@ namespace Froggy.Socle
 #endif
             if (chargement == null) { Debug.LogError($"Décor de test introuvable : {decor}", this); return; }
             chargement.completed += _ => Activer();
+        }
+
+        private System.Collections.IEnumerator AttendreLeDecor()
+        {
+            while (!SceneManager.GetSceneByPath(decor).isLoaded) yield return null;
+            Activer();
         }
 
         private void Activer()

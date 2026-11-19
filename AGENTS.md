@@ -96,8 +96,9 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
 - Partie complète : `Assets/Froggy/Scenes/Partie_JardinJaponais.unity`, lancée par « Solo » (avec 3 bots). Comme une
   scène de test, elle charge le jardin par-dessus (`DecorDeTest`) et assemble tous les systèmes avec leurs vrais
   réglages (3 min, météo du jardin). **Un nouveau système de jeu s'y ajoute aussi**, pas seulement dans la scène de test
-  de son poste, sans ses outils `Essai…`. Ses repères sont provisoires : à placer au Bâtisseur. Le salon charge encore la
-  vitrine tant que les objets, la torgnole, la météo et le cookie sacré ne sont pas en réseau. `PartieJardinTests`
+  de son poste, sans ses outils `Essai…`. Ses repères sont provisoires : à placer au Bâtisseur. En ligne, le salon charge
+  le jardin puis cette scène : ses repères servent, ses systèmes locaux restent éteints (`SystemesHorsLigne`) et
+  `PartieReseau` apporte ceux de l'hôte. Un système ajouté ici va aussi dans `PartieReseau` s'il doit jouer en ligne. `PartieJardinTests`
   vérifie que chaque système y est une fois, et **échoue si un système d'une scène de test de poste y manque**. En
   partie, Échap ou Start ouvre la pause (`MenuPause` : reprendre, rejouer, retour au menu ; le solo se fige).
 - Froggy en ligne (`Assets/Froggy/Scripts/Reseau/FroggyReseau.cs`, P2-02, première version sans prédiction) : le salon
