@@ -94,8 +94,9 @@ Les deux joueurs doivent être dans le même mode.
 | « Aucun salon KRBF trouvé sur ce réseau » (local) | Mauvais code, salon pas encore créé, ou pas le même réseau : passer en ligne |
 | « Code inconnu de cet hôte » (local) | L'hôte trouvé a un autre code (rare) |
 | « Salon plein (4 joueurs) » | Il y a déjà 4 joueurs |
-| « Partie en cours » | On ne rejoint pas une partie commencée : attendre le retour au salon |
-| « Déconnecté : l'hôte a fermé le salon… » | L'hôte est parti ; recréer ou rejoindre un autre salon |
+| « Partie en cours : vous entrerez dès qu'elle sera finie (≈ m:ss) » | On attend : le jeu réessaie tout seul et entre dans la salle d'attente au retour au salon. « Retour » annule |
+| « L'hôte a quitté la partie. » / « L'hôte a fermé le salon. » | L'hôte est parti ; recréer ou rejoindre un autre salon |
+| « Connexion perdue avec l'hôte. » | L'hôte a coupé sans prévenir (fenêtre fermée, internet coupé) |
 | Windows demande d'autoriser Unity sur le réseau | Accepter (réseau privé) : sinon les autres machines ne trouvent pas le salon |
 
 **F10** cache le panneau. Ce panneau est **provisoire** : les vrais écrans (titre, salon, fin de partie) sont faits par
@@ -190,6 +191,19 @@ Le prefab `Assets/Froggy/Prefabs/Reseau/PartieReseau.prefab` (règles du poste 3
 jardin) apparaît quand tous les joueurs ont leur personnage et disparaît au retour au salon. Une vraie arène
 apportera ses repères.
 
+## Départs et arrivées (P2-06)
+
+| Ce qui arrive | Ce qui se passe |
+|---|---|
+| **Un joueur quitte** en pleine partie (bouton, fenêtre fermée, internet coupé) | Chez l'hôte : le cookie sacré tombe derrière lui s'il le portait, **tous ses cookies tombent en couronne autour de sa place** (même s'il était intouchable), « Joueur N a quitté la partie » s'affiche chez tous, et **la partie continue** sans lui, sans bot à sa place (même à un seul joueur, jusqu'à la fin du temps) |
+| **Quelqu'un arrive** pendant une partie | Il reste au menu : « Partie en cours : vous entrerez dès qu'elle sera finie (≈ m:ss) ». Le jeu réessaie toutes les 5 s ; il entre dans la salle d'attente au retour au salon. « Retour » annule |
+| **L'hôte quitte** (salon ou partie) | Il prévient tout le monde avant de couper : chacun revient sur « Rejoindre un salon » avec « L'hôte a quitté la partie. » (ou « L'hôte a fermé le salon. ») ; sans prévenir (fenêtre fermée, coupure) : « Connexion perdue avec l'hôte. » |
+
+Pour un poste qui écoute : l'événement du socle **`TypeEvenement.JoueurParti`** (« Auteur » : la Froggy du joueur
+parti, encore là à cet instant) part chez chaque joueur. Côté code : `Salon.QuandConnexionDistante` →
+`PartieReseau.JoueurParti(numero)` → `PartieCookieSacre.LacherAuDepart`, `PartieCookies.FaireToutLacher` puis
+`Retirer` ; à l'arrivée, `Salon.EnAttente`.
+
 ## Les 5 règles d'un script réseau
 
 1. **Un objet partagé porte un `NetworkObject`.** Sans lui, chaque joueur a sa propre copie, invisible des autres. Un
@@ -263,7 +277,12 @@ avec P2-02 (#23).
   redémarrage de Unity (vu le 18/11/2026, cause non trouvée dans FishNet). Arrêter le serveur soi-même dans
   `OnApplicationQuit` l'a évité ; `TestReseau` passe en plus au port suivant si besoin.
 - **Arrivée pendant une partie** : FishNet envoie à tout nouveau joueur les scènes « globales » déjà chargées, donc il
-  tomberait en pleine partie. Le salon refuse donc l'entrée tant que la partie dure (P2-06 décidera mieux).
+  tomberait en pleine partie. La porte refuse donc l'entrée tant que la partie dure, en donnant le temps restant, et
+  l'arrivant réessaie tout seul (P2-06).
+- **Un joueur part : agir dans `OnRemoteConnectionState`** (serveur) : FishNet l'appelle **avant** de détruire ses
+  objets ; sa Froggy et son numéro sont encore là pour faire tomber ses cookies. Après, il serait trop tard.
+- **Un objet accroché à une Froggy** (le cookie sacré porté) disparaît avec elle : le décrocher avant de la détruire
+  (`FroggyReseau.OnStopClient` → `PartieCookieSacre.Decrocher`).
 - **Un message (RPC) arrive avant l'état copié** : FishNet envoie l'état synchronisé toutes les 0,1 s, un message
   tout de suite. Un client qui réagit au message lirait l'ancien score : `PartieReseau` met donc le nouveau score (ou
   le gagnant) dans le message. Vu le 18/11/2026 (« partie finie » reçue, gagnant encore vide).

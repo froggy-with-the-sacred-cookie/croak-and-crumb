@@ -182,3 +182,20 @@ Exemple : `Assets/Froggy/Scripts/Reseau/Salon/RelaisSalon.cs` et `Salon.cs` (`Cr
   `ProjectSettings.asset` par `SerializedObject` sur `ProjectSettings/ProjectSettings.asset` : le jeu marche,
   `CloudProjectSettings` (éditeur) reste vide. `UnityConnect.BindProject` (interne) ne fait rien si déconnecté.
 - **Fermer un hôte** : serveur d'abord, puis client (sinon « stale connection » en rouge dans le transport Unity).
+
+## 11. Départs, arrivées, départ de l'hôte (P2-06)
+
+Exemple : `Salon.cs` (`QuandConnexionDistante`, `QuandFermeture`, `AttendreFinDePartie`), `PartieReseau.JoueurParti`.
+
+- **Un joueur part** : `ServerManager.OnRemoteConnectionState(Stopped)` est appelé **avant**
+  `Objects.ClientDisconnected` (lu dans `ServerManager.cs`) : ses objets existent encore, son numéro aussi. C'est là
+  qu'on fait tomber ce qu'il porte, puis qu'on le retire. Pas d'événement « joueur parti » dans FishNet côté client :
+  le relayer soi-même (ici `TypeEvenement.JoueurParti` du socle, par l'RPC des événements de P2-04).
+- **Un objet accroché** à l'objet d'un joueur disparaît avec lui (despawn → destruction des enfants) : le décrocher
+  dans `OnStopClient` avant `Destroy`.
+- **Savoir pourquoi on est coupé** : `ClientConnectionStateArgs` ne donne aucune raison. L'hôte envoie un broadcast
+  (`ServerManager.Broadcast(new FermetureSalon …)`) **juste avant** `StopConnection(true)` : il part avant les
+  messages de déconnexion. Pas reçu = coupure brutale.
+- **Arrivée pendant une partie** : refuser à la porte (sinon FishNet lui envoie les scènes globales), répondre avec le
+  temps restant, et faire réessayer le client tout seul (coroutine, quelques secondes) ; garder un « Retour » qui
+  annule.
