@@ -136,6 +136,25 @@ namespace Froggy.Reseau
             return porteur != null && cookies.FaireLacher(porteur, direction);
         }
 
+        /// <summary>
+        /// Hôte : ce joueur quitte la partie (P2-06), appelé par le salon <b>avant</b> que sa Froggy disparaisse. Le cookie
+        /// sacré tombe derrière lui s'il le portait, ses cookies en couronne autour de lui, l'événement « joueur parti »
+        /// part chez tous, puis il ne compte plus. La partie continue, sans bot à sa place.
+        /// </summary>
+        [Server]
+        public void JoueurParti(int joueur)
+        {
+            var porteur = cookies.Trouver(joueur);
+            if (porteur == null) return;
+            var sacre = GetComponent<PartieCookieSacre>();
+            if (sacre != null) sacre.LacherAuDepart(porteur);   // avant les cookies : rien ne le fait relâcher ensuite
+            cookies.FaireToutLacher(porteur);
+            EvenementsPartie.Emettre(TypeEvenement.JoueurParti, porteur.gameObject, null, porteur.transform.position);
+            cookies.Retirer(porteur);
+            if (porteurSacre.Value == joueur) PorteurCookieSacre = ReglesPartie.Personne;
+            Publier();
+        }
+
         /// <summary>Hôte : qui porte le cookie sacré (ReglesPartie.Personne : personne). Pour P5-08.</summary>
         public int PorteurCookieSacre
         {

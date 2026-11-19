@@ -43,7 +43,7 @@ namespace Froggy.Interface
             rejoindre = f.Feuille("Rejoindre", panneau, true, new Vector2(255f, -195f), new Vector2(470f, 112f),
                 Rejoindre);
             retour = f.Pilule("Retour", transform, new Vector2(0f, -400f), new Vector2(260f, 74f),
-                () => Menu.Afficher(Ecran.Accueil));
+                () => Retour());
         }
 
         private void OnEnable()
@@ -61,7 +61,9 @@ namespace Froggy.Interface
 
         public override bool Retour()
         {
-            if (abonne != null && abonne.Occupe) return true; // on attend la fin de la recherche
+            // en attente de la fin d'une partie (P2-06) : Retour annule l'attente
+            if (abonne != null && abonne.EnAttente) abonne.Quitter();
+            else if (abonne != null && abonne.Occupe) return true; // on attend la fin de la recherche
             Menu.Afficher(Ecran.Accueil);
             return true;
         }
@@ -93,7 +95,7 @@ namespace Froggy.Interface
             FabriqueMenu.Activer(creer, libre);
             FabriqueMenu.Activer(rejoindre, libre && code.Saisie.Complet);
             FabriqueMenu.Activer(code, libre);
-            FabriqueMenu.Activer(retour, !abonne.Occupe);
+            FabriqueMenu.Activer(retour, !abonne.Occupe || abonne.EnAttente);
 
             bool erreur = !abonne.Occupe && !string.IsNullOrEmpty(abonne.DerniereErreur);
             etat.text = abonne.Occupe || abonne.Connecte ? abonne.Etat : erreur ? abonne.DerniereErreur : "";

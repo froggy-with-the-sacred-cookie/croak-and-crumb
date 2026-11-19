@@ -321,6 +321,31 @@ namespace Froggy.Outils.Tests
         }
 
         [Test]
+        public void SonPorteurQuiPartLeLacheMemeIntouchable()
+        {
+            // P2-06 : un joueur qui quitte la partie en ligne lâche le cookie sacré, même tout juste réapparu
+            var m = Monter();
+            Attraper(m);
+            m.Porteur.Intouchable = true;
+            Assert.That(m.Sacre.LacherAuDepart(m.Porteur), Is.True);
+            Assert.That(m.Sacre.Regles.Etat, Is.EqualTo(EtatCookieSacre.AuSol));
+            Assert.That(m.Partie.PorteurCookieSacre, Is.Null);
+            Assert.That(m.Sacre.LacherAuDepart(m.Porteur), Is.False, "il ne le porte plus");
+        }
+
+        [Test]
+        public void SaFroggyDetruiteNeLEmportePas()
+        {
+            // P2-06 : le modèle est accroché à la Froggy qui le porte ; on le décroche avant qu'elle disparaisse
+            var m = Monter();
+            Attraper(m);
+            Assert.That(m.Sacre.Cookie.transform.IsChildOf(m.Froggy.transform), Is.True, "accroché pendant qu'il le porte");
+            m.Sacre.Decrocher(m.Froggy.transform);
+            Object.DestroyImmediate(m.Froggy);
+            Assert.That(m.Sacre.Cookie != null, Is.True, "toujours là après la disparition de la Froggy");
+        }
+
+        [Test]
         public void UneNouvellePartieLeRemetAZero()
         {
             var m = Monter();

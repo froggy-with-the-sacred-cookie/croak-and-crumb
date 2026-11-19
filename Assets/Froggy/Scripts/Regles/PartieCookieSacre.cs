@@ -134,9 +134,28 @@ namespace Froggy.Regles
         /// donnée (nulle : derrière lui), sans traverser un mur. Rend false si ce joueur ne le portait pas ou s'il est
         /// intouchable (il vient de réapparaître, P3-04), ou en Miroir (réseau, pas l'hôte), comme PartieCookies.FaireLacher.
         /// </summary>
-        public bool FaireLacher(PorteurCookies porteur, Vector3 direction)
+        public bool FaireLacher(PorteurCookies porteur, Vector3 direction) => FaireLacher(porteur, direction, false);
+
+        /// <summary>
+        /// Le porteur quitte la partie en ligne (P2-06) : le cookie sacré tombe derrière lui, même s'il est intouchable.
+        /// Rend false s'il ne le portait pas.
+        /// </summary>
+        public bool LacherAuDepart(PorteurCookies porteur) => FaireLacher(porteur, Vector3.zero, true);
+
+        /// <summary>
+        /// La Froggy qui porte le cookie sacré va disparaître (joueur parti, P2-06) : le modèle est décroché d'elle avant,
+        /// sinon il disparaîtrait avec elle. Chez un client, l'état reçu de l'hôte le reposera au sol.
+        /// </summary>
+        public void Decrocher(Transform froggy)
         {
-            if (Regles == null || porteur == null || porteur.Intouchable || (deroulement != null && deroulement.Miroir)) return false;
+            if (leCookie != null && froggy != null && leCookie.transform.IsChildOf(froggy))
+                leCookie.transform.SetParent(transform, true);
+        }
+
+        private bool FaireLacher(PorteurCookies porteur, Vector3 direction, bool memeIntouchable)
+        {
+            if (Regles == null || porteur == null || (porteur.Intouchable && !memeIntouchable)
+                || (deroulement != null && deroulement.Miroir)) return false;
             Vector3 chute = PointDeChute(porteur.transform, direction);
             if (!Regles.Lacher(porteur.Joueur, chute)) return false;
             Poser(chute);
