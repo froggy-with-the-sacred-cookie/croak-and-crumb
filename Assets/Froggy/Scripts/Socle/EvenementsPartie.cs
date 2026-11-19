@@ -19,6 +19,11 @@ namespace Froggy.Socle
         JoueurReapparu,
         /// <summary>Un joueur a donné une torgnole ; « Auteur » le frappeur, « Objet » le joueur touché, vide si raté (P4-10).</summary>
         CoupDonne,
+        /// <summary>
+        /// Un joueur a quitté la partie en ligne (P2-06) ; « Auteur » est ce joueur (sa Froggy, encore là à cet instant).
+        /// Ses cookies et le cookie sacré viennent de tomber ; la partie continue sans lui.
+        /// </summary>
+        JoueurParti,
     }
 
     /// <summary>Un événement de partie : quoi, par qui, avec quoi, où. « Auteur » et « Objet » peuvent être vides.</summary>

@@ -120,9 +120,20 @@ namespace Froggy.Interface
             if (RetourDemande()) Retour();
         }
 
-        /// <summary>Vrai quand seule la scène Menu est ouverte.</summary>
-        public static bool MenuVisible() =>
-            SceneManager.sceneCount == 1 && SceneManager.GetActiveScene().path == SceneMenu;
+        /// <summary>
+        /// Vrai quand seule la scène Menu est ouverte. Les scènes créées en jeu, sans fichier, ne comptent pas : FishNet en
+        /// laisse une (« MovedObjectsHolder ») après une partie en ligne, et le menu ne revenait plus (P2-06).
+        /// </summary>
+        public static bool MenuVisible()
+        {
+            if (SceneManager.GetActiveScene().path != SceneMenu) return false;
+            for (int i = 0; i < SceneManager.sceneCount; i++)
+            {
+                string chemin = SceneManager.GetSceneAt(i).path;
+                if (!string.IsNullOrEmpty(chemin) && chemin != SceneMenu) return false;
+            }
+            return true;
+        }
 
         /// <summary>Échap au clavier, B à la manette : l'action « Cancel » du module d'interface (réaffectable).</summary>
         private static bool RetourDemande()
