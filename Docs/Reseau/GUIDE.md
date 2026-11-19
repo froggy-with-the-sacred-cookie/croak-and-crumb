@@ -283,6 +283,9 @@ avec P2-02 (#23).
   objets ; sa Froggy et son numéro sont encore là pour faire tomber ses cookies. Après, il serait trop tard.
 - **Un objet accroché à une Froggy** (le cookie sacré porté) disparaît avec elle : le décrocher avant de la détruire
   (`FroggyReseau.OnStopClient` → `PartieCookieSacre.Decrocher`).
+- **FishNet laisse une scène vide « MovedObjectsHolder »** après le chargement d'une partie, et ne la ferme jamais :
+  compter les scènes ouvertes (`sceneCount == 1`) ne dit donc plus « on est au menu ». `MenuPrincipal.MenuVisible`
+  ignore les scènes sans fichier. Vu le 19/11/2026 : après une partie en ligne, le menu ne revenait plus (écran vide).
 - **Un message (RPC) arrive avant l'état copié** : FishNet envoie l'état synchronisé toutes les 0,1 s, un message
   tout de suite. Un client qui réagit au message lirait l'ancien score : `PartieReseau` met donc le nouveau score (ou
   le gagnant) dans le message. Vu le 18/11/2026 (« partie finie » reçue, gagnant encore vide).

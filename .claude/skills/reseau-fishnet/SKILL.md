@@ -199,3 +199,6 @@ Exemple : `Salon.cs` (`QuandConnexionDistante`, `QuandFermeture`, `AttendreFinDe
 - **Arrivée pendant une partie** : refuser à la porte (sinon FishNet lui envoie les scènes globales), répondre avec le
   temps restant, et faire réessayer le client tout seul (coroutine, quelques secondes) ; garder un « Retour » qui
   annule.
+- **FishNet laisse une scène vide « MovedObjectsHolder »** (créée au chargement de scènes, jamais déchargée) : ne
+  jamais tester « une seule scène ouverte » avec `sceneCount == 1`. Ignorer les scènes sans fichier (`path` vide),
+  comme `MenuPrincipal.MenuVisible` (vu le 19/11/2026 : le menu ne revenait plus après une partie en ligne).
