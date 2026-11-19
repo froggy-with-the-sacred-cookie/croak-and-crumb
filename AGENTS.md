@@ -77,10 +77,16 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
   `Postes/5_MeteoEvenements/ReglagesCookieSacre.asset`. En réseau, `CookieSacreReseau` envoie l'état de l'hôte ; chez
   un joueur qui n'est pas l'hôte (« Miroir »), il ne décide rien et le montre (`Refleter`).
 - HUD de partie (`Assets/Froggy/Scripts/Interface/`) : `ContenuHud` écrit les textes (scores, minuteur, objet,
-  torgnole, cookie sacré, météo, fin, en C# pur) et `HudPartie` les dessine. Il s'installe seul en jeu, ne lit que ce
-  que la scène a, et éteint les affichages provisoires des postes (menu **Froggy ▸ HUD de partie** pour les
-  retrouver). Un poste qui ajoute un affichage provisoire lui donne une propriété `AffichageProvisoire` et le branche
-  dans `HudPartie.PrendreLaPlace` ; une nouvelle information de jeu s'ajoute au HUD, pas dans un `OnGUI` de plus.
+  torgnole, cookie sacré, météo, fin, en C# pur) et `HudPartie` photographie la partie (`EtatHud`). Il s'installe
+  seul en jeu, ne lit que ce que la scène a, et éteint les affichages provisoires des postes (menu **Froggy ▸ HUD de
+  partie** pour les retrouver). Un poste qui ajoute un affichage provisoire lui donne une propriété
+  `AffichageProvisoire` et le branche dans `HudPartie.PrendreLaPlace` ; une nouvelle information de jeu s'ajoute au
+  HUD, pas dans un `OnGUI` de plus. Le dessin habillé (#63, refonte du 19/11/2026) est `VueHud`, sur un Canvas :
+  jetons de couleur numérotés, icônes peintes dans `Interface/Resources/Hud/Icones/`, annonces en étiquette penchée,
+  score des autres au-dessus de leur tête ; l'ancien dessin revient par **Froggy ▸ HUD de partie habillé**. **Un
+  objet ou une météo nouveaux ont une icône** : `FicheObjet.icone`, ou `Hud/Icones/<clé>.png` avec
+  `<clé> = ContenuHud.CleIcone(nom)` (« Gel éclair » → `gel_eclair`) ; un test échoue sinon. Recherche et maquette :
+  `Docs/Recherches/hud-party-games-2026-11-19.md`.
 - Nage (`Assets/Froggy/Scripts/Deplacement/`) : une `ZoneEau` (boîte déclencheur dont le dessus est la surface) sur
   chaque plan d'eau assez profond pour nager ; dedans, `DeplacementWow` passe la main à `NageFroggy` (flotte, nage à
   60 % de la course, plonge avec C ou le bouton est, ressort en sautant). Réglages : `ReglagesNage`. L'éclaboussure et
