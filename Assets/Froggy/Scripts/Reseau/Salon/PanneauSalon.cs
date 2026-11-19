@@ -51,6 +51,7 @@ namespace Froggy.Reseau
         private void HorsLigne()
         {
             GUILayout.Label(salon.Etat, texte);
+            if (salon.EnAttente && GUILayout.Button("Ne plus attendre", GUILayout.Height(28))) salon.Quitter();   // P2-06
             GUI.enabled = !salon.Occupe;
             bool local = GUILayout.Toggle(!salon.EnLigne, " Réseau local (sans internet)");
             if (local == salon.EnLigne) salon.EnLigne = !local;

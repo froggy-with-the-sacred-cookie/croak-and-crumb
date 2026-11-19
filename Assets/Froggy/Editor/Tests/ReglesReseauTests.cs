@@ -143,6 +143,34 @@ namespace Froggy.Outils.Tests
         }
 
         [Test]
+        public void UnJoueurQuiPartLacheTousSesCookiesAutourDeLui()
+        {
+            var (hote, chezHote) = Machine("hôte", 1, 2);
+            var (client, chezClient) = Machine("client", 1, 2);
+            client.Miroir = true;
+
+            for (int i = 0; i < Points.Length; i++) { chezHote[1].transform.position = Sur(i); hote.Pas(Dt); }
+            Assert.That(chezHote[1].Nombre, Is.EqualTo(3));
+            chezHote[1].Intouchable = true;   // il vient de réapparaître : il part quand même avec rien
+
+            Assert.That(hote.FaireToutLacher(chezHote[1]), Is.EqualTo(3), "P2-06 : tous ses cookies tombent");
+            hote.Retirer(chezHote[1]);
+            Assert.That(hote.Regles.NombreAuSol, Is.EqualTo(3));
+            Assert.That(hote.Regles.Portes(2), Is.EqualTo(0));
+            Assert.That(hote.Trouver(2), Is.Null, "il ne fait plus partie de la partie");
+            var places = new HashSet<Vector3>();
+            for (int i = 0; i < 3; i++) places.Add(hote.Regles.CookieAuSol(i).position);
+            Assert.That(places.Count, Is.EqualTo(3), "en couronne, pas les uns sur les autres");
+
+            Recopier(hote, client);
+            Assert.That(client.transform.childCount, Is.EqualTo(Points.Length + 3), "le client voit les 3 cookies au sol");
+
+            // le joueur 1 les ramasse : la partie continue sans le joueur 2
+            for (int i = 0; i < 3; i++) { chezHote[0].transform.position = hote.Regles.CookieAuSol(0).position; hote.Pas(Dt); }
+            Assert.That(chezHote[0].Nombre, Is.EqualTo(3));
+        }
+
+        [Test]
         public void LeClientAfficheLeMemeTempsEtLeMemeGagnant()
         {
             var (hote, chezHote) = Machine("hôte", 1, 3);

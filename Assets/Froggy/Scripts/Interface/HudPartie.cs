@@ -394,6 +394,12 @@ namespace Froggy.Interface
         /// <summary>Écoute les événements du socle (un test l'appelle directement) : les messages de torgnole.</summary>
         public void Reagir(EvenementPartie ev)
         {
+            // un joueur a quitté la partie en ligne (P2-06) : même emplacement que les messages de torgnole
+            if (ev.Type == TypeEvenement.JoueurParti && ev.Auteur != null && ev.Auteur.TryGetComponent(out PorteurCookies parti))
+            {
+                Annoncer(ref messageTorgnole, ref finTorgnole, $"Joueur {parti.Joueur} a quitté la partie");
+                return;
+            }
             if (ev.Type != TypeEvenement.CoupDonne || cookies == null) return;
             PorteurCookies local = cookies.Trouver(etat.Local);
             if (local == null) return;

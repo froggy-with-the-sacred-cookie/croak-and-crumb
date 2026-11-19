@@ -20,6 +20,14 @@ namespace Froggy.Reseau
     public struct ReponseEntreeSalon : IBroadcast
     {
         public RefusSalon Refus;
+        /// <summary>Partie en cours (P2-06) : secondes avant la fin, environ ; 0 si inconnu.</summary>
+        public float Reste;
+    }
+
+    /// <summary>L'hôte ferme le salon (P2-06) : envoyé à tous juste avant l'arrêt, pour dire pourquoi on est coupé.</summary>
+    public struct FermetureSalon : IBroadcast
+    {
+        public bool EnPartie;
     }
 
     /// <summary>
@@ -37,8 +45,11 @@ namespace Froggy.Reseau
         /// <summary>Côté client : le code à présenter à la prochaine connexion.</summary>
         public string CodeAPresenter { get; set; } = "";
 
-        /// <summary>Côté client : l'hôte a répondu (Aucun = accepté).</summary>
-        public event Action<RefusSalon> Reponse;
+        /// <summary>Côté hôte : secondes avant la fin de la partie en cours (P2-06), pour celui qui attend.</summary>
+        public Func<float> TempsRestant { get; set; }
+
+        /// <summary>Côté client : l'hôte a répondu (Aucun = accepté) ; en partie, le temps restant en secondes.</summary>
+        public event Action<RefusSalon, float> Reponse;
 
         private string jetonHote = "";
 
@@ -87,11 +98,12 @@ namespace Froggy.Reseau
             conn.CustomData = hote ? new MarqueHote() : null;
 
             // La réponse part avant le résultat : en cas de refus, FishNet coupe juste après.
-            NetworkManager.ServerManager.Broadcast(conn, new ReponseEntreeSalon { Refus = refus }, false);
+            float reste = refus == RefusSalon.PartieEnCours && TempsRestant != null ? TempsRestant() : 0f;
+            NetworkManager.ServerManager.Broadcast(conn, new ReponseEntreeSalon { Refus = refus, Reste = reste }, false);
             OnAuthenticationResult?.Invoke(conn, refus == RefusSalon.Aucun);
         }
 
-        private void QuandReponse(ReponseEntreeSalon reponse, Channel canal) => Reponse?.Invoke(reponse.Refus);
+        private void QuandReponse(ReponseEntreeSalon reponse, Channel canal) => Reponse?.Invoke(reponse.Refus, reponse.Reste);
 
         private void OnDestroy()
         {

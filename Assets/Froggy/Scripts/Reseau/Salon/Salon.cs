@@ -105,6 +105,19 @@ namespace Froggy.Reseau
 
         /// <summary>Vrai pendant une création ou une recherche de salon.</summary>
         public bool Occupe => enCours != null;
+
+        /// <summary>
+        /// Arrivé pendant une partie (P2-06) : on attend qu'elle finisse, le jeu réessaie tout seul ; salon.Etat dit
+        /// « Partie en cours : vous entrerez dès qu'elle sera finie (≈ m:ss) ». Quitter() arrête l'attente.
+        /// </summary>
+        public bool EnAttente { get; private set; }
+
+        /// <summary>PROVISOIRE : secondes entre deux essais pendant l'attente.</summary>
+        private const float AttenteEntreEssais = 5f;
+
+        private bool fermeturePrevenue;   // client : l'hôte a dit qu'il fermait (P2-06)
+        private bool fermetureEnPartie;
+        private string codeAttendu;
         public bool Connecte => SalonReseau.Actuel != null && reseau.IsClientStarted;
         public bool EstHote => reseau != null && reseau.IsServerStarted;
 
@@ -199,6 +212,7 @@ namespace Froggy.Reseau
         {
             if (enCours != null) StopCoroutine(enCours);
             enCours = null;
+            EnAttente = false;
             Etat = "Hors ligne"; // avant Fermer : un départ voulu n'est pas une « déconnexion »
             DerniereErreur = "";
             Fermer();
@@ -252,6 +266,8 @@ namespace Froggy.Reseau
             reseau.ClientManager.OnClientConnectionState += QuandClientChange;
             reseau.SceneManager.OnClientPresenceChangeEnd += QuandPresenceChange;
             porte.Reponse += QuandReponse;
+            porte.TempsRestant = TempsRestantPartie;
+            reseau.ClientManager.RegisterBroadcast<FermetureSalon>(QuandFermeture);
             SalonReseau.Change += Relayer;
             EvenementsPartie.Emis += QuandEvenement;
         }
@@ -267,6 +283,7 @@ namespace Froggy.Reseau
                 reseau.SceneManager.OnClientPresenceChangeEnd -= QuandPresenceChange;
             }
             if (porte != null) porte.Reponse -= QuandReponse;
+            if (reseau != null) reseau.ClientManager.UnregisterBroadcast<FermetureSalon>(QuandFermeture);
             SalonReseau.Change -= Relayer;
             EvenementsPartie.Emis -= QuandEvenement;
         }
@@ -331,7 +348,8 @@ namespace Froggy.Reseau
         private IEnumerator RejoindreSalon(string code)
         {
             DerniereErreur = "";
-            Etat = $"Recherche du salon {code}…";
+            fermeturePrevenue = false;
+            if (!EnAttente) Etat = $"Recherche du salon {code}…";
             Change?.Invoke();
 
             string adresse = null;
@@ -345,7 +363,7 @@ namespace Froggy.Reseau
                 yield break;
             }
 
-            Etat = $"Connexion au salon {code} ({adresse}:{port})…";
+            if (!EnAttente) Etat = $"Connexion au salon {code} ({adresse}:{port})…";
             Change?.Invoke();
             porte.CodeAPresenter = code;
             if (transport != null) transport.SetConnectionData(adresse, port);   // remet aussi le mode direct
@@ -402,7 +420,8 @@ namespace Froggy.Reseau
         private IEnumerator RejoindreEnLigne(string code)
         {
             DerniereErreur = "";
-            Etat = $"Connexion au salon {code} (en ligne)…";
+            fermeturePrevenue = false;
+            if (!EnAttente) Etat = $"Connexion au salon {code} (en ligne)…";
             Change?.Invoke();
 
             var place = relais.Rejoindre(code);
@@ -427,6 +446,10 @@ namespace Froggy.Reseau
             recherche.Arreter();
             porte.OublierHote();
             if (reseau == null) return;
+            // P2-06 : l'hôte prévient tout le monde avant de couper (« L'hôte a quitté la partie » plutôt que « connexion
+            // perdue ») ; le message part avant les messages de déconnexion de FishNet.
+            if (reseau.IsServerStarted)
+                reseau.ServerManager.Broadcast(new FermetureSalon { EnPartie = etat != null && etat.Phase == PhaseSalon.EnPartie });
             // Le serveur d'abord : il prévient chaque joueur (le client de l'hôte compris) pendant que tous sont encore
             // là. Dans l'autre ordre, le transport Unity écrit « stale connection » en rouge (vu le 18/11/2026, P2-05).
             if (reseau.IsServerStarted) reseau.ServerManager.StopConnection(true);
@@ -577,6 +600,10 @@ namespace Froggy.Reseau
         private void QuandConnexionDistante(NetworkConnection conn, RemoteConnectionStateArgs args)
         {
             if (args.ConnectionState != RemoteConnectionState.Stopped || etat == null) return;
+            // P2-06 : parti en pleine partie → ses cookies (et le cookie sacré) tombent, la partie continue. FishNet nous
+            // prévient avant de détruire ses objets : sa Froggy et son numéro sont encore là.
+            if (etat.Phase == PhaseSalon.EnPartie && PartieReseau.Actuelle != null && NumeroDe(conn.ClientId, out int numero))
+                PartieReseau.Actuelle.JoueurParti(numero);
             if (joueurs.TryGetValue(conn.ClientId, out NetworkObject joueur))
             {
                 if (joueur != null && joueur.IsSpawned) reseau.ServerManager.Despawn(joueur);
@@ -591,12 +618,14 @@ namespace Froggy.Reseau
             if (args.ConnectionState == LocalConnectionState.Stopped)
             {
                 if (!EstHote && enCours == null && string.IsNullOrEmpty(DerniereErreur) && Etat != "Hors ligne")
-                    Signaler("Déconnecté : l'hôte a fermé le salon ou la connexion est perdue.");
+                    Signaler(!fermeturePrevenue ? "Connexion perdue avec l'hôte."
+                             : fermetureEnPartie ? "L'hôte a quitté la partie." : "L'hôte a fermé le salon.");
+                fermeturePrevenue = false;
                 if (EstHote) Fermer();
-                Etat = string.IsNullOrEmpty(DerniereErreur) ? "Hors ligne" : DerniereErreur;
+                if (!EnAttente) Etat = string.IsNullOrEmpty(DerniereErreur) ? "Hors ligne" : DerniereErreur;
 
-                // Coupé en pleine partie (l'hôte est parti) : on retire le décor de la partie, resté chez nous.
-                // P2-06 fera mieux (message, retour au menu).
+                // Coupé en pleine partie (l'hôte est parti) : on retire le décor de la partie, resté chez nous ; les menus
+                // (P6-03) reviennent alors sur « Rejoindre un salon » avec le message (P2-06).
                 foreach (string nom in ScenesDePartie())
                 {
                     var scene = UnityEngine.SceneManagement.SceneManager.GetSceneByName(nom);
@@ -607,24 +636,61 @@ namespace Froggy.Reseau
             Change?.Invoke();
         }
 
-        private void QuandReponse(RefusSalon refus)
+        private void QuandReponse(RefusSalon refus, float reste)
         {
             switch (refus)
             {
                 case RefusSalon.Aucun:
+                    EnAttente = false;
                     Etat = EstHote ? $"Salon {porte.CodeAPresenter} ouvert" : $"Dans le salon {porte.CodeAPresenter}";
                     Change?.Invoke();
                     break;
                 case RefusSalon.CodeInconnu: Signaler("Code inconnu de cet hôte."); break;
                 case RefusSalon.SalonPlein: Signaler($"Salon plein ({EtatSalon.JoueursMax} joueurs)."); break;
-                case RefusSalon.PartieEnCours: Signaler("Partie en cours : réessayer quand elle sera finie."); break;
+                case RefusSalon.PartieEnCours:
+                    // P2-06 : on attend la fin de la partie, puis on réessaie tout seul
+                    EnAttente = true;
+                    codeAttendu = porte.CodeAPresenter;
+                    Etat = MessageAttente(reste);
+                    if (enCours != null) StopCoroutine(enCours);
+                    enCours = StartCoroutine(AttendreFinDePartie());
+                    Change?.Invoke();
+                    break;
             }
+        }
+
+        /// <summary>« Partie en cours : vous entrerez dès qu'elle sera finie (≈ 1:23). »</summary>
+        public static string MessageAttente(float reste) =>
+            reste > 0f ? $"Partie en cours : vous entrerez dès qu'elle sera finie (≈ {Froggy.Regles.DeroulementPartie.Temps(reste)})."
+                       : "Partie en cours : vous entrerez dès qu'elle sera finie.";
+
+        /// <summary>Arrivé pendant une partie : quelques secondes, puis on refrappe à la porte avec le même code.</summary>
+        private IEnumerator AttendreFinDePartie()
+        {
+            yield return new WaitForSecondsRealtime(AttenteEntreEssais);
+            yield return new WaitUntil(() => !reseau.IsClientStarted);   // la porte a coupé après sa réponse
+            enCours = StartCoroutine(enLigne ? RejoindreEnLigne(codeAttendu) : RejoindreSalon(codeAttendu));
+        }
+
+        /// <summary>Hôte : temps restant de la partie en cours, pour celui qui attend (0 : inconnu).</summary>
+        private float TempsRestantPartie()
+        {
+            var partie = PartieReseau.Actuelle;
+            var regles = partie != null && partie.Deroulement != null ? partie.Deroulement.Regles : null;
+            return regles != null ? regles.Reste + delaiRetour : 0f;   // + le délai avant le retour au salon
+        }
+
+        private void QuandFermeture(FermetureSalon fermeture, Channel canal)
+        {
+            fermeturePrevenue = true;
+            fermetureEnPartie = fermeture.EnPartie;
         }
 
         private void Relayer() => Change?.Invoke();
 
         private void Signaler(string message)
         {
+            EnAttente = false;
             DerniereErreur = message;
             Etat = message;
             Debug.LogWarning($"[Salon] {message}", this);

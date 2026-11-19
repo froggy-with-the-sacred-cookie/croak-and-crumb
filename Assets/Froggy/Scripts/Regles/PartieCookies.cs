@@ -219,6 +219,32 @@ namespace Froggy.Regles
         {
             // en Miroir (réseau, P2-04) : seul l'hôte fait lâcher un cookie
             if (Regles == null || Miroir || porteur == null || !porteurs.Contains(porteur) || porteur.Intouchable) return false;
+            return LacherUn(porteur, direction);
+        }
+
+        /// <summary>
+        /// Un joueur quitte la partie en ligne (P2-06) : tous ses cookies tombent en couronne autour de lui (pas les uns
+        /// sur les autres), même s'il est intouchable, puisqu'il ne reviendra pas. Rend le nombre de cookies lâchés.
+        /// Puis Retirer(porteur) pour qu'il ne compte plus.
+        /// </summary>
+        public int FaireToutLacher(PorteurCookies porteur)
+        {
+            if (Regles == null || Miroir || porteur == null || !porteurs.Contains(porteur)) return 0;
+            int n = Regles.Portes(porteur.Joueur);
+            Vector3 devant = porteur.transform.forward;
+            for (int i = 0; i < n; i++)
+                LacherUn(porteur, Quaternion.Euler(0f, 360f * i / n, 0f) * devant);
+            return n;
+        }
+
+        /// <summary>Ce joueur ne fait plus partie de la partie (il est parti, P2-06) : il ne ramasse plus, ne compte plus.</summary>
+        public void Retirer(PorteurCookies porteur)
+        {
+            if (porteur != null) porteurs.Remove(porteur);
+        }
+
+        private bool LacherUn(PorteurCookies porteur, Vector3 direction)
+        {
             Vector3 chute = PointDeChute(porteur.transform, direction);
             int numero = Regles.Lacher(porteur.Joueur, chute);
             if (numero < 0) return false;

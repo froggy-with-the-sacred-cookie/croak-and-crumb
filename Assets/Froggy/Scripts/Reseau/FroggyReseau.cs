@@ -59,7 +59,14 @@ namespace Froggy.Reseau
         {
             base.OnStopClient();
             if (Locale == this) Locale = null;
-            if (froggy != null) Destroy(froggy);
+            if (froggy != null)
+            {
+                // Joueur parti (P2-06) : le cookie sacré qu'il portait est accroché à cette copie ; on le décroche avant
+                // de la détruire, sinon il disparaîtrait avec elle (l'hôte, puis l'état reçu, le reposent au sol).
+                var sacre = FindAnyObjectByType<Froggy.Regles.PartieCookieSacre>();
+                if (sacre != null) sacre.Decrocher(froggy.transform);
+                Destroy(froggy);
+            }
             froggy = null;
         }
 
