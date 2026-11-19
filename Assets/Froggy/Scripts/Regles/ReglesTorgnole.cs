@@ -34,6 +34,13 @@ namespace Froggy.Regles
 
         public bool Prete(int joueur) => Reste(joueur) <= 0f;
 
+        /// <summary>
+        /// La recharge commence sans coup donné ici : en réseau, chez un joueur qui n'est pas l'hôte, le coup vient
+        /// d'arriver de l'hôte (#128). Elle finit un peu après celle de l'hôte (le temps du message) : jamais « prête »
+        /// alors que l'hôte refuserait encore.
+        /// </summary>
+        public void Recharger(int joueur) => restes[joueur] = recharge;
+
         /// <summary>Un pas : les recharges avancent.</summary>
         public void Pas(float dt)
         {

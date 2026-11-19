@@ -25,6 +25,8 @@ GameObject:
   - component: {fileID: 8055285663673181109}
   - component: {fileID: 7906589829903040198}
   - component: {fileID: 837134008996484863}
+  - component: {fileID: 8012796949891533176}
+  - component: {fileID: 3853200025710250469}
   m_Layer: 0
   m_Name: PartieReseau
   m_TagString: Untagged
@@ -330,6 +332,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db75eb3551123e04ab2774f13793d7c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Froggy.Reseau.GelReseau
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 8323199054783479740}
+  _networkObjectCache: {fileID: 0}
+--- !u!114 &8012796949891533176
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1757615929357730268}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f5be36d615f9054fae8c19d79dbcc24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Froggy.Regles.ApparitionJoueurs
+  reglages: {fileID: 11400000, guid: 22178b578276f7848bbd28fa23a4b168, type: 2}
+  partie: {fileID: 8401164890271491837}
+  clignoter: 1
+--- !u!114 &3853200025710250469
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1757615929357730268}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f709525a6f0afa488f2ba2eb732fbb0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Froggy.Reseau.ReapparitionReseau
   _componentIndexCache: 255
   _addedNetworkObject: {fileID: 8323199054783479740}
   _networkObjectCache: {fileID: 0}

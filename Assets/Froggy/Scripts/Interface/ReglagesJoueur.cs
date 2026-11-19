@@ -1,12 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
 namespace Froggy.Interface
 {
     /// <summary>
-    /// Les réglages du joueur (début de P6-05) : volumes par famille et intensité des effets forts. Chaque valeur va de
-    /// 0 à 1 ; 0 coupe, 1 joue tel que réglé (skill accessibilite). Enregistrés à part, dans
+    /// Les réglages du joueur (P6-05) : volumes par famille, intensité des effets forts (de 0 à 1 ; 0 coupe, 1 joue tel
+    /// que réglé, skill accessibilite), champ de vision (en degrés) et touches réaffectées (Commandes). Enregistrés à part, dans
     /// <c>reglages_joueur.json</c> du dossier de données du jeu, jamais dans une sauvegarde de partie.
     ///
     /// Pour un poste qui joue un effet ou un son : lire <c>ReglagesJoueur.Actuels.secousses</c> (par exemple) au moment
@@ -25,6 +26,14 @@ namespace Froggy.Interface
         [Range(0f, 1f)] public float secousses = 1f;
         [Range(0f, 1f)] public float flashs = 1f;
         [Range(0f, 1f)] public float vibrations = 1f;
+
+        public const float ChampMin = 50f, ChampMax = 90f, ChampDefaut = 60f;
+
+        /// <summary>Le champ de vision vertical de la caméra en troisième personne, en degrés (CameraOrbitale).</summary>
+        [Range(ChampMin, ChampMax)] public float champDeVision = ChampDefaut;
+
+        /// <summary>Les touches changées par le joueur (écran Commandes) ; les autres gardent celles du jeu.</summary>
+        public List<ToucheJoueur> touches = new List<ToucheJoueur>();
 
         private static ReglagesJoueur actuels;
 
@@ -54,6 +63,10 @@ namespace Froggy.Interface
             secousses = Borne(secousses);
             flashs = Borne(flashs);
             vibrations = Borne(vibrations);
+            champDeVision = float.IsNaN(champDeVision) || float.IsInfinity(champDeVision)
+                ? ChampDefaut : Mathf.Clamp(champDeVision, ChampMin, ChampMax);
+            if (touches == null) touches = new List<ToucheJoueur>();
+            touches.RemoveAll(x => x == null || string.IsNullOrEmpty(x.id) || x.chemin == null);
         }
 
         private static float Borne(float v) => float.IsNaN(v) || float.IsInfinity(v) ? 1f : Mathf.Clamp01(v);
@@ -103,5 +116,13 @@ namespace Froggy.Interface
                 Debug.LogWarning($"[Réglages] Impossible d'enregistrer ({e.Message}).");
             }
         }
+    }
+
+    /// <summary>Une touche changée : l'identifiant de la liaison dans InputSystem_Actions et le chemin choisi.</summary>
+    [Serializable]
+    public sealed class ToucheJoueur
+    {
+        public string id;
+        public string chemin;
     }
 }

@@ -56,16 +56,13 @@ namespace Froggy.Regles
 
         private void OnEnable()
         {
-            frappe = new InputAction("Torgnole", InputActionType.Button);
-            frappe.AddBinding("<Keyboard>/v");
-            frappe.AddBinding("<Gamepad>/buttonWest");
+            frappe = Froggy.Interface.Commandes.Creer("Torgnole");   // V ou bouton ouest, réaffectable (P6-05)
             frappe.Enable();
         }
 
         private void OnDisable()
         {
-            frappe?.Disable();
-            frappe?.Dispose();
+            Froggy.Interface.Commandes.Liberer(frappe);
             frappe = null;
         }
 

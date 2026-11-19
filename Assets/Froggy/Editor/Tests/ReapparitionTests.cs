@@ -184,6 +184,89 @@ namespace Froggy.Outils.Tests
             finally { EvenementsPartie.Emis -= ecoute; }
         }
 
+        // une Froggy (boîte de 1 m, Rigidbody) inscrite comme joueur 1, et une apparition sur deux repères et un centre
+        private (ApparitionJoueurs apparition, PorteurCookies porteur, MeshRenderer modele, PartieCookies cookies) Arene(bool cinematique)
+        {
+            var reglagesCookies = ScriptableObject.CreateInstance<ReglagesCookies>();
+            var reglages = ScriptableObject.CreateInstance<ReglagesReapparition>();
+            aDetruire.Add(reglagesCookies);
+            aDetruire.Add(reglages);
+            scene = EditorSceneManager.NewPreviewScene();
+            var j1 = Repere(RepereArene.Sorte.Joueur, 1, new Vector3(0f, 0f, 0f));
+            var j2 = Repere(RepereArene.Sorte.Joueur, 2, new Vector3(20f, 0f, 0f));
+            var centre = Repere(RepereArene.Sorte.Centre, 1, new Vector3(10f, 0f, 0f));
+            var froggy = Objet("Froggy", new Vector3(-5f, 3f, 7f));
+            froggy.AddComponent<BoxCollider>();
+            froggy.AddComponent<Rigidbody>().isKinematic = cinematique;
+            var modele = Objet("Modèle", Vector3.zero).AddComponent<MeshRenderer>();
+            modele.transform.SetParent(froggy.transform, false);
+            var autre = Objet("Autre", new Vector3(2f, 0.5f, 0f));   // un mannequin près du point du joueur 1
+            var cookies = Objet("Cookies", Vector3.zero).AddComponent<PartieCookies>();
+            cookies.Regler(reglagesCookies);
+            cookies.Demarrer(new RepereArene[0], new[] { froggy, autre });
+            var apparition = Objet("Apparition", Vector3.zero).AddComponent<ApparitionJoueurs>();
+            apparition.Regler(reglages, cookies);
+            apparition.PoserAuDepart = false;   // en réseau, le salon a posé les joueurs
+            apparition.Demarrer(new[] { j1, j2, centre });
+            return (apparition, froggy.GetComponent<PorteurCookies>(), modele, cookies);
+        }
+
+        [Test]
+        public void EnLigneLHoteFaitPoserChezLuiLaFroggyDUnAutre()
+        {
+            var (apparition, porteur, _, _) = Arene(cinematique: true);   // chez l'hôte, la copie d'une Froggy distante
+            Assert.That(porteur.transform.position, Is.EqualTo(new Vector3(-5f, 3f, 7f)), "#144 : le salon l'a posée, on n'y touche pas");
+
+            var envois = new List<(PorteurCookies, Vector3, Quaternion)>();
+            apparition.PoserAilleurs = (p, ou, rot) => envois.Add((p, ou, rot));
+            porteur.transform.position = new Vector3(5f, -10f, 0f);   // tombée hors de l'arène
+            for (int i = 0; i < 52; i++) apparition.Pas(Dt);   // un peu plus de 1 s
+            Assert.That(envois.Count, Is.EqualTo(1), "sa place de réapparition part chez son propriétaire");
+            Assert.That(envois[0].Item1, Is.SameAs(porteur));
+            Assert.That(Vector3.Distance(envois[0].Item2, new Vector3(20f, 0.52f, 0f)), Is.LessThan(1e-3f), "loin du mannequin");
+            Assert.That(Vector3.Angle(envois[0].Item3 * Vector3.forward, Vector3.left), Is.LessThan(1f), "tournée vers le centre");
+
+            // le réseau n'a pas encore apporté sa nouvelle place : la copie suit encore la chute
+            for (int i = 0; i < 20; i++) { porteur.transform.position = new Vector3(5f, -12f, 0f); apparition.Pas(Dt); }
+            Assert.That(envois.Count, Is.EqualTo(1), "pas de deuxième réapparition pendant le trajet du message");
+            Assert.That(apparition.Etat(porteur.Joueur), Is.EqualTo(EtatReapparition.Intouchable));
+            porteur.transform.position = envois[0].Item2;   // la place arrive
+            apparition.Pas(Dt);
+            Assert.That(porteur.Intouchable, Is.True, "réapparue : intouchable un moment");
+        }
+
+        [Test]
+        public void EnMiroirRienNEstDecideIciEtLEtatRecuSeMontre()
+        {
+            var (apparition, porteur, modele, _) = Arene(cinematique: false);
+            apparition.Miroir = true;
+            var recus = new List<EvenementPartie>();
+            System.Action<EvenementPartie> ecoute = e => { if (e.Type == TypeEvenement.JoueurReapparu) recus.Add(e); };
+            EvenementsPartie.Emis += ecoute;
+            try
+            {
+                porteur.transform.position = new Vector3(5f, -10f, 0f);
+                for (int i = 0; i < 60; i++) apparition.Pas(Dt);
+                Assert.That(porteur.transform.position, Is.EqualTo(new Vector3(5f, -10f, 0f)), "#144 : c'est l'hôte qui la remet en jeu");
+                Assert.That(recus, Is.Empty, "« joueur réapparu » arrive de l'hôte, pas d'ici");
+                Assert.That(porteur.Intouchable, Is.False);
+
+                apparition.Refleter(porteur.Joueur, EtatReapparition.Intouchable);
+                bool cachee = false;
+                for (int i = 0; i < 30; i++) { apparition.Pas(Dt); cachee |= modele.forceRenderingOff; }
+                Assert.That(porteur.Intouchable, Is.True, "l'état de l'hôte se montre ici");
+                Assert.That(cachee, Is.True, "elle clignote");
+
+                apparition.Poser(porteur, new Vector3(20f, 0.52f, 0f), Quaternion.identity);   // l'ordre de l'hôte
+                Assert.That(porteur.transform.position, Is.EqualTo(new Vector3(20f, 0.52f, 0f)));
+                apparition.Refleter(porteur.Joueur, EtatReapparition.EnJeu);
+                apparition.Pas(Dt);
+                Assert.That(porteur.Intouchable, Is.False);
+                Assert.That(modele.forceRenderingOff, Is.False, "visible de nouveau");
+            }
+            finally { EvenementsPartie.Emis -= ecoute; }
+        }
+
         private RepereArene Repere(RepereArene.Sorte sorte, int joueur, Vector3 position)
         {
             var r = Objet(sorte.ToString(), position).AddComponent<RepereArene>();

@@ -91,6 +91,9 @@ namespace Froggy.Interface
         [System.NonSerialized] private float prochaineRecherche;
 
         private readonly EtatHud etat = new EtatHud();
+
+        // les icônes des touches (P6-05, IconesTouches) ; sans icône, le nom de la touche s'écrit dans le texte
+        private Sprite iconeTorgnole, iconeDash, iconeObjet;
         private readonly HashSet<Object> pris = new HashSet<Object>();
         private readonly List<System.Action> aRendre = new List<System.Action>();
         private readonly List<JoueurHud> classement = new List<JoueurHud>();
@@ -243,7 +246,7 @@ namespace Froggy.Interface
             {
                 e.RechargeTorgnole = torgnoles.Regles.Reste(e.Local);
                 e.DureeRechargeTorgnole = torgnoles.Regles.DureeRecharge;
-                e.ToucheTorgnole = Touche(torgnoles.ActionFrapper);
+                e.ToucheTorgnole = Touche(torgnoles.ActionFrapper, out iconeTorgnole);
             }
 
             // le dash (#134) : celui de la Froggy de ce joueur, qu'il y ait une partie ou non
@@ -256,7 +259,7 @@ namespace Froggy.Interface
                 e.RechargeDash = dash.Regles.Reste(cle);
                 e.DureeRechargeDash = dash.Regles.DureeRecharge;
                 e.Assomme = dash.Regles.Assomme(cle);
-                e.ToucheDash = Touche(dash.ActionDash);
+                e.ToucheDash = Touche(dash.ActionDash, out iconeDash);
             }
 
             e.Meteo = null;
@@ -296,7 +299,7 @@ namespace Froggy.Interface
             e.Objet = local.Fiche != null ? local.Fiche.nom : null;
             e.RechargeObjet = local.Recharge;
             e.DureeRechargeObjet = local.DernierUtilise != null ? local.DernierUtilise.recharge : 0f;
-            e.ToucheObjet = Touche(objets.ActionUtiliser);
+            e.ToucheObjet = Touche(objets.ActionUtiliser, out iconeObjet);
 
             if (local.Fiche == ficheVue) return;
             if (local.Fiche != null) Annoncer(ref messageObjet, ref finObjet, $"{local.Fiche.nom} !");
@@ -350,20 +353,34 @@ namespace Froggy.Interface
         /// La touche d'une action telle que l'Input System l'affiche, pour le dernier appareil utilisé (clavier ou
         /// manette) : réaffectée, elle suit (skill accessibilite).
         /// </summary>
-        private static string Touche(InputAction action)
+        private static string Touche(InputAction action, out Sprite icone)
         {
+            icone = null;
             if (action == null) return "";
-            var clavier = Keyboard.current;
-            var manette = Gamepad.current;
-            bool parManette = manette != null && (clavier == null || manette.lastUpdateTime > clavier.lastUpdateTime);
-            string appareil = parManette ? "<Gamepad>" : "<Keyboard>";
+            string appareil = IconesTouches.ParManette() ? "<Gamepad>" : "<Keyboard>";
             var liaisons = action.bindings;
             for (int i = 0; i < liaisons.Count; i++)
             {
                 string chemin = liaisons[i].effectivePath;
-                if (chemin != null && chemin.StartsWith(appareil)) return action.GetBindingDisplayString(i);
+                if (chemin == null || !chemin.StartsWith(appareil)) continue;
+                icone = IconesTouches.Pour(action, i);
+                return icone != null ? "" : action.GetBindingDisplayString(i);   // l'icône remplace le nom
             }
             return action.GetBindingDisplayString();
+        }
+
+        private float LargeurIcone(Sprite icone) => icone == null ? 0f : S(44f) * IconesTouches.Echelle(icone) + S(2f);
+
+        // l'icône d'une touche dans un panneau du bas, à la hauteur du texte
+        private void DessinerIcone(Sprite icone, float x, Rect zone, Color teinte)
+        {
+            if (icone == null) return;
+            Color avant = GUI.color;
+            GUI.color = teinte;
+            // le dessin de Kenney garde une marge : 44 points pour une touche à la taille du texte, plus pour Espace, Maj…
+            float cote = S(44f) * IconesTouches.Echelle(icone);
+            GUI.DrawTexture(new Rect(x, zone.y + S(24f) - cote * .5f, cote, cote), icone.texture, ScaleMode.ScaleToFit);
+            GUI.color = avant;
         }
 
         // ---------------------------------------------------------------- Messages courts
@@ -530,10 +547,13 @@ namespace Froggy.Interface
             float bas = h - marge;
             if (ligne.Length > 0)
             {
-                float largeur = Mathf.Max(S(300f), gauche.CalcSize(new GUIContent(ligne)).x + S(32f));
+                Sprite icone = e.RechargeObjet > 0f || string.IsNullOrEmpty(e.Objet) ? null : iconeObjet;
+                float texteLarge = gauche.CalcSize(new GUIContent(ligne)).x;
+                float largeur = Mathf.Max(S(300f), texteLarge + S(32f) + LargeurIcone(icone));
                 var zone = new Rect(marge, bas - S(60f), largeur, S(60f));
                 Panneau(zone, Fond);
                 Ecrire(new Rect(zone.x + S(16f), zone.y + S(4f), zone.width - S(32f), S(40f)), ligne, gauche, Color.white);
+                DessinerIcone(icone, zone.x + S(16f) + texteLarge + S(4f), zone, Color.white);
                 Jauge(new Rect(zone.x + S(16f), zone.yMax - S(14f), zone.width - S(32f), S(6f)),
                     ContenuHud.Jauge(e.RechargeObjet, e.DureeRechargeObjet), e.RechargeObjet > 0f);
                 bas = zone.y - S(8f);
@@ -549,11 +569,14 @@ namespace Froggy.Interface
             float bas = h - marge;
             if (ligne.Length > 0)
             {
-                float largeur = Mathf.Max(S(300f), gauche.CalcSize(new GUIContent(ligne)).x + S(32f));
+                float decale = LargeurIcone(iconeTorgnole);
+                float largeur = Mathf.Max(S(300f), gauche.CalcSize(new GUIContent(ligne)).x + S(32f) + decale);
                 var zone = new Rect(w - largeur - marge, bas - S(60f), largeur, S(60f));
                 Panneau(zone, Fond);
-                Ecrire(new Rect(zone.x + S(16f), zone.y + S(4f), zone.width - S(32f), S(40f)), ligne, gauche,
-                    e.RechargeTorgnole > 0f ? Gris : Color.white);
+                Color teinte = e.RechargeTorgnole > 0f ? Gris : Color.white;
+                DessinerIcone(iconeTorgnole, zone.x + S(10f), zone, teinte);
+                Ecrire(new Rect(zone.x + S(16f) + decale, zone.y + S(4f), zone.width - S(32f) - decale, S(40f)), ligne,
+                    gauche, teinte);
                 Jauge(new Rect(zone.x + S(16f), zone.yMax - S(14f), zone.width - S(32f), S(6f)),
                     ContenuHud.Jauge(e.RechargeTorgnole, e.DureeRechargeTorgnole), e.RechargeTorgnole > 0f);
                 bas = zone.y - S(8f);
@@ -563,11 +586,15 @@ namespace Froggy.Interface
             if (dash.Length > 0)
             {
                 bool attente = e.RechargeDash > 0f || e.Assomme;
-                float largeur = Mathf.Max(S(300f), gauche.CalcSize(new GUIContent(dash)).x + S(32f));
+                Sprite icone = e.Assomme ? null : iconeDash;
+                float decale = LargeurIcone(icone);
+                float largeur = Mathf.Max(S(300f), gauche.CalcSize(new GUIContent(dash)).x + S(32f) + decale);
                 var zone = new Rect(w - largeur - marge, bas - S(60f), largeur, S(60f));
                 Panneau(zone, Fond);
-                Ecrire(new Rect(zone.x + S(16f), zone.y + S(4f), zone.width - S(32f), S(40f)), dash, gauche,
-                    e.Assomme ? Or : attente ? Gris : Color.white);
+                Color teinte = e.Assomme ? Or : attente ? Gris : Color.white;
+                DessinerIcone(icone, zone.x + S(10f), zone, teinte);
+                Ecrire(new Rect(zone.x + S(16f) + decale, zone.y + S(4f), zone.width - S(32f) - decale, S(40f)), dash,
+                    gauche, teinte);
                 Jauge(new Rect(zone.x + S(16f), zone.yMax - S(14f), zone.width - S(32f), S(6f)),
                     ContenuHud.Jauge(e.RechargeDash, e.DureeRechargeDash), attente);
                 bas = zone.y - S(8f);

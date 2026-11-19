@@ -165,6 +165,7 @@ namespace Froggy.Cameras
             lookAction = joueur.GetComponent<PlayerInput>().actions["Look"];
             moveAction = joueur.GetComponent<PlayerInput>().actions["Move"];
             virage = ActionVirage(moveAction, compositesClavier);
+            champTroisiemePersonne = Froggy.Interface.ReglagesJoueur.Actuels.champDeVision;   // réglage du joueur (P6-05)
             foreach (var r in joueur.GetComponentsInChildren<Renderer>(true)) rendusJoueur.Add((r, r.shadowCastingMode));
             colliderJoueur = joueur.GetComponent<Collider>();
         }
@@ -192,10 +193,28 @@ namespace Froggy.Cameras
             }
             virage.Enable();
             PasDeCote(false);
+            Froggy.Interface.ReglagesJoueur.Change += AppliquerReglages;
+            Froggy.Interface.Commandes.Change += RefaireVirage;
+        }
+
+        // le joueur a bougé le curseur du champ de vision (Paramètres, aussi depuis la pause)
+        private void AppliquerReglages() => champTroisiemePersonne = Froggy.Interface.ReglagesJoueur.Actuels.champDeVision;
+
+        // une touche de Move a changé (écran Commandes) : le virage reprend les nouvelles touches
+        private void RefaireVirage()
+        {
+            bool actif = virage.enabled;
+            virage.Disable();
+            virage.Dispose();
+            compositesClavier.Clear();   // les mêmes index : seuls les chemins des touches ont changé
+            virage = ActionVirage(moveAction, compositesClavier);
+            if (actif) virage.Enable();
         }
 
         private void OnDisable()
         {
+            Froggy.Interface.ReglagesJoueur.Change -= AppliquerReglages;
+            Froggy.Interface.Commandes.Change -= RefaireVirage;
             Cacher(false);
             Curseur(false);
             PasDeCote(true);

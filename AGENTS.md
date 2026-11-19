@@ -91,8 +91,18 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
   salon (P2-03) ; `MenuPrincipal` s'y installe seul et montre un écran à la fois (accueil de Julien, Paramètres,
   Rejoindre un salon, Salle d'attente), à la souris comme à la manette. La partie se charge par-dessus et le menu se
   cache jusqu'au retour. Les écrans ne passent que par `Salon.Local` ; leurs textes sont dans `ContenuSalle` (C# pur).
-  Les réglages du joueur (volumes, secousses, flashs, vibrations, de 0 à 1) : `ReglagesJoueur.Actuels`, à lire au
-  moment où l'effet part ; les tests écrivent dans un fichier de test, jamais dans le vrai.
+  Les réglages du joueur (volumes, secousses, flashs, vibrations, de 0 à 1 ; champ de vision en degrés ; touches) :
+  `ReglagesJoueur.Actuels`, à lire au moment où l'effet part ; les tests écrivent dans un fichier de test, jamais dans
+  le vrai. Paramètres (`PanneauReglages`) s'ouvre aussi depuis la pause.
+- Commandes (P6-05, `Scripts/Interface/Commandes.cs`) : **toute touche du jeu est une action de la carte « Player »
+  d'`InputSystem_Actions`**, avec une liaison clavier et une manette ; le joueur la change dans Paramètres ▸ Commandes.
+  Un poste prend sa copie par `Commandes.Creer("NomAction")` (rendue par `Commandes.Liberer`), ou appelle
+  `Commandes.Suivre(playerInput.actions)` ; jamais de `new InputAction` avec une touche écrite en dur. Une nouvelle
+  commande s'ajoute aussi à `Commandes.Lignes`. Une touche affichée se lit sur l'action : son icône par
+  `IconesTouches.Pour(action, index)` (manette branchée, toutes les touches du clavier du pack), sinon son nom
+  (`GetBindingDisplayString`). Icônes **provisoires, à faire valider** : pack « Input Prompts » 1.5a de Kenney (CC0)
+  dans `Interface/Resources/Touches`, importées en sprites par `ImportIconesTouches` ; `IconesTouches.Actives = false`
+  remet le texte.
 - Partie complète : `Assets/Froggy/Scenes/Partie_JardinJaponais.unity`, lancée par « Solo » (avec 3 bots). Comme une
   scène de test, elle charge le jardin par-dessus (`DecorDeTest`) et assemble tous les systèmes avec leurs vrais
   réglages (3 min, météo du jardin). **Un nouveau système de jeu s'y ajoute aussi**, pas seulement dans la scène de test
@@ -111,7 +121,9 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
   les autres montrent** (leurs composants passent en « Miroir »). `PartieReseau` (cookies, temps, gagnant),
   `MeteoReseau`, `CookieSacreReseau`, `TorgnoleReseau` (la touche demande le coup à l'hôte ; le recul part chez le
   propriétaire de la Froggy touchée), `ObjetsReseau` (boîtes, objet tenu, « objet utilisé » envoyé à tous, numéros
-  dans l'ordre du salon) et `GelReseau` (l'hôte décide qui est gelé). Un effet qui ne pousse que les corps non
+  dans l'ordre du salon), `GelReseau` (l'hôte décide qui est gelé) et `ReapparitionReseau` (l'hôte décide la chute
+  et la réapparition ; la Froggy d'un autre joueur est posée chez son propriétaire ; un repère « Apparition d'un
+  joueur » par joueur dans le préfabriqué). Un effet qui ne pousse que les corps non
   cinématiques (super croassement) joue partout et pousse chaque Froggy chez son propriétaire. Une nouvelle mécanique
   de partie s'ajoute à ce préfabriqué avec son script réseau ; la tester à deux fenêtres (skill
   `test-multijoueur-local`, section 7).
