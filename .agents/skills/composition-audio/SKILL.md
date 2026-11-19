@@ -75,3 +75,11 @@ garder ces règles.
 - `mus_<arene>_<etat>_stem_<nom>_v01.wav`, `sfx_<source>_<action>_<matiere>_<variante>.wav`. Une nouvelle version garde
   son suffixe (`_v02`) et ne remplace l'ancienne qu'après écoute.
 - Un manifeste par groupe de stems : BPM, tonalité, durée en échantillons, niveaux, déclencheurs, versions.
+- **OGG** (Froggy, 19 novembre 2026, musique P6-08) : le `ffmpeg` de Homebrew n'a pas `libvorbis` (« Unknown encoder ») ;
+  `oggenc -q 6` le remplace et garde le nombre d'échantillons exact (3 024 000 pour chaque couche du jardin, comme les
+  WAV). Le vérifier après encodage : `ffmpeg -i x.ogg -f s16le -ac 1 - | wc -c` divisé par 2. À l'import dans Unity :
+  `normalize: 0` (sinon l'équilibre entre stems casse), couches lues ensemble en `CompressedInMemory` (départ à
+  l'échantillon par `PlayScheduled`), thème long seul en `Streaming`.
+- **Dosage en partie** : le volume de base de la musique sous les effets, la couche de tension et les jingles se
+  règlent dans `ReglagesMusique` ; la partition de Froggy est `Tools/musique/froggy_musique.py` (sortie : un JSON par
+  morceau, à passer à `render_music`).

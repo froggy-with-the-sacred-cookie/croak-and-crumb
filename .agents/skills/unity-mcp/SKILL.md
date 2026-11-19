@@ -120,6 +120,15 @@ Pièges :
   2026, macOS) lance le Test Runner **dans l'éditeur ouvert**, sans second éditeur, et rend le résumé et chaque
   résultat en JSON (236 tests en quelques secondes). Mêmes règles que `run_tests` : hors mode Play, scène ouverte non
   modifiée.
+- **Vérifier une branche sans ouvrir Unity** (Froggy, 19 novembre 2026, musique P6-08 : branche dans un worktree, Mac à
+  16 Go avec 12,6 Go d'échange et 6,8 Go libres ; un import `-batchmode` aurait ajouté 3,4 Go de `Library` et poussé
+  l'échange sur le disque). Un petit `.csproj` du scratchpad (`netstandard2.1`, `dotnet build`) compile les fichiers
+  neufs contre `Contents/Resources/Scripting/Managed/UnityEngine/*.dll` (`UnityEditor.CoreModule` est dedans ; ne pas
+  ajouter `Managed/UnityEditor.dll` : `MenuItem` serait en double), `Library/ScriptAssemblies/*.dll` du projet ouvert
+  et `nunit.framework.dll` du `PackageCache` ; puis une console `net10.0` appelle par réflexion les tests en C# pur.
+  Ça prouve la compilation et la logique, pas l'import des assets ni le jeu : le dire, et faire tourner la suite
+  complète dans Unity quand la machine le permet. `--disable-build-servers` évite des serveurs de compilation qui
+  restent en mémoire.
 - **`TestRunnerApi.Execute` part en différé** (MCP officiel, `Unity_RunCommand`, Froggy, 18 novembre 2026) : l'appel
   rend la main avant que la série démarre. Un rapport écrit dans un fichier par `ICallbacks` doit être **effacé avant
   le lancement** ; sinon on lit le « FINI » de la série d'avant (207 lus au lieu de 222 : les nouveaux tests manquaient).
