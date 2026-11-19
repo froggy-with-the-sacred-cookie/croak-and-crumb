@@ -59,7 +59,7 @@ panneau. La simulation ne marche qu'en éditeur et en build de développement.
 L'hôte écoute sur le port 7770, ou le suivant s'il est pris (FishNet garde parfois l'ancien port ouvert, voir
 « Pièges connus »). Il note le port choisi dans `%TEMP%\froggy-test-reseau-port.txt`, que les autres fenêtres lisent.
 Le code : `Assets/Froggy/Scripts/Reseau/TestReseau.cs` (démarrage), `PanneauTestReseau.cs`, réglages
-`Assets/Froggy/Reseau/ReglagesTestReseau.asset`, le tout dans le prefab `Assets/Froggy/Prefabs/Reseau/TestReseau.prefab`.
+`Assets/Froggy/Postes/2_Reseau/ReglagesTestReseau.asset`, le tout dans le prefab `Assets/Froggy/Prefabs/Reseau/TestReseau.prefab`.
 
 ## Jouer par code (salon)
 
@@ -130,8 +130,10 @@ salon.Quitter();
 Les règles (4 joueurs au plus, couleur unique, lancement quand tous les invités sont prêts) sont dans `EtatSalon.cs`
 et testées dans `Assets/Froggy/Editor/Tests/SalonTests.cs`. Le prefab `Assets/Froggy/Prefabs/Reseau/Salon.prefab`
 contient le NetworkManager, le salon, le relais (`RelaisSalon`), la recherche locale, le transport Unity
-(`UnityTransport`), le panneau, les 4 points d'apparition et la caméra ; la scène de partie est un champ de `Salon`
-(`Vitrine_JardinJaponais` pour l'instant).
+(`UnityTransport`), le panneau, 4 points d'apparition de secours et la caméra. La partie est un champ de `Salon` :
+il charge `sceneDecor` (`Vitrine_JardinJaponais`) **puis** `scenePartie` (`Partie_JardinJaponais`, la partie complète,
+#130), dans cet ordre, et les décharge ensemble au retour. Chaque joueur apparaît sur le repère « Apparition d'un
+joueur » de son numéro dans la scène de partie (sinon sur les points du préfabriqué).
 
 ### Jouer par internet : ce qu'il y a derrière (P2-05)
 
@@ -167,8 +169,8 @@ temps, gagnant, porteur du cookie sacré. Il fait tourner les règles du poste 3
 telles quelles. Chez les autres joueurs, ces composants sont en **Miroir** : ils ne décident rien et montrent ce que
 l'hôte a décidé. Tout passe par le canal fiable : rien ne se perd, même avec « Mauvaise connexion ».
 
-Comment le voir : le salon (section précédente), **Lancer la partie**. Le jardin s'ouvre avec 5 cookies provisoires,
-compte à rebours, partie de 30 s (`ReglagesPartie_Essai`), score en haut à gauche, temps en haut, gagnant à la fin,
+Comment le voir : le salon (section précédente), **Lancer la partie**. La partie complète s'ouvre : cookies, boîtes et
+gobelin sur les repères de l'arène, compte à rebours, partie de 3 minutes (`ReglagesPartie`), HUD, gagnant à la fin,
 puis retour au salon. Le panneau du salon passe en bas à gauche pendant la partie.
 
 **Pour un poste qui écoute** (son, effets, HUD) : rien ne change. `EvenementsPartie` part chez **chaque** joueur
@@ -187,9 +189,11 @@ if (partie != null && partie.IsServerStarted)    // seulement sur l'hôte
 }
 ```
 
-Le prefab `Assets/Froggy/Prefabs/Reseau/PartieReseau.prefab` (règles du poste 3 + 5 repères **provisoires** dans le
-jardin) apparaît quand tous les joueurs ont leur personnage et disparaît au retour au salon. Une vraie arène
-apportera ses repères.
+Le prefab `Assets/Froggy/Prefabs/Reseau/PartieReseau.prefab` (les règles décidées par l'hôte : cookies, déroulement,
+objets, torgnole, météo, cookie sacré) apparaît quand tous les joueurs ont leur personnage et disparaît au retour au
+salon. Il n'a **pas de repères** : il prend ceux de l'arène, la partie complète. Les systèmes locaux de cette scène
+restent éteints en ligne (`SystemesHorsLigne`), pour ne jamais tourner en double avec ceux de l'hôte. Pas encore en
+ligne : la réapparition et les bots (#121).
 
 ## Départs et arrivées (P2-06)
 

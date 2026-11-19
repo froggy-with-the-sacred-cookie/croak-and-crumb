@@ -74,7 +74,7 @@ namespace Froggy.Outils
             plan.GetComponent<MeshRenderer>().sharedMaterial = eau;
 
             // Froggy, pour jouer (la caméra du joueur remplace celle de la scène)
-            var joueur = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Template/Prefabs/PlayerTemplate.prefab");
+            var joueur = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Froggy/Joueur/Prefabs/PlayerTemplate.prefab");
             if (joueur != null)
             {
                 var j = (GameObject)PrefabUtility.InstantiatePrefab(joueur);

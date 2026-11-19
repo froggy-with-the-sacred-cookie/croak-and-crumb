@@ -1,14 +1,22 @@
-# Scène Template
+# Joueur (ancien dossier `Assets/Template`)
 
-Point de départ et référence pour tester une mécanique. Ce n'est **pas** le contrôleur de Froggy : c'est un cube qui
-court, saute et regarde autour de lui, pour que chacun parte d'une base qui marche.
+**`Prefabs/PlayerTemplate.prefab` est la base de la Froggy du jeu.** Seul, c'est un cube qui court, saute et regarde
+autour de lui. Dans le jardin (`Vitrine_JardinJaponais`), son instance « PlayerTemplate » reçoit en plus
+`DeplacementWow`, `FroggyApparence`, `CameraOrbitale`, `SonsMouvement`… : c'est elle que copient les bots (`BotsPartie`,
+qui la reconnaît à son `PlayerInput` allumé) et le réseau (`FroggyReseau`, **par son nom**). Ne pas renommer l'objet ni
+le préfabriqué sans chercher « PlayerTemplate » dans les scripts.
+
+Le dossier s'appelait `Assets/Template` jusqu'au 19 novembre 2026 ; les scripts gardent leurs noms `Template…` et
+l'espace de noms `Froggy.Template`.
+
+La scène `Scenes/Template.unity` reste un point de départ pour essayer une mécanique sur un cube.
 
 ## Utiliser
 
 1. Dupliquer `Scenes/Template.unity` (Ctrl+D) dans son propre dossier, ne pas modifier l'original.
 2. Glisser `Prefabs/PlayerTemplate.prefab` dans n'importe quelle scène : il apporte sa caméra, rien d'autre à ajouter
    (retirer la Main Camera de la scène si elle en a une).
-3. Le décor vient du pack **Grid Master** (`Assets/Assets/Grid Master/URP/Prefabs`) : sol `GM-Base`, marches
+3. Le décor vient du pack **Grid Master** (`Assets/ThirdParty/Grid Master/URP/Prefabs`) : sol `GM-Base`, marches
    `GM-Cube` de 0,5 / 1 / 1,5 / 2 m, rampe `GM-Ramp`, escalier `GM-Stairs`.
 
 ## Commandes

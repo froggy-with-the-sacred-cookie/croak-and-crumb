@@ -39,13 +39,17 @@ namespace Froggy.Reseau
         [SerializeField] private bool enLigne = true;
 
         [Header("Partie")]
-        [Tooltip("Scène chargée chez tous au lancement (doit être dans les Build Settings).")]
-        [SerializeField] private string scenePartie = "Vitrine_JardinJaponais";
+        [Tooltip("Scène chargée chez tous au lancement (doit être dans les Build Settings) : la partie complète (#130).")]
+        [SerializeField] private string scenePartie = "Partie_JardinJaponais";
+
+        [Tooltip("Décor chargé juste avant la partie, et déchargé avec elle (vide : aucun). La partie complète le charge " +
+                 "elle-même hors ligne (DecorDeTest) ; en ligne, il doit être là avant les Froggy, qui en copient le joueur.")]
+        [SerializeField] private string sceneDecor = "Vitrine_JardinJaponais";
 
         [Tooltip("Personnage provisoire de chaque joueur (NetworkObject).")]
         [SerializeField] private NetworkObject prefabJoueur;
 
-        [Tooltip("Points d'apparition, dans l'ordre des numéros de joueur.")]
+        [Tooltip("Points d'apparition, dans l'ordre des numéros de joueur, si la scène de partie n'a pas de repères « Apparition d'un joueur ».")]
         [SerializeField] private Transform[] apparitions;
 
         [Tooltip("Secondes entre « partie finie » et le retour au salon.")]
@@ -469,7 +473,8 @@ namespace Froggy.Reseau
             if (!porte.EstLHote(qui) || !etat.Lancer()) return;
             Publier();
             // Additive : la scène du salon (et son NetworkManager) reste chargée.
-            reseau.SceneManager.LoadGlobalScenes(new SceneLoadData(scenePartie) { ReplaceScenes = ReplaceOption.None });
+            // le décor d'abord : FishNet charge les scènes d'une demande dans l'ordre
+            reseau.SceneManager.LoadGlobalScenes(new SceneLoadData(ScenesDePartie()) { ReplaceScenes = ReplaceOption.None });
         }
 
         internal void QuandRetour(NetworkConnection qui)
@@ -489,12 +494,29 @@ namespace Froggy.Reseau
                 if (joueur != null && joueur.IsSpawned) reseau.ServerManager.Despawn(joueur);
             joueurs.Clear();
 
-            reseau.SceneManager.UnloadGlobalScenes(new SceneUnloadData(scenePartie));
+            reseau.SceneManager.UnloadGlobalScenes(new SceneUnloadData(ScenesDePartie()));
             etat.RevenirAuSalon();
             Publier();
         }
 
         private void Publier() => SalonReseau.Actuel?.Publier(etat);
+
+        /// <summary>Les scènes d'une partie, dans l'ordre de chargement : le décor (s'il y en a un), puis la partie.</summary>
+        public string[] ScenesDePartie() =>
+            string.IsNullOrEmpty(sceneDecor) ? new[] { scenePartie } : new[] { sceneDecor, scenePartie };
+
+        /// <summary>
+        /// Le repère « Apparition d'un joueur » de ce numéro dans la scène de partie (placé au Bâtisseur), ou null : la
+        /// vraie arène apporte ses points d'apparition, ceux du préfabriqué ne servent qu'en secours.
+        /// </summary>
+        private static Transform RepereJoueur(UnityEngine.SceneManagement.Scene scene, int numero)
+        {
+            if (!scene.IsValid() || !scene.isLoaded) return null;
+            foreach (GameObject racine in scene.GetRootGameObjects())
+                foreach (var r in racine.GetComponentsInChildren<Froggy.Arene.RepereArene>(true))
+                    if (r.sorte == Froggy.Arene.RepereArene.Sorte.Joueur && r.joueur == numero) return r.transform;
+            return null;
+        }
 
         /// <summary>Chaque joueur reçoit son personnage quand il a fini de charger la scène de partie.</summary>
         private void QuandPresenceChange(ClientPresenceChangeEventArgs args)
@@ -507,7 +529,8 @@ namespace Froggy.Reseau
             if (i < 0 || joueurs.ContainsKey(conn.ClientId)) return;
 
             int numero = etat.Membres[i].Numero;
-            Transform ou = apparitions != null && apparitions.Length >= numero ? apparitions[numero - 1] : null;
+            Transform ou = RepereJoueur(args.Scene, numero);
+            if (ou == null && apparitions != null && apparitions.Length >= numero) ou = apparitions[numero - 1];
             NetworkObject joueur = Instantiate(prefabJoueur,
                 ou != null ? ou.position : Vector3.up * 2f, ou != null ? ou.rotation : Quaternion.identity);
             reseau.ServerManager.Spawn(joueur, conn);
@@ -603,9 +626,12 @@ namespace Froggy.Reseau
 
                 // Coupé en pleine partie (l'hôte est parti) : on retire le décor de la partie, resté chez nous ; les menus
                 // (P6-03) reviennent alors sur « Rejoindre un salon » avec le message (P2-06).
-                var scene = UnityEngine.SceneManagement.SceneManager.GetSceneByName(scenePartie);
-                if (scene.isLoaded && UnityEngine.SceneManagement.SceneManager.sceneCount > 1)
-                    UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync(scene);
+                foreach (string nom in ScenesDePartie())
+                {
+                    var scene = UnityEngine.SceneManagement.SceneManager.GetSceneByName(nom);
+                    if (scene.isLoaded && UnityEngine.SceneManagement.SceneManager.sceneCount > 1)
+                        UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync(scene);
+                }
             }
             Change?.Invoke();
         }

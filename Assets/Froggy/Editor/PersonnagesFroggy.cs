@@ -18,7 +18,7 @@ namespace Froggy.Outils
     /// </summary>
     public static class PersonnagesFroggy
     {
-        private const string SceneTemplate = "Assets/Template/Scenes/Template.unity";
+        private const string SceneTemplate = "Assets/Froggy/Joueur/Scenes/Template.unity";
         public const string SceneTest = "Assets/Froggy/Scenes/Test_Personnages.unity";
 
         // Seuils du mélange, en m/s. PROVISOIRES : à régler en jeu avec les vraies vitesses de Froggy.

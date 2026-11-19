@@ -92,6 +92,35 @@ namespace Froggy.Outils.Tests
 
         private const string DecorDeTestJardin = Socle.DecorDeTest.Jardin;
 
+        // ---------------------------------------------------------------- En ligne (#130)
+
+        [Test]
+        public void HorsLigneSeulementLesSystemesLocauxSAllument()
+        {
+            // les systèmes locaux attendent éteints : en ligne, PartieReseau apporte ceux de l'hôte
+            Assert.That(Fois(Guid("Assets/Froggy/Scripts/Reseau/SystemesHorsLigne.cs")), Is.EqualTo(1));
+            var groupe = Regex.Match(Texte, @"m_Name: ""Syst\\xE8mes \(hors ligne\)""\s+m_TagString: \w+\s+m_Icon: [^\n]+\s+m_NavMeshLayer: \d+\s+m_StaticEditorFlags: \d+\s+m_IsActive: (\d)");
+            Assert.That(groupe.Success, Is.True, "le groupe « Systèmes (hors ligne) » manque");
+            Assert.That(groupe.Groups[1].Value, Is.EqualTo("0"), "le groupe doit être éteint dans la scène");
+        }
+
+        [Test]
+        public void LeSalonChargeLeJardinPuisLaPartieComplete()
+        {
+            string salon = File.ReadAllText("Assets/Froggy/Prefabs/Reseau/Salon.prefab");
+            Assert.That(salon, Does.Contain("scenePartie: " + Path.GetFileNameWithoutExtension(Scene)));
+            Assert.That(salon, Does.Not.Contain("sceneDecor: \n"), "le décor doit être chargé avant la partie");
+        }
+
+        [Test]
+        public void LaPartieEnLigneApporteSesReglesPasSesReperes()
+        {
+            string prefab = File.ReadAllText("Assets/Froggy/Prefabs/Reseau/PartieReseau.prefab");
+            Assert.That(prefab, Does.Not.Contain("guid: " + Guid("Assets/Froggy/Scripts/Arene/RepereArene.cs")),
+                "les repères viennent de l'arène (la partie complète), pas du préfabriqué");
+            Assert.That(prefab, Does.Contain("guid: " + Guid("Assets/Froggy/Postes/3_ReglesBots/ReglagesPartie.asset")), "3 minutes");
+        }
+
         /// <summary>
         /// Garde-fou : un poste qui ajoute un système à sa scène de test l'ajoute aussi à la partie complète. Exceptions :
         /// ses outils Essai… et les porteurs (PorteurCookies, PorteurObjet), que les règles posent seules sur les Froggy.
