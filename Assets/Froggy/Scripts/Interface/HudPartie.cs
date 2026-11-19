@@ -23,7 +23,10 @@ namespace Froggy.Interface
     /// Il s'installe tout seul au lancement (un objet « HUD de partie » qui survit aux changements de scène), sans
     /// toucher aux scènes ni aux préfabriqués des postes. Il éteint alors les affichages provisoires qu'il remplace et
     /// les rallume quand on le coupe : menu Froggy ▸ HUD de partie (réglage de l'éditeur, pour comparer).
-    /// Dessiné en IMGUI comme les affichages provisoires : l'habillage du jalon 2 choisira sa technique.
+    ///
+    /// Habillage du jalon 2 (refonte du 19/11/2026) : VueHud le dessine sur un Canvas (jetons, icônes peintes, étiquettes
+    /// penchées, score des autres au-dessus de leur tête). L'ancien dessin IMGUI reste, pour comparer : menu Froggy ▸
+    /// HUD de partie habillé (décoché : l'ancien).
     /// </summary>
     [DisallowMultipleComponent]
     public class HudPartie : MonoBehaviour
@@ -67,6 +70,30 @@ namespace Froggy.Interface
             }
         }
 
+        private const string CleHabille = "Froggy.HudPartie.habille";
+
+        /// <summary>
+        /// Le HUD habillé (VueHud, vrai par défaut) ; faux : l'ancien dessin IMGUI du jalon 1, pour comparer (garde-fou 7).
+        /// Gardé d'une session à l'autre dans l'éditeur ; toujours vrai dans un build.
+        /// </summary>
+        public static bool Habille
+        {
+            get
+            {
+#if UNITY_EDITOR
+                return UnityEditor.EditorPrefs.GetBool(CleHabille, true);
+#else
+                return true;
+#endif
+            }
+            set
+            {
+#if UNITY_EDITOR
+                UnityEditor.EditorPrefs.SetBool(CleHabille, value);
+#endif
+            }
+        }
+
         // sans rechargement du domaine à l'entrée en mode Play, le HUD de la partie d'avant resterait
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void Vider() => Actuel = null;
@@ -102,6 +129,12 @@ namespace Froggy.Interface
         [System.NonSerialized] private float finTorgnole, finObjet;
         [System.NonSerialized] private FicheObjet ficheVue;
 
+        // le HUD habillé et ce qu'il lit en plus de l'état
+        private VueHud vue;
+        private readonly DonneesVueHud donneesVue = new DonneesVueHud();
+        private readonly Dictionary<PorteurCookies, Renderer> rendus = new Dictionary<PorteurCookies, Renderer>();
+        private System.Action rejouer;
+
         private GUIStyle texte, petit, gauche, droite, grand, enorme, bouton;
         private float echelleStyles = -1f, k = 1f;
 
@@ -130,12 +163,14 @@ namespace Froggy.Interface
         {
             EvenementsPartie.Emis -= Reagir;
             RendreLaPlace();
+            if (vue != null) vue.gameObject.SetActive(false);
         }
 
         private void Update()
         {
             Chercher();
             Photographier();
+            MontrerVue();
             var clavier = Keyboard.current;
             if (etat.PartieConnue && etat.Phase == Phase.Finie && etat.RejouerPermis && clavier != null && clavier[Key.R].wasPressedThisFrame)
                 deroulement.Rejouer();
@@ -176,8 +211,55 @@ namespace Froggy.Interface
             PrendreLaPlace();
         }
 
-        /// <summary>Relit la partie (à chaque image ; un test l'appelle hors jeu).</summary>
-        public void Rafraichir() => Photographier();
+        /// <summary>Relit la partie et la montre (à chaque image ; un test l'appelle hors jeu).</summary>
+        public void Rafraichir()
+        {
+            Photographier();
+            MontrerVue();
+        }
+
+        /// <summary>Le HUD habillé de cette partie (créé à la première image), ou rien avec l'ancien dessin.</summary>
+        public VueHud Vue => vue;
+
+        private void MontrerVue()
+        {
+            if (!Habille)
+            {
+                if (vue != null) vue.gameObject.SetActive(false);
+                return;
+            }
+            if (vue == null) vue = VueHud.Creer(transform);
+
+            var d = donneesVue;
+            d.ToucheDash = iconeDash;
+            d.ToucheTorgnole = iconeTorgnole;
+            d.ToucheObjet = iconeObjet;
+            PorteurObjet porteObjet = objets != null && objets.Regles != null ? objets.Local : null;
+            d.IconeObjet = porteObjet != null && porteObjet.Fiche != null ? porteObjet.Fiche.icone : null;
+            d.MessageObjet = MessageObjet;
+            d.MessageTorgnole = MessageTorgnole;
+            d.Rejouer = rejouer ??= () => { if (deroulement != null) deroulement.Rejouer(); };
+            d.Froggy.Clear();
+            if (cookies != null)
+                foreach (var p in cookies.Porteurs)
+                    if (p != null)
+                        d.Froggy.Add(new FroggyHud { Joueur = p.Joueur, Cookies = p.Nombre, Couleur = CouleurDe(p.Joueur), Tete = Tete(p) });
+            vue.Montrer(etat, d);
+        }
+
+        // le haut de la tête d'une Froggy : le haut de son dessin (le premier rendu trouvé), sinon 1,2 m au-dessus
+        private Vector3 Tete(PorteurCookies p)
+        {
+            if (!rendus.TryGetValue(p, out Renderer rendu) || rendu == null)
+            {
+                rendu = p.GetComponentInChildren<SkinnedMeshRenderer>();
+                if (rendu == null) rendu = p.GetComponentInChildren<Renderer>();
+                rendus[p] = rendu;
+            }
+            Vector3 pos = p.transform.position;
+            float haut = rendu != null ? rendu.bounds.max.y : pos.y + 1.2f;
+            return new Vector3(pos.x, haut + .25f, pos.z);
+        }
 
         // le HUD prend la place des affichages provisoires « en attendant le HUD (P6-02) »
         private void PrendreLaPlace()
@@ -219,6 +301,7 @@ namespace Froggy.Interface
                 ReglesPartie r = deroulement.Regles;
                 e.Phase = r.Phase;
                 e.Reste = r.Reste;
+                e.Duree = r.Duree;
                 e.Gagnant = r.Gagnant;
                 e.RejouerPermis = deroulement.RejouerPermis;
             }
@@ -440,6 +523,7 @@ namespace Froggy.Interface
 
         private void OnGUI()
         {
+            if (Habille) return;   // le HUD habillé (VueHud) dessine ; ceci est l'ancien dessin, gardé pour comparer
             var e = etat;
             bool rien = !e.PartieConnue && e.Joueurs.Count == 0 && !e.ObjetsConnus && !e.TorgnoleConnue && string.IsNullOrEmpty(e.Meteo)
                         && !e.DashConnu;
