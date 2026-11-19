@@ -142,10 +142,10 @@ namespace Froggy.Deplacement
             {
                 moveAction = entree.actions["Move"];
                 jumpAction = entree.actions["Jump"];
+                Froggy.Interface.Commandes.Suivre(entree.actions);   // la réaffectation du joueur (P6-05)
             }
-            pasDeCote = new InputAction("PasDeCote", InputActionType.Value);
-            pasDeCote.AddCompositeBinding("1DAxis").With("Negative", "<Keyboard>/q").With("Positive", "<Keyboard>/e");
-            courseAuto = new InputAction("CourseAuto", InputActionType.Button, "<Keyboard>/numLock");
+            pasDeCote = Froggy.Interface.Commandes.Creer("PasDeCote");     // Q / E (position QWERTY), réaffectables
+            courseAuto = Froggy.Interface.Commandes.Creer("CourseAuto");   // Verr. num
         }
 
         private void OnEnable()
@@ -162,6 +162,12 @@ namespace Froggy.Deplacement
             courseAuto.Disable();
             auto = false;
             if (ancien != null) ancien.enabled = true;
+        }
+
+        private void OnDestroy()
+        {
+            Froggy.Interface.Commandes.Liberer(pasDeCote);
+            Froggy.Interface.Commandes.Liberer(courseAuto);
         }
 
         /// <summary>Pour un test : les entrées viennent d'ici, plus des appareils.</summary>

@@ -10,7 +10,8 @@ using UnityEngine.UI;
 namespace Froggy.Interface
 {
     /// <summary>
-    /// Le menu pause (#131) : Échap au clavier ou Start à la manette, pendant une partie. « Reprendre », « Rejouer »
+    /// Le menu pause (#131) : Échap au clavier ou Start à la manette, pendant une partie. « Reprendre », « Paramètres »
+    /// (les mêmes qu'au menu principal, P6-05), « Rejouer »
     /// (solo) et « Retour au menu ». En solo, la partie se fige (Time.timeScale à 0 : le temps de jeu, les règles et les
     /// bots avancent au pas du jeu) ; en ligne, elle continue (Notion : « pause (le jeu continue en multijoueur) ») et
     /// « Quitter la partie » quitte le salon. Échap, Start ou B referment. S'installe seul au lancement, dans le style
@@ -22,7 +23,9 @@ namespace Froggy.Interface
 
         private Canvas canvas;
         private GameObject systemeSaisie;
-        private Button reprendre, rejouer, quitter;
+        private Button reprendre, parametres, rejouer, quitter;
+        private RectTransform panneauPause;
+        private PanneauReglages reglages;
         private float echelleAvant = 1f;
         private bool fige;
 
@@ -61,17 +64,24 @@ namespace Froggy.Interface
                 return;
             }
 
+            if (PanneauReglages.EnEcoute) return;   // Échap annule l'écoute d'une touche, sans refermer
             Keyboard clavier = Keyboard.current;
             Gamepad manette = Gamepad.current;
             bool bascule = (clavier != null && clavier.escapeKey.wasPressedThisFrame)
                            || (manette != null && manette.startButton.wasPressedThisFrame);
+            bool retour = Ouvert && manette != null && manette.buttonEast.wasPressedThisFrame;
+            if (Ouvert && ReglagesOuverts && (bascule || retour))
+            {
+                reglages.Retour();   // Paramètres : des Commandes aux réglages, puis à la pause
+                return;
+            }
             if (bascule)
             {
                 if (Ouvert) Fermer();
                 else if (EnPartie) Ouvrir();
                 return;
             }
-            if (Ouvert && manette != null && manette.buttonEast.wasPressedThisFrame) Fermer();
+            if (retour) Fermer();
         }
 
         /// <summary>Ouvre la pause : en solo, la partie se fige.</summary>
@@ -82,6 +92,7 @@ namespace Froggy.Interface
             rejouer.gameObject.SetActive(solo);
             FabriqueMenu.Libeller(quitter, solo ? "Retour au menu" : "Quitter la partie");
             canvas.gameObject.SetActive(true);
+            MontrerReglages(false);
             AssurerEventSystem();
             if (solo && !fige)
             {
@@ -97,8 +108,26 @@ namespace Froggy.Interface
         /// <summary>Referme la pause et rend le temps à la partie.</summary>
         public void Fermer()
         {
+            if (reglages != null) reglages.gameObject.SetActive(false);   // enregistre les réglages changés
             if (canvas != null) canvas.gameObject.SetActive(false);
             Degeler();
+        }
+
+        private bool ReglagesOuverts => reglages != null && reglages.gameObject.activeSelf;
+
+        private void MontrerReglages(bool oui)
+        {
+            if (oui && reglages == null)
+            {
+                GameObject modele = Resources.Load<GameObject>("MenuEtang/Menu_Principal_Etang");
+                var f = new FabriqueMenu(modele != null ? modele.GetComponent<VueMenuEtang>() : null);
+                reglages = PanneauReglages.Creer(canvas.transform, f, () => MontrerReglages(false));
+            }
+            if (reglages != null) reglages.gameObject.SetActive(oui);
+            panneauPause.gameObject.SetActive(!oui);
+            if (EventSystem.current == null) return;
+            Selectable cible = oui ? reglages.PremierFocus : parametres;
+            if (cible != null) cible.Select();
         }
 
         private void Degeler()
@@ -153,11 +182,14 @@ namespace Froggy.Interface
             GameObject modele = Resources.Load<GameObject>("MenuEtang/Menu_Principal_Etang");
             var f = new FabriqueMenu(modele != null ? modele.GetComponent<VueMenuEtang>() : null);
             RectTransform panneau = FabriqueMenu.Panneau("Panneau", objet.transform, new Vector2(0f, -10f),
-                new Vector2(720f, 640f), FabriqueMenu.Nuit, FabriqueMenu.Turquoise);
-            f.Titre("Pause", panneau, new Vector2(0f, 215f));
-            reprendre = f.Feuille("Reprendre", panneau, true, new Vector2(0f, 65f), new Vector2(520f, 124f), Fermer);
-            rejouer = f.Feuille("Rejouer", panneau, false, new Vector2(0f, -80f), new Vector2(480f, 112f), Rejouer);
-            quitter = f.Feuille("Retour au menu", panneau, false, new Vector2(0f, -210f), new Vector2(480f, 112f),
+                new Vector2(720f, 760f), FabriqueMenu.Nuit, FabriqueMenu.Turquoise);
+            panneauPause = panneau;
+            f.Titre("Pause", panneau, new Vector2(0f, 275f));
+            reprendre = f.Feuille("Reprendre", panneau, true, new Vector2(0f, 135f), new Vector2(520f, 124f), Fermer);
+            parametres = f.Feuille("Paramètres", panneau, false, new Vector2(0f, 5f), new Vector2(480f, 112f),
+                () => MontrerReglages(true));
+            rejouer = f.Feuille("Rejouer", panneau, false, new Vector2(0f, -120f), new Vector2(480f, 112f), Rejouer);
+            quitter = f.Feuille("Retour au menu", panneau, false, new Vector2(0f, -245f), new Vector2(480f, 112f),
                 Quitter);
             canvas.gameObject.SetActive(false);
         }

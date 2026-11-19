@@ -44,14 +44,14 @@ namespace Froggy.Deplacement
         {
             if (plonger == null)
             {
-                plonger = new InputAction("Plonger", InputActionType.Button);
-                plonger.AddBinding("<Keyboard>/c");
-                plonger.AddBinding("<Gamepad>/buttonEast");
+                plonger = Froggy.Interface.Commandes.Creer("Plonger");   // C ou bouton est, réaffectable (P6-05)
             }
             plonger.Enable();
         }
 
         private void OnDisable() => plonger?.Disable();
+
+        private void OnDestroy() => Froggy.Interface.Commandes.Liberer(plonger);
 
         /// <summary>La zone d'eau où se trouve ce point (le centre de Froggy), ou null.</summary>
         public ZoneEau Zone(Vector3 centre) => ZoneEau.Trouver(gameObject.scene.GetPhysicsScene(), centre, tampon);

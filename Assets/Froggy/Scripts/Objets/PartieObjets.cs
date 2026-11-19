@@ -68,9 +68,7 @@ namespace Froggy.Objets
             SceneManager.sceneLoaded += QuandUneSceneArrive;
             if (utiliser == null)
             {
-                utiliser = new InputAction("UtiliserObjet", InputActionType.Button);
-                utiliser.AddBinding("<Keyboard>/f");
-                utiliser.AddBinding("<Gamepad>/buttonNorth");
+                utiliser = Froggy.Interface.Commandes.Creer("UtiliserObjet");   // F ou bouton nord, réaffectable (P6-05)
             }
             utiliser.Enable();
         }
@@ -80,6 +78,8 @@ namespace Froggy.Objets
             SceneManager.sceneLoaded -= QuandUneSceneArrive;
             utiliser?.Disable();
         }
+
+        private void OnDestroy() => Froggy.Interface.Commandes.Liberer(utiliser);
 
         private void Start() => Demarrer();
 
@@ -233,7 +233,7 @@ namespace Froggy.Objets
             if (style == null) style = new GUIStyle(GUI.skin.label) { fontSize = 22, fontStyle = FontStyle.Bold };
 
             string texte = local.Fiche == null ? "Objet : aucun"
-                : local.Pret ? $"Objet : {local.Fiche.nom}  (F pour utiliser)"
+                : local.Pret ? $"Objet : {local.Fiche.nom}  ({utiliser?.GetBindingDisplayString()} pour utiliser)"
                 : $"Objet : {local.Fiche.nom}";
             if (local.Recharge > 0f) texte += $"  (recharge {local.Recharge:0.0} s)";
             Ecrire(new Rect(14f, Screen.height - 44f, 700f, 30f), texte, local.Fiche != null ? local.Fiche.couleur : Color.white);
