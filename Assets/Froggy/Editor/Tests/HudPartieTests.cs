@@ -388,6 +388,58 @@ namespace Froggy.Outils.Tests
                     "icône de la météo « " + tirage.evenement.nom + " »");
         }
 
+        // ---------------------------------------------------------------- Repère du cookie sacré (#152)
+
+        [Test]
+        public void LeRepereSaitQuandLeCookieSacreEstHorsChamp()
+        {
+            Rect zone = BordEcran.ZoneLibre;
+            Assert.That(BordEcran.HorsChamp(new Vector3(.5f, .5f, 8f), zone), Is.False, "au milieu de l'écran");
+            Assert.That(BordEcran.HorsChamp(new Vector3(.5f, .5f, -8f), zone), Is.True, "derrière la caméra");
+            Assert.That(BordEcran.HorsChamp(new Vector3(1.3f, .5f, 8f), zone), Is.True, "à droite, hors de l'écran");
+            Assert.That(BordEcran.HorsChamp(new Vector3(.5f, .9f, 8f), zone), Is.True, "sous le HUD du haut");
+        }
+
+        [Test]
+        public void HorsChampLeRepereSePoseAuBordDansSaDirection()
+        {
+            Rect zone = BordEcran.ZoneLibre;
+            Vector2 p = BordEcran.AuBord(new Vector3(2f, .5f, 8f), zone, 16f / 9f, out float angle);
+            Assert.That(p.x, Is.EqualTo(zone.xMax).Within(1e-4f), "à droite : bord droit");
+            Assert.That(p.y, Is.EqualTo(.5f).Within(1e-4f));
+            Assert.That(angle, Is.EqualTo(0f).Within(.01f), "la flèche montre la droite");
+
+            p = BordEcran.AuBord(new Vector3(.5f, 3f, 8f), zone, 16f / 9f, out angle);
+            Assert.That(p.y, Is.EqualTo(zone.yMax).Within(1e-4f), "loin devant, en haut : sous le HUD du haut");
+            Assert.That(angle, Is.EqualTo(90f).Within(.01f));
+
+            // derrière la caméra, la projection est retournée : un cookie derrière à droite se montre à gauche
+            p = BordEcran.AuBord(new Vector3(.8f, .5f, -8f), zone, 16f / 9f, out angle);
+            Assert.That(p.x, Is.EqualTo(zone.xMin).Within(1e-4f));
+            Assert.That(Mathf.Abs(angle), Is.EqualTo(180f).Within(.01f));
+
+            // pile derrière : vers le bas (« retourne-toi »)
+            p = BordEcran.AuBord(new Vector3(.5f, .5f, -8f), zone, 16f / 9f, out angle);
+            Assert.That(p.y, Is.EqualTo(zone.yMin).Within(1e-4f));
+            Assert.That(angle, Is.EqualTo(-90f).Within(.01f));
+        }
+
+        [Test]
+        public void PasDeRepereQuandCestToiQuiPortesLeCookieSacre()
+        {
+            var parent = new GameObject("HUD de test");
+            aDetruire.Add(parent);
+            var vue = VueHud.Creer(parent.transform);
+            var e = Etat(Phase.EnJeu, 50f, (1, 0), (2, 0));
+            e.Sacre = EtatCookieSacre.Porte; e.PorteurSacre = 1;
+            var d = new DonneesVueHud { SacreVisible = true, SacrePorte = true, SacreChezMoi = true };
+            vue.Montrer(e, d);
+            Assert.That(vue.RepereSacreVisible, Is.False, "ton jeton et l'annonce le disent déjà");
+            d.SacreVisible = false; d.SacreChezMoi = false;
+            vue.Montrer(e, d);
+            Assert.That(vue.RepereSacreVisible, Is.False, "rien à suivre");
+        }
+
         [Test]
         public void LeHudHabilleMontreLaPartie()
         {

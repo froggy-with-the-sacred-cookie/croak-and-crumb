@@ -23,6 +23,10 @@ namespace Froggy.Interface
         public Sprite ToucheDash, ToucheTorgnole, ToucheObjet, IconeObjet;
         public string MessageObjet = "", MessageTorgnole = "";
         public readonly List<FroggyHud> Froggy = new List<FroggyHud>();
+
+        // le cookie sacré dans le monde (#152) : où il est, s'il est sur une Froggy, si c'est la Froggy de ce joueur
+        public bool SacreVisible, SacrePorte, SacreChezMoi;
+        public Vector3 SacreIci;
         public System.Action Rejouer;
     }
 
@@ -93,7 +97,7 @@ namespace Froggy.Interface
         private readonly List<Pastille> pastilles = new List<Pastille>();
         private readonly Etiquette[] etiquettes = new Etiquette[2];
         private readonly List<Repere> reperes = new List<Repere>();
-        private RectTransform haut, bas, fin, barre, barrePleine, meteo;
+        private RectTransform haut, bas, fin, barre, barrePleine, meteo, repere, repereAxe;
         private Text minuteur, sousMinuteur, decompte, decompteSous, meteoTexte, message, finTitre, finRaison;
         private Image meteoIcone;
         private Bouton dash, torgnole, objet;
@@ -126,6 +130,10 @@ namespace Froggy.Interface
         public bool DashPret => dash != null && dash.Pret;
         public bool TorgnolePrete => torgnole != null && torgnole.Pret;
         public bool ObjetTenu => objet != null && objet.Icone.enabled;
+        /// <summary>Le repère du cookie sacré est affiché (#152).</summary>
+        public bool RepereSacreVisible => repere != null && repere.gameObject.activeSelf;
+        /// <summary>Le repère est au bord de l'écran (le cookie sacré est hors champ).</summary>
+        public bool RepereSacreAuBord { get; private set; }
 
         // ---------------------------------------------------------------- Construction
 
@@ -285,6 +293,33 @@ namespace Froggy.Interface
                 r.Rect.gameObject.SetActive(false);
                 reperes.Add(r);
             }
+
+            // le repère du cookie sacré (#152) : disque d'or (la couleur du cookie, pas le turquoise du kappa, trop proche
+            // du joueur 3) et une pointe qui montre la direction ; au-dessus des étiquettes de score
+            repere = Rect("Repère du cookie sacré", racine, Vector2.zero, new Vector2(.5f, .5f), Vector2.zero, new Vector2(60f, 60f));
+            repereAxe = Rect("Axe", repere, new Vector2(.5f, .5f), new Vector2(.5f, .5f), Vector2.zero, Vector2.zero);
+            Pointe("Bord", repereAxe, Encre, new Vector2(30f, 0f), new Vector2(26f, 32f));
+            Pointe("Pointe", repereAxe, Or, new Vector2(32f, 0f), new Vector2(18f, 22f));
+            Disque("Bord", repere, Encre, 62f);
+            Disque("Or", repere, Or, 56f);
+            Disque("Fond", repere, new Color(.07f, .15f, .1f, 1f), 46f);
+            Image icone = Icone("Cookie sacré", repere, new Vector2(.5f, .5f), Vector2.zero, 40f);
+            icone.sprite = IconeHud("cookie_sacre");
+            repere.gameObject.SetActive(false);
+        }
+
+        private static void Pointe(string nom, RectTransform parent, Color couleur, Vector2 position, Vector2 taille)
+        {
+            var go = new GameObject(nom, typeof(RectTransform), typeof(CanvasRenderer), typeof(TriangleHud));
+            go.transform.SetParent(parent, false);
+            var t = go.GetComponent<TriangleHud>();
+            t.color = couleur;
+            t.raycastTarget = false;
+            var r = t.rectTransform;
+            r.anchorMin = r.anchorMax = new Vector2(.5f, .5f);
+            r.pivot = new Vector2(0f, .5f);
+            r.anchoredPosition = position;
+            r.sizeDelta = taille;
         }
 
         private void ConstruireFin()
@@ -349,6 +384,7 @@ namespace Froggy.Interface
             {
                 MontrerFin(e);
                 CacherReperes();
+                repere.gameObject.SetActive(false);
                 decompte.text = decompteSous.text = "";
                 return;
             }
@@ -357,6 +393,7 @@ namespace Froggy.Interface
             MontrerEtiquettes(e);
             MontrerBoutons(e, d);
             MontrerReperes(e, d);
+            MontrerRepereSacre(e, d);
         }
 
         private void MontrerPastilles(EtatHud e)
@@ -586,6 +623,38 @@ namespace Froggy.Interface
                 if (libre) break;
             }
             return position;
+        }
+
+        // le cookie sacré (#152) : au-dessus de lui s'il est à l'écran, sinon au bord, pointé vers lui ; rien quand c'est
+        // ce joueur qui le porte (son jeton et l'annonce le disent déjà)
+        private void MontrerRepereSacre(EtatHud e, DonneesVueHud d)
+        {
+            bool enJeu = !e.PartieConnue || e.Phase == Phase.EnJeu || e.Phase == Phase.Prolongation;
+            Camera cam = Camera.main;
+            bool montrer = enJeu && d.SacreVisible && !d.SacreChezMoi && cam != null;
+            repere.gameObject.SetActive(montrer);
+            if (!montrer) { RepereSacreAuBord = false; return; }
+
+            Vector3 vp = cam.WorldToViewportPoint(d.SacreIci);
+            Vector2 taille = racine.rect.size;
+            float balance = 5f * Mathf.Sin(Time.unscaledTime * 3f);
+            RepereSacreAuBord = BordEcran.HorsChamp(vp, BordEcran.ZoneLibre);
+            if (!RepereSacreAuBord)
+            {
+                // au-dessus de l'étiquette de score quand il est sur une Froggy
+                float dessus = d.SacrePorte ? 96f : 44f;
+                repere.anchoredPosition = new Vector2(vp.x * taille.x, vp.y * taille.y + dessus + balance);
+                repereAxe.localEulerAngles = new Vector3(0f, 0f, -90f);
+            }
+            else
+            {
+                Vector2 p = BordEcran.AuBord(vp, BordEcran.ZoneLibre, taille.x / Mathf.Max(1f, taille.y), out float angle);
+                repere.anchoredPosition = new Vector2(p.x * taille.x, p.y * taille.y);
+                repereAxe.localEulerAngles = new Vector3(0f, 0f, angle);
+                repere.localScale = Vector3.one * (1f + .06f * Mathf.Abs(Mathf.Sin(Time.unscaledTime * 3f)));
+                return;
+            }
+            repere.localScale = Vector3.one;
         }
 
         private void CacherReperes()
