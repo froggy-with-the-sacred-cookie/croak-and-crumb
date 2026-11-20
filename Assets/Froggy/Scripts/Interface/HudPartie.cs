@@ -145,11 +145,21 @@ namespace Froggy.Interface
         {
             if (Actuel != null && Actuel != this) { Destroy(this); return; }
             Actuel = this;
+            UnityEngine.SceneManagement.SceneManager.sceneLoaded += QuandUneSceneArrive;
         }
 
         private void OnDestroy()
         {
+            UnityEngine.SceneManagement.SceneManager.sceneLoaded -= QuandUneSceneArrive;
             if (Actuel == this) Actuel = null;
+        }
+
+        // une scène arrive (la partie) : on cherche tout de suite, pour éteindre les affichages provisoires des postes avant
+        // leur premier OnGUI (dessiné par-dessus tout, même l'écran de chargement)
+        private void QuandUneSceneArrive(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode mode)
+        {
+            if (!float.IsPositiveInfinity(prochaineRecherche)) prochaineRecherche = 0f;
+            if (isActiveAndEnabled) Chercher();
         }
 
         private void OnEnable()

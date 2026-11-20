@@ -388,6 +388,75 @@ namespace Froggy.Outils.Tests
                     "icône de la météo « " + tirage.evenement.nom + " »");
         }
 
+        // ---------------------------------------------------------------- Fin de partie, chargement, taille (maquettes de Julien)
+
+        [TestCase(1, "1er")]
+        [TestCase(2, "2e")]
+        [TestCase(4, "4e")]
+        public void LeRangSEcritALaFrancaise(int rang, string texte)
+        {
+            Assert.That(ContenuHud.Rang(rang), Is.EqualTo(texte));
+        }
+
+        [Test]
+        public void LeClassementMetLeGagnantDevantPuisLesCookies()
+        {
+            // le joueur 2 a gagné avec le cookie sacré malgré moins de cookies : il passe devant ; égalité : le plus petit numéro
+            var e = Etat(Phase.Finie, 0f, (1, 3), (2, 1), (3, 3), (4, 0));
+            e.Gagnant = 2;
+            var ordre = ContenuHud.Classement(e);
+            Assert.That(ordre.ConvertAll(j => j.Joueur), Is.EqualTo(new List<int> { 2, 1, 3, 4 }));
+        }
+
+        [Test]
+        public void ChaqueAstuceDeChargementSeLitSansTouche()
+        {
+            Assert.That(ContenuChargement.Astuces, Is.Not.Empty);
+            for (int i = 0; i < ContenuChargement.Astuces.Length * 2; i++)
+                Assert.That(ContenuChargement.Astuce(i), Does.StartWith("Astuce : "));
+            Assert.That(ContenuChargement.Astuce(-3), Is.Not.Empty, "un nombre négatif ne casse rien");
+            Assert.That(ContenuChargement.Astuce(7), Is.EqualTo(ContenuChargement.Astuce(7)));
+        }
+
+        [Test]
+        public void LaTailleDuHudResteDansSesBornes()
+        {
+            Assert.That(new ReglagesJoueur().tailleHud, Is.EqualTo(1f));
+            var r = new ReglagesJoueur { tailleHud = 4f };
+            r.Borner();
+            Assert.That(r.tailleHud, Is.EqualTo(ReglagesJoueur.TailleHudMax));
+            r.tailleHud = 0f;   // un ancien fichier sans ce réglage
+            r.Borner();
+            Assert.That(r.tailleHud, Is.EqualTo(1f));
+            r.tailleHud = float.NaN;
+            r.Borner();
+            Assert.That(r.tailleHud, Is.EqualTo(1f));
+        }
+
+        [Test]
+        public void LaFinMontreLePodiumEtTonRang()
+        {
+            var parent = new GameObject("HUD de test");
+            aDetruire.Add(parent);
+            var vue = VueHud.Creer(parent.transform);
+            var e = Etat(Phase.Finie, 0f, (1, 3), (2, 1), (3, 2), (4, 0));
+            e.Gagnant = 2;
+            e.Local = 3;
+            var d = new DonneesVueHud();
+            vue.Montrer(e, d);
+            Assert.That(vue.FinVisible, Is.True);
+            Assert.That(vue.PodiumVisible, Is.EqualTo(3), "trois marches à 4 joueurs");
+            Assert.That(vue.RangLocal, Is.EqualTo("3e"), "2 (gagnant), 1, puis 3");
+            Assert.That(vue.BarreTonRang, Is.False, "déjà sur le podium : pas de barre « Ton classement » en plus");
+            Assert.That(vue.Taille, Is.EqualTo(ReglagesJoueur.Actuels.tailleHud), "la taille du HUD suit le réglage");
+
+            var deux = Etat(Phase.Finie, 0f, (1, 0), (2, 2));
+            deux.Gagnant = 2;
+            vue.Montrer(deux, d);
+            Assert.That(vue.PodiumVisible, Is.EqualTo(2));
+            Assert.That(vue.RangLocal, Is.EqualTo("2e"), "le joueur local du test est le 1");
+        }
+
         // ---------------------------------------------------------------- Repère du cookie sacré (#152)
 
         [Test]

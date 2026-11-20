@@ -34,7 +34,7 @@ namespace Froggy.Interface
         private AudioSource ambiance;
         private Canvas canvas;
         private GameObject systemeSaisie;
-        private RectTransform menuPrincipal;
+        private RectTransform menuPrincipal, tableau;
         private VueMenuEtang etang;
         private EcranParametres ecranParametres;
         private EcranSalons ecranSalons;
@@ -43,6 +43,31 @@ namespace Froggy.Interface
 
         /// <summary>L'écran affiché.</summary>
         public Ecran EcranActuel => ecran;
+
+        private const string CleTableau = "Froggy.Menu.accueilTableau";
+
+        /// <summary>
+        /// L'accueil en variante A de la maquette de Julien (boutons à gauche, peinture du jardin à droite ; page Notion
+        /// P6-03), vrai par défaut ; faux : l'étang centré d'origine, pour comparer (garde-fou 7). Gardé dans l'éditeur ;
+        /// toujours vrai dans un build. Menu Froggy ▸ Menus ▸ Accueil avec le tableau du jardin.
+        /// </summary>
+        public static bool AccueilTableau
+        {
+            get
+            {
+#if UNITY_EDITOR
+                return UnityEditor.EditorPrefs.GetBool(CleTableau, true);
+#else
+                return true;
+#endif
+            }
+            set
+            {
+#if UNITY_EDITOR
+                UnityEditor.EditorPrefs.SetBool(CleTableau, value);
+#endif
+            }
+        }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void Reinitialiser()
@@ -107,8 +132,14 @@ namespace Froggy.Interface
                     CacherPanneauProvisoire();   // au retour d'une partie solo, le salon de la scène Menu est neuf
                     Afficher(ecran);
                     if (ambiance.clip != null && !ambiance.isPlaying) ambiance.Play();
+                    EcranChargement.Cacher();
                 }
-                else ambiance.Stop();
+                else
+                {
+                    ambiance.Stop();
+                    // en ligne, le salon fait arriver la partie : l'écran de chargement la couvre jusqu'au compte à rebours
+                    if (!EcranChargement.Visible) EcranChargement.Montrer();
+                }
             }
             if (!visible) return;
 
@@ -157,6 +188,7 @@ namespace Froggy.Interface
                 ecranParametres.Depuis(ecran);
             ecran = cible;
             if (menuPrincipal != null) menuPrincipal.gameObject.SetActive(cible == Ecran.Accueil);
+            if (tableau != null) tableau.gameObject.SetActive(cible == Ecran.Accueil);
             if (ecranParametres != null) ecranParametres.gameObject.SetActive(cible == Ecran.Parametres);
             if (ecranSalons != null) ecranSalons.gameObject.SetActive(cible == Ecran.Salons);
             if (ecranSalle != null) ecranSalle.gameObject.SetActive(cible == Ecran.SalleAttente);
@@ -198,7 +230,7 @@ namespace Froggy.Interface
         {
             Reseau.Salon salon = Reseau.Salon.Local;
             if (salon != null && !salon.Connecte && !salon.Occupe) Destroy(salon.gameObject);
-            SceneManager.LoadScene(SceneSolo);
+            EcranChargement.Charger(SceneSolo);
         }
 
         /// <summary>Les écrans posés sur l'étang (ou sur l'eau du croquis), cachés jusqu'à leur tour.</summary>
@@ -251,7 +283,63 @@ namespace Froggy.Interface
             etang.Rejoindre.onClick.AddListener(() => Afficher(Ecran.Salons));
             etang.Parametres.onClick.AddListener(() => Afficher(Ecran.Parametres));
             etang.Solo.onClick.AddListener(LancerSolo);
+            if (AccueilTableau) PoserTableau();
             ConstruireEcrans(etang.transform);
+        }
+
+        /// <summary>
+        /// Accueil, variante A de la maquette de Julien : le bloc de l'étang (titre et feuilles-boutons) passe à gauche, la
+        /// peinture du jardin s'encadre à droite (bord turquoise, filet clair, lotus sur le coin, légende).
+        /// </summary>
+        private void PoserTableau()
+        {
+            Sprite peinture = Resources.Load<Sprite>(EcranChargement.CarteJardin);
+            if (peinture == null || menuPrincipal == null) return;
+            menuPrincipal.anchorMin = menuPrincipal.anchorMax = new Vector2(.25f, .5f);
+            menuPrincipal.anchoredPosition = Vector2.zero;
+            menuPrincipal.localScale = Vector3.one * .8f;
+
+            tableau = FabriqueMenu.Zone("Tableau du jardin", etang.transform, Vector2.zero, new Vector2(1040f, 620f));
+            tableau.anchorMin = tableau.anchorMax = new Vector2(.69f, .5f);
+            tableau.anchoredPosition = new Vector2(0f, 10f);
+
+            Image halo = FabriqueMenu.Arrondi("Halo", tableau, false, new Color(.43f, .8f, .78f, .35f), .5f);
+            FabriqueMenu.Etirer(halo.rectTransform);
+            halo.rectTransform.offsetMin = new Vector2(-9f, -9f);
+            halo.rectTransform.offsetMax = new Vector2(9f, 9f);
+            Image masque = FabriqueMenu.Arrondi("Cadre", tableau, true, Color.white, .6f);
+            FabriqueMenu.Etirer(masque.rectTransform);
+            masque.gameObject.AddComponent<Mask>().showMaskGraphic = false;
+            var objet = new GameObject("Peinture du jardin", typeof(RectTransform), typeof(Image), typeof(AspectRatioFitter));
+            objet.transform.SetParent(masque.transform, false);
+            var image = objet.GetComponent<Image>();
+            image.sprite = peinture;
+            image.raycastTarget = false;
+            var ajuste = objet.GetComponent<AspectRatioFitter>();
+            ajuste.aspectMode = AspectRatioFitter.AspectMode.EnvelopeParent;
+            ajuste.aspectRatio = 16f / 9f;
+            Image bord = FabriqueMenu.Arrondi("Bord", tableau, false, FabriqueMenu.Turquoise, .6f);
+            FabriqueMenu.Etirer(bord.rectTransform);
+            Image filet = FabriqueMenu.Arrondi("Filet", tableau, false, new Color(1f, 1f, 1f, .45f), 1.2f);
+            FabriqueMenu.Etirer(filet.rectTransform);
+            filet.rectTransform.offsetMin = new Vector2(10f, 10f);
+            filet.rectTransform.offsetMax = new Vector2(-10f, -10f);
+
+            var fabrique = new FabriqueMenu(etang);
+            fabrique.Puce(EcranChargement.NomJardin, tableau, new Vector2(0f, -310f), new Vector2(340f, 58f),
+                FabriqueMenu.NuitProfonde, FabriqueMenu.Ivoire, 30);
+            Sprite fleur = Resources.Load<Sprite>("MenuEtang/Fleur");
+            if (fleur != null)
+            {
+                var lotus = new GameObject("Lotus", typeof(RectTransform), typeof(Image));
+                lotus.transform.SetParent(tableau, false);
+                var il = lotus.GetComponent<Image>();
+                il.sprite = fleur;
+                il.preserveAspect = true;
+                il.raycastTarget = false;
+                FabriqueMenu.Placer(il.rectTransform, new Vector2(500f, 290f), new Vector2(170f, 112f));
+                il.rectTransform.localEulerAngles = new Vector3(0f, 0f, -10f);
+            }
         }
 
 #if UNITY_EDITOR

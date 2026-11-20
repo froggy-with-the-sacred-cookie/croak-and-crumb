@@ -113,8 +113,12 @@ namespace Froggy.Interface
             Ligne(vueReglages, "Vibrations", -180f, () => r.vibrations, v => r.vibrations = v);
             Ligne(vueReglages, "Champ de vision", -238f, () => r.champDeVision, v => r.champDeVision = v,
                 ReglagesJoueur.ChampMin, ReglagesJoueur.ChampMax, v => Mathf.RoundToInt(v) + "°");
-            f.Texte("0 % coupe l'effet. Réglages gardés sur cet ordinateur.", vueReglages, 28, FabriqueMenu.Brume,
-                TextAnchor.MiddleCenter, new Vector2(0f, -310f), new Vector2(1000f, 44f));
+            // la taille du HUD de partie (de loin, sur une télé, on l'agrandit) ; pas entière : 75 à 150 %
+            Slider taille = Ligne(vueReglages, "Taille du HUD", -296f, () => r.tailleHud, v => r.tailleHud = v,
+                ReglagesJoueur.TailleHudMin, ReglagesJoueur.TailleHudMax, v => Mathf.RoundToInt(v * 100f) + " %");
+            taille.wholeNumbers = false;
+            f.Texte("0 % coupe l'effet · gardé sur cet ordinateur", vueReglages, 24, FabriqueMenu.Brume,
+                TextAnchor.MiddleRight, new Vector2(150f, -4f), new Vector2(620f, 40f));
             boutonCommandes = f.Feuille("Commandes", vueReglages, true, new Vector2(-220f, -435f),
                 new Vector2(380f, 100f), () => Montrer(true, premiereTouche));
             f.Feuille("Retour", vueReglages, false, new Vector2(220f, -435f), new Vector2(380f, 100f),

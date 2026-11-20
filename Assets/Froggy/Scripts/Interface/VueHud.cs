@@ -101,10 +101,25 @@ namespace Froggy.Interface
         private Text minuteur, sousMinuteur, decompte, decompteSous, meteoTexte, message, finTitre, finRaison;
         private Image meteoIcone;
         private Bouton dash, torgnole, objet;
-        private RectTransform finLignes, finBouton;
-        private readonly List<Pastille> finRangs = new List<Pastille>();
+        private RectTransform finPanneau, finBouton, finTrait;
+        private readonly List<RectTransform> finTirets = new List<RectTransform>();
+        private readonly List<Carte> podium = new List<Carte>();
+        private Carte quatrieme, tonRang;
         private readonly List<JoueurHud> classement = new List<JoueurHud>();
+
+        // une marche du podium, une ligne du classement ou la barre « Ton classement » (maquette de Julien)
+        private class Carte
+        {
+            public RectTransform Rect;
+            public Image Bord, Onglet, Jeton, Cookie;
+            public Text Rang, Numero, Nom, Score;
+        }
         private string decompteVu = "";
+        private CanvasScaler echelle;
+        private float tailleVue = -1f;
+
+        /// <summary>La taille du HUD appliquée (réglage du joueur, 0,75 à 1,5).</summary>
+        public float Taille => tailleVue;
         private float decomptePop = -9f;
         private DonneesVueHud donnees;
 
@@ -116,6 +131,12 @@ namespace Froggy.Interface
         public int Couronne { get; private set; } = ReglesPartie.Personne;
         public string TexteMinuteur => minuteur != null && minuteur.gameObject.activeInHierarchy ? minuteur.text : "";
         public bool FinVisible => fin != null && fin.gameObject.activeSelf;
+        /// <summary>Le nombre de marches du podium affichées (1 à 3).</summary>
+        public int PodiumVisible { get; private set; }
+        /// <summary>Le rang du joueur local au classement de fin (« 2e »), ou vide s'il n'y est pas.</summary>
+        public string RangLocal { get; private set; } = "";
+        /// <summary>La barre « Ton classement » est affichée (seulement si le joueur local n'est ni sur le podium ni 4e).</summary>
+        public bool BarreTonRang => tonRang != null && tonRang.Rect.gameObject.activeSelf;
         public bool BarreVisible => barre != null && barre.gameObject.activeInHierarchy;
         public bool MeteoVisible => meteo != null && meteo.gameObject.activeInHierarchy;
         /// <summary>Les étiquettes d'annonce affichées, de haut en bas.</summary>
@@ -151,6 +172,7 @@ namespace Froggy.Interface
             echelle.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
             echelle.matchWidthOrHeight = 1f;
             var vue = go.AddComponent<VueHud>();
+            vue.echelle = echelle;
             vue.Construire();
             return vue;
         }
@@ -324,44 +346,105 @@ namespace Froggy.Interface
 
         private void ConstruireFin()
         {
-            fin = Rect("Fin de partie", racine, new Vector2(.5f, .5f), new Vector2(.5f, .5f), new Vector2(0f, 20f), new Vector2(640f, 520f));
-            Image fond = FabriqueMenu.Arrondi("Fond", fin, true, Creme, .7f);
-            FabriqueMenu.Etirer(fond.rectTransform);
-            Image bord = FabriqueMenu.Arrondi("Bord", fin, false, Encre, .7f);
-            FabriqueMenu.Etirer(bord.rectTransform);
+            // l'écran de victoire voilé, et par-dessus le classement de Julien (page Notion P6-03) : podium, 4e, ton rang
+            fin = Rect("Fin de partie", racine, new Vector2(.5f, .5f), new Vector2(.5f, .5f), Vector2.zero, Vector2.zero);
+            FabriqueMenu.Etirer(fin);
+            var voile = new GameObject("Voile", typeof(RectTransform), typeof(Image));
+            voile.transform.SetParent(fin, false);
+            FabriqueMenu.Etirer((RectTransform)voile.transform);
+            Image iv = voile.GetComponent<Image>();
+            iv.color = new Color(.02f, .07f, .11f, .55f);
+            iv.raycastTarget = false;
 
-            RectTransform ruban = Rect("Titre", fin, new Vector2(.5f, 1f), new Vector2(.5f, .5f), new Vector2(0f, 0f), new Vector2(520f, 86f));
-            Penchee("Bord", ruban, Encre, 5f, 18f);
-            Penchee("Fond", ruban, Ruban, 0f, 18f);
-            finTitre = Ecrire("Texte", ruban, "", 54, Creme, TextAnchor.MiddleCenter, new Vector2(.5f, .5f), new Vector2(0f, 2f), new Vector2(700f, 86f), 5f);
-            finRaison = Ecrire("Raison", fin, "", 30, Encre, TextAnchor.MiddleCenter, new Vector2(.5f, 1f), new Vector2(0f, -76f), new Vector2(600f, 40f), 0f);
+            finPanneau = FabriqueMenu.Panneau("Classement", fin, new Vector2(0f, 6f), new Vector2(900f, 700f),
+                FabriqueMenu.Nuit, FabriqueMenu.Turquoise, .7f);
+            Deco("MenuEtang/Nenuphar_Jade", new Vector2(-470f, -320f), 210f, 16f);
+            Deco("MenuEtang/Nenuphar_Anis", new Vector2(478f, 300f), 170f, -24f);
+            Deco("MenuEtang/Fleur", new Vector2(-452f, 304f), 150f, 10f);
+            Deco("MenuEtang/Fleur", new Vector2(462f, -316f), 128f, -8f);
 
-            finLignes = Rect("Classement", fin, new Vector2(.5f, 1f), new Vector2(.5f, 1f), new Vector2(0f, -110f), new Vector2(520f, 280f));
-            for (int i = 0; i < 4; i++)
-            {
-                var p = new Pastille();
-                p.Rect = Rect("Rang " + (i + 1), finLignes, new Vector2(.5f, 1f), new Vector2(.5f, 1f), new Vector2(0f, -i * 66f), new Vector2(520f, 58f));
-                Pilule("Fond", p.Rect, new Color(1f, 1f, 1f, .55f), true);
-                p.Contour = Pilule("Toi", p.Rect, Encre, false);
-                p.Jeton = Jeton(p.Rect, new Vector2(29f, -29f), 22f, out p.Numero, 26);
-                p.Score = Ecrire("Nom", p.Rect, "", 30, Encre, TextAnchor.MiddleLeft, new Vector2(0f, .5f), new Vector2(64f, 1f), new Vector2(300f, 58f), 0f);
-                p.Cookie = Icone("Cookie", p.Rect, new Vector2(1f, .5f), new Vector2(-90f, 0f), 34f);
-                p.Couronne = null;
-                var compte = Ecrire("Cookies", p.Rect, "", 36, Encre, TextAnchor.MiddleLeft, new Vector2(1f, .5f), new Vector2(-66f, 1f), new Vector2(60f, 58f), 0f);
-                p.Toi = compte.rectTransform;   // rangé ici : le nombre de cookies du rang
-                finRangs.Add(p);
-            }
+            finTitre = Ecrire("Titre", finPanneau, "", 66, Creme, TextAnchor.MiddleCenter, new Vector2(.5f, 1f), new Vector2(0f, -72f), new Vector2(800f, 90f), 5f);
+            finTitre.rectTransform.pivot = new Vector2(.5f, .5f);
+            finTrait = (RectTransform)FabriqueMenu.Arrondi("Trait", finPanneau, true, FabriqueMenu.Anis, 3f).transform;
+            Placer(finTrait, new Vector2(.5f, 1f), new Vector2(0f, -124f), new Vector2(360f, 10f));
+            for (int i = 0; i < 6; i++)
+                finTirets.Add((RectTransform)FabriqueMenu.Arrondi("Tiret", finPanneau, true, FabriqueMenu.Anis, 4f).transform);
+            finRaison = Ecrire("Raison", finPanneau, "", 30, FabriqueMenu.Turquoise, TextAnchor.MiddleCenter, new Vector2(.5f, 1f), new Vector2(0f, -160f), new Vector2(800f, 40f), 0f);
+            finRaison.rectTransform.pivot = new Vector2(.5f, .5f);
 
-            finBouton = Rect("Rejouer", fin, new Vector2(.5f, 0f), new Vector2(.5f, .5f), new Vector2(0f, 56f), new Vector2(260f, 60f));
-            Image fondBouton = FabriqueMenu.Arrondi("Fond", finBouton, true, Ruban, 1f);
-            FabriqueMenu.Etirer(fondBouton.rectTransform);
-            fondBouton.raycastTarget = true;
-            Image bordBouton = FabriqueMenu.Arrondi("Bord", finBouton, false, Encre, 1f);
-            FabriqueMenu.Etirer(bordBouton.rectTransform);
-            Ecrire("Texte", finBouton, "Rejouer (R)", 30, Creme, TextAnchor.MiddleCenter, new Vector2(.5f, .5f), Vector2.zero, new Vector2(260f, 60f), 3f);
+            podium.Add(CreerCarte("1er", new Vector2(240f, 190f), Or));
+            podium.Add(CreerCarte("2e", new Vector2(220f, 160f), FabriqueMenu.Turquoise));
+            podium.Add(CreerCarte("3e", new Vector2(220f, 160f), FabriqueMenu.Turquoise));
+            quatrieme = CreerLigne("4e", FabriqueMenu.Turquoise);
+            tonRang = CreerLigne("Ton classement", FabriqueMenu.Anis);
+            // « Ton classement » d'abord, puis le rang, le jeton et le nom décalés d'autant
+            Ecrire("Libellé", tonRang.Rect, "Ton classement", 24, Creme, TextAnchor.MiddleLeft, new Vector2(0f, .5f), new Vector2(24f, 1f), new Vector2(200f, 58f), 0f);
+            ((RectTransform)tonRang.Rang.transform.parent).anchoredPosition = new Vector2(250f, 0f);
+            ((RectTransform)tonRang.Jeton.transform.parent).anchoredPosition = new Vector2(318f, -29f);
+            tonRang.Nom.rectTransform.anchoredPosition = new Vector2(346f, 1f);
+
+            finBouton = Rect("Rejouer", finPanneau, new Vector2(.5f, 1f), new Vector2(.5f, .5f), Vector2.zero, new Vector2(380f, 92f));
+            var feuille = finBouton.gameObject.AddComponent<Image>();
+            feuille.sprite = Resources.Load<Sprite>("MenuEtang/Feuille_Claire");
+            feuille.preserveAspect = true;
+            if (feuille.sprite == null) feuille.color = FabriqueMenu.Anis;
+            Ecrire("Texte", finBouton, "Rejouer (R)", 34, FabriqueMenu.Encre, TextAnchor.MiddleCenter, new Vector2(.5f, .5f), new Vector2(-10f, 0f), new Vector2(380f, 92f), 0f);
             // dès l'appui : au clic gauche, la caméra capture la souris et le relâchement n'arrive jamais au bouton
             finBouton.gameObject.AddComponent<AppuiHud>().Action = () => donnees?.Rejouer?.Invoke();
             fin.gameObject.SetActive(false);
+        }
+
+        private void Deco(string sprite, Vector2 position, float taille, float angle)
+        {
+            Image i = Icone("Décor", finPanneau, new Vector2(.5f, .5f), position, taille);
+            i.sprite = Resources.Load<Sprite>(sprite);
+            i.enabled = i.sprite != null;
+            i.rectTransform.localEulerAngles = new Vector3(0f, 0f, angle);
+        }
+
+        private static void Placer(RectTransform r, Vector2 ancre, Vector2 position, Vector2 taille)
+        {
+            r.anchorMin = r.anchorMax = ancre;
+            r.pivot = new Vector2(.5f, .5f);
+            r.anchoredPosition = position;
+            r.sizeDelta = taille;
+        }
+
+        // une marche du podium : onglet du rang en haut, jeton et nom, puis le score en gros
+        private Carte CreerCarte(string rang, Vector2 taille, Color bord)
+        {
+            var c = new Carte();
+            c.Rect = Rect("Marche " + rang, finPanneau, new Vector2(.5f, 1f), new Vector2(.5f, .5f), Vector2.zero, taille);
+            Image fond = FabriqueMenu.Arrondi("Fond", c.Rect, true, FabriqueMenu.NuitProfonde, 1.2f);
+            FabriqueMenu.Etirer(fond.rectTransform);
+            c.Bord = FabriqueMenu.Arrondi("Bord", c.Rect, false, bord, 1.2f);
+            FabriqueMenu.Etirer(c.Bord.rectTransform);
+            RectTransform onglet = Rect("Onglet", c.Rect, new Vector2(.5f, 1f), new Vector2(.5f, .5f), Vector2.zero, new Vector2(96f, 40f));
+            c.Onglet = Pilule("Fond", onglet, bord, true);
+            c.Rang = Ecrire("Rang", onglet, rang, 26, FabriqueMenu.Encre, TextAnchor.MiddleCenter, new Vector2(.5f, .5f), new Vector2(0f, 1f), new Vector2(96f, 40f), 0f);
+            c.Jeton = Jeton(c.Rect, new Vector2(taille.x * .5f, -46f), 18f, out c.Numero, 22);
+            c.Jeton.transform.parent.GetComponent<RectTransform>().anchorMin = c.Jeton.transform.parent.GetComponent<RectTransform>().anchorMax = new Vector2(0f, 1f);
+            c.Nom = Ecrire("Nom", c.Rect, "", 26, Creme, TextAnchor.MiddleCenter, new Vector2(.5f, 1f), new Vector2(0f, -84f), new Vector2(taille.x, 34f), 0f);
+            c.Cookie = Icone("Cookie", c.Rect, new Vector2(.5f, 0f), new Vector2(-28f, 30f), 38f);
+            c.Score = Ecrire("Score", c.Rect, "", 38, Creme, TextAnchor.MiddleLeft, new Vector2(.5f, 0f), new Vector2(-4f, 31f), new Vector2(100f, 46f), 3f);
+            return c;
+        }
+
+        // une ligne : pastille du rang, jeton, nom, et le score à droite
+        private Carte CreerLigne(string nom, Color bord)
+        {
+            var c = new Carte();
+            c.Rect = Rect(nom, finPanneau, new Vector2(.5f, 1f), new Vector2(.5f, .5f), Vector2.zero, new Vector2(680f, 58f));
+            Pilule("Fond", c.Rect, FabriqueMenu.NuitProfonde, true);
+            c.Bord = Pilule("Bord", c.Rect, bord, false);
+            RectTransform onglet = Rect("Rang", c.Rect, new Vector2(0f, .5f), new Vector2(.5f, .5f), new Vector2(52f, 0f), new Vector2(76f, 38f));
+            c.Onglet = Pilule("Fond", onglet, bord, true);
+            c.Rang = Ecrire("Texte", onglet, "", 24, FabriqueMenu.Encre, TextAnchor.MiddleCenter, new Vector2(.5f, .5f), new Vector2(0f, 1f), new Vector2(76f, 38f), 0f);
+            c.Jeton = Jeton(c.Rect, new Vector2(124f, -29f), 20f, out c.Numero, 24);
+            c.Nom = Ecrire("Nom", c.Rect, "", 28, Creme, TextAnchor.MiddleLeft, new Vector2(0f, .5f), new Vector2(156f, 1f), new Vector2(330f, 58f), 0f);
+            c.Cookie = Icone("Cookie", c.Rect, new Vector2(1f, .5f), new Vector2(-104f, 0f), 34f);
+            c.Score = Ecrire("Score", c.Rect, "", 34, Creme, TextAnchor.MiddleLeft, new Vector2(1f, .5f), new Vector2(-80f, 1f), new Vector2(70f, 58f), 0f);
+            return c;
         }
 
         // ---------------------------------------------------------------- Montrer
@@ -370,6 +453,7 @@ namespace Froggy.Interface
         public void Montrer(EtatHud e, DonneesVueHud d)
         {
             donnees = d;
+            AppliquerTaille();
             bool rien = !e.PartieConnue && e.Joueurs.Count == 0 && !e.ObjetsConnus && !e.TorgnoleConnue
                         && string.IsNullOrEmpty(e.Meteo) && !e.DashConnu;
             bool visible = !rien && !(Application.isPlaying && MenuPrincipal.MenuVisible());
@@ -666,33 +750,74 @@ namespace Froggy.Interface
         {
             var (titre, raison) = ContenuHud.Fin(e);
             Texte(finTitre, titre);
+            finTitre.color = e.Gagnant == e.Local ? Or : Creme;
             Texte(finRaison, raison);
-            classement.Clear();
-            classement.AddRange(e.Joueurs);
-            classement.Sort((a, b) =>
+            // les traits verts en éventail de part et d'autre du titre (comme le logo et les titres de Julien)
+            float demi = finTitre.preferredWidth * .5f + 36f;
+            for (int k = 0; k < finTirets.Count; k++)
             {
-                if ((a.Joueur == e.Gagnant) != (b.Joueur == e.Gagnant)) return a.Joueur == e.Gagnant ? -1 : 1;
-                int c = b.Cookies.CompareTo(a.Cookies);
-                return c != 0 ? c : a.Joueur.CompareTo(b.Joueur);
-            });
-            for (int i = 0; i < finRangs.Count; i++)
-            {
-                var p = finRangs[i];
-                bool la = i < classement.Count;
-                p.Rect.gameObject.SetActive(la);
-                if (!la) continue;
-                JoueurHud j = classement[i];
-                p.Jeton.color = j.Couleur;
-                Texte(p.Numero, j.Joueur.ToString());
-                Texte(p.Score, ContenuHud.Nom(e, j.Joueur));
-                p.Cookie.sprite = IconeHud(j.Joueur == e.Gagnant && raison == "avec le cookie sacré" ? "cookie_sacre" : "cookie");
-                Texte(p.Toi.GetComponent<Text>(), j.Cookies.ToString());
-                p.Contour.enabled = j.Joueur == e.Local;
+                int cote = k < 3 ? -1 : 1, i = k % 3 - 1;
+                Placer(finTirets[k], new Vector2(.5f, 1f), new Vector2(cote * (demi + (i == 0 ? 6f : 0f)), -72f + i * 20f), new Vector2(30f, 9f));
+                finTirets[k].localEulerAngles = new Vector3(0f, 0f, -cote * i * 28f);
             }
-            float hauteur = 130f + classement.Count * 66f + (e.RejouerPermis ? 100f : 30f);
-            fin.sizeDelta = new Vector2(640f, hauteur);
+
+            ContenuHud.Classement(e, classement);
+            bool parLeSacre = raison == "avec le cookie sacré";
+            // le podium : le 1er au centre, plus haut ; le 2e à gauche, le 3e à droite
+            Vector2[] places = { new Vector2(0f, -300f), new Vector2(-262f, -316f), new Vector2(262f, -316f) };
+            PodiumVisible = Mathf.Min(3, classement.Count);
+            for (int i = 0; i < podium.Count; i++)
+            {
+                bool la = i < classement.Count;
+                podium[i].Rect.gameObject.SetActive(la);
+                if (!la) continue;
+                podium[i].Rect.anchoredPosition = places[i];
+                Remplir(podium[i], classement[i], i + 1, e, parLeSacre);
+            }
+
+            float y = -446f;
+            quatrieme.Rect.gameObject.SetActive(classement.Count >= 4);
+            if (classement.Count >= 4)
+            {
+                quatrieme.Rect.anchoredPosition = new Vector2(0f, y);
+                Remplir(quatrieme, classement[3], 4, e, parLeSacre);
+                y -= 72f;
+            }
+
+            // « Ton classement » : pour un joueur qu'on ne voit ni sur le podium ni en 4e (la maquette de Julien prévoit des
+            // classements longs) ; de 2 à 4 joueurs, son nom en or suffit
+            int rangLocal = classement.FindIndex(j => j.Joueur == e.Local);
+            RangLocal = rangLocal >= 0 ? ContenuHud.Rang(rangLocal + 1) : "";
+            bool barre = rangLocal >= 4;
+            tonRang.Rect.gameObject.SetActive(barre);
+            if (barre)
+            {
+                tonRang.Rect.anchoredPosition = new Vector2(0f, y);
+                Remplir(tonRang, classement[rangLocal], rangLocal + 1, e, parLeSacre);
+                tonRang.Nom.color = Creme;
+                y -= 72f;
+            }
+
             finBouton.gameObject.SetActive(e.RejouerPermis);
-            if (e.RejouerPermis) AssurerSaisie();
+            if (e.RejouerPermis)
+            {
+                finBouton.anchoredPosition = new Vector2(0f, y - 30f);
+                y -= 92f;
+                AssurerSaisie();
+            }
+            finPanneau.sizeDelta = new Vector2(900f, -y + 34f);
+            finPanneau.anchoredPosition = new Vector2(0f, 6f);
+        }
+
+        private void Remplir(Carte c, JoueurHud j, int rang, EtatHud e, bool parLeSacre)
+        {
+            Texte(c.Rang, ContenuHud.Rang(rang));
+            c.Jeton.color = j.Couleur;
+            Texte(c.Numero, j.Joueur.ToString());
+            Texte(c.Nom, ContenuHud.Nom(e, j.Joueur));
+            c.Nom.color = j.Joueur == e.Local ? Or : Creme;
+            Texte(c.Score, j.Cookies.ToString());
+            c.Cookie.sprite = IconeHud(rang == 1 && parLeSacre ? "cookie_sacre" : "cookie");
         }
 
         // ---------------------------------------------------------------- Outils
@@ -705,6 +830,15 @@ namespace Froggy.Interface
             s = Resources.Load<Sprite>(DossierIcones + cle);
             icones[cle] = s;
             return s;
+        }
+
+        // la taille du HUD (Paramètres ▸ Taille du HUD) : on réduit la résolution de référence, tout grandit d'autant
+        private void AppliquerTaille()
+        {
+            float t = ReglagesJoueur.Actuels.tailleHud;
+            if (Mathf.Approximately(t, tailleVue) || echelle == null) return;
+            tailleVue = t;
+            echelle.referenceResolution = new Vector2(1920f, 1080f) / Mathf.Max(.1f, t);
         }
 
         // la clé d'icône d'un nom, gardée : on ne la recalcule pas à chaque image
