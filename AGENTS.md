@@ -149,6 +149,13 @@ pas écrit est une **proposition**, jamais une décision. Une contradiction avec
   saut ne changent pas) ; `ReglesDash` (C# pur) tient recharges et assommements ; `PartieDash` s'installe seul en jeu,
   lit la touche du joueur local, bouscule la Froggy percutée et assomme les deux si elles dashaient toutes les deux.
   Un bot ou l'hôte dashe par `PartieDash.Actuel.Dasher(froggy)`. Le choc n'est pas encore en réseau (aucun script dans `Scripts/Reseau/Partie/`).
+- Musique (P6-08, `Assets/Froggy/Scripts/Audio/`) : `MusiqueJeu` s'installe seul et joue le thème au menu, puis en
+  partie les quatre couches du jardin (`Audio/Musique/`, même longueur exacte, lues ensemble) ; la couche de tension
+  entre à la dernière minute, calée sur la mesure ; un jingle de victoire ou de défaite à la fin. `ReglesMusique`
+  (C# pur) décide ce qui joue d'après la partie, en ligne comme en solo (il lit `PartieReseau` comme le HUD). Fichiers
+  et dosage : `Postes/6_InterfaceSon/Resources/ReglagesMusique.asset`. Volume : « Musique » des Paramètres. Menu
+  **Froggy ▸ Musique** pour la couper dans l'éditeur. Partition (Sound Forge) : `Tools/musique/froggy_musique.py` ;
+  un nouveau morceau garde la même longueur pour toutes ses couches, sinon un test échoue.
 
 ## Les branches
 

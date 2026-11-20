@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8c28d06be944b9cb86e3a452d66167f, type: 3}
+  m_Name: ReglagesMusique
+  m_EditorClassIdentifier: Assembly-CSharp::Froggy.Audio.ReglagesMusique
+  menu: {fileID: 8300000, guid: af9927d73c5048c3ba21fe07be7f8f6b, type: 3}
+  ambiance: {fileID: 8300000, guid: 819883dc8fc4442eaba3a41c4166ab3e, type: 3}
+  melodie: {fileID: 8300000, guid: 0172412eb2da4dd69d8bce6930f80999, type: 3}
+  rythme: {fileID: 8300000, guid: bb7d79329d504b39be5720bd229c5ce0, type: 3}
+  tension: {fileID: 8300000, guid: 9276a4259fef4199a3c1f203de55f9d1, type: 3}
+  tempo: 112
+  tempsParMesure: 4
+  victoire: {fileID: 8300000, guid: 753ebac70f484502b054ff2ba6d86ef1, type: 3}
+  defaite: {fileID: 8300000, guid: bb6346acc07f44f6a281d6d870faa069, type: 3}
+  volume: 0.6
+  seuilDerniereMinute: 60
+  margeSortie: 5
+  fonduEntree: 1.5
+  fonduTension: 2
+  fonduSortie: 1
+  fonduFin: 0.4
